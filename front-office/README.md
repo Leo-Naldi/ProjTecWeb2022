@@ -18,3 +18,7 @@ Sito pubblico per Animal House.
     - L'app ha memoria di utenti e dei loro animali.
 - [Servizi Online]: 
     -videoconf con esperti, veterinari, con il proprio animale in ospedale o in pensione.
+
+# Implementazione
+
+L'app e' stata implementata utilizzando React, React-Bootstrap e Material-UI.
