@@ -2,7 +2,7 @@ import { React } from "react";
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import { InputBase } from "@mui/material";
+import { Badge, InputBase } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
 import { Stack } from "@mui/system";
 
@@ -50,7 +50,7 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
     alignItems: "center",
 }));
 
-function CommerceHeaderBar({isLogged}) {
+function CommerceHeaderBar({isLogged, shoppingCart}) {
 
     return (
         <Box>
@@ -75,14 +75,17 @@ function CommerceHeaderBar({isLogged}) {
                     </SearchField>
 
                     <Stack direction="row">
-                        <IconButton
-                            size="large"
-                            edge="start"
-                            color="inherit"
-                            sx={{ mr: 2 }}>
-                            <ShoppingCartIcon />
-                        </IconButton>
-                        {isLogged ? null : 
+                        
+                            <IconButton
+                                size="large"
+                                edge="start"
+                                color="inherit"
+                                sx={{ mr: 2 }}>
+                                <Badge badgeContent={shoppingCart.length} color="secondary">
+                                    <ShoppingCartIcon />
+                                </Badge>
+                            </IconButton>
+                        {isLogged ? null :
                             <IconButton
                                 size="large"
                                 edge="start"

@@ -14,11 +14,16 @@ import getProducts from "../utils/getProducts";
 function Commerce() {
 
     const [isLogged, SetIsLogged] = useState(false);
+    const [shoppingCart, setShoppingCart] = useState([]);
     const [products, setProducts] = useState(getProducts(20));
+
+    function addToshoppingCartHandler(product) {
+        setShoppingCart([...shoppingCart, product]);
+    }
 
     return (
         <Box>
-            <CommerceHeaderBar isLogged={isLogged}/>
+            <CommerceHeaderBar isLogged={isLogged} shoppingCart={shoppingCart}/>
             <main>
                 {/* Hero unit */}
                 <Box
@@ -49,33 +54,13 @@ function Commerce() {
                 <Container sx={{ py: 2 }} maxWidth="lg">
                     {/* End hero unit */}
                     <Grid container spacing={2}>
-                        {products.map((card) => (
-                            <Grid item key={card} xs={12} sm={6} md={3}>
-                                <Card
-                                    sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-                                >
-                                    <CardMedia
-                                        component="img"
-                                        sx={{
-                                            pt: '0%',
-                                        }}
-                                        image="https://source.unsplash.com/random"
-                                        alt="random"
-                                    />
-                                    <CardContent sx={{ flexGrow: 1 }}>
-                                        <Typography gutterBottom variant="h5" component="h2">
-                                            Heading
-                                        </Typography>
-                                        <Typography>
-                                            This is a media card. You can use this section to describe the
-                                            content.
-                                        </Typography>
-                                    </CardContent>
-                                    <CardActions>
-                                        <Button size="small">View</Button>
-                                        <Button size="small">Edit</Button>
-                                    </CardActions>
-                                </Card>
+                        {products.map((product) => (
+                            <Grid item key={product.id} xs={12} sm={6} md={3}>
+                                <ProductCard id={product.id}
+                                    name={product.name}
+                                    img={product.img}
+                                    price={product.price}
+                                    addToCartHandler={addToshoppingCartHandler} />
                             </Grid>
                         ))}
                     </Grid>
