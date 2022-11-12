@@ -1,8 +1,8 @@
-import { React, useState } from "react";
+import { React } from "react";
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import { Badge, InputBase, Slide } from "@mui/material";
+import { Badge, InputBase } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
 import { Stack } from "@mui/system";
 
@@ -12,7 +12,6 @@ import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
 import Search from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
-import SignIn from "../pages/SignIn";
 
 const SearchField = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -52,7 +51,7 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
     alignItems: "center",
 }));
 
-function CommerceHeaderBar({isLogged, shoppingCart, openSignIn}) {
+function HeaderBar({isLogged, shoppingCart, openSignIn}) {
 
     return (
         <Box>
@@ -102,4 +101,4 @@ function CommerceHeaderBar({isLogged, shoppingCart, openSignIn}) {
     );
 }
 
-export default CommerceHeaderBar;
+export default HeaderBar;

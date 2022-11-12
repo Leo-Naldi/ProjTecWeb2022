@@ -1,8 +1,8 @@
 import { React, useState } from "react";
-import { Slide, Typography, Grid, Container } from "@mui/material";
+import { Typography, Grid, Container } from "@mui/material";
 import Box from '@mui/material/Box';
 
-import CommerceHeaderBar from "../components/HeaderBar";
+import HeaderBar from "../components/HeaderBar";
 import ProductCard from "../components/ProductCard";
 import SignInSide from "../components/SignInSide";
 
@@ -22,7 +22,7 @@ function Commerce() {
 
     return (
         <Box>
-            <CommerceHeaderBar 
+            <HeaderBar 
                 isLogged={isLogged} 
                 shoppingCart={shoppingCart}
                 openSignIn={() => {setSignInOpen(!signInOpen)}}/>
