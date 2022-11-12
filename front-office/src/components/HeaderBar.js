@@ -1,8 +1,8 @@
-import { React } from "react";
+import { React, useState } from "react";
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import { Badge, InputBase } from "@mui/material";
+import { Badge, InputBase, Slide } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
 import { Stack } from "@mui/system";
 
@@ -11,6 +11,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
 import Search from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+
+import SignIn from "../pages/SignIn";
 
 const SearchField = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -50,7 +52,7 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
     alignItems: "center",
 }));
 
-function CommerceHeaderBar({isLogged, shoppingCart}) {
+function CommerceHeaderBar({isLogged, shoppingCart, openSignIn}) {
 
     return (
         <Box>
@@ -89,7 +91,8 @@ function CommerceHeaderBar({isLogged, shoppingCart}) {
                             <IconButton
                                 size="large"
                                 edge="start"
-                                color="inherit">
+                                color="inherit"
+                                onClick={() => { openSignIn() }}>
                                 <AccountCircleTwoToneIcon />
                             </IconButton>}
                     </Stack>

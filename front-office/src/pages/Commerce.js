@@ -1,9 +1,10 @@
 import { React, useState } from "react";
+import { Slide, Typography, Grid, Container } from "@mui/material";
 import Box from '@mui/material/Box';
-import { Typography, Grid, Container } from "@mui/material";
 
 import CommerceHeaderBar from "../components/HeaderBar";
 import ProductCard from "../components/ProductCard";
+import SignInSide from "../components/SignInSide";
 
 import getProducts from "../utils/getProducts";
 
@@ -12,16 +13,23 @@ function Commerce() {
     const [isLogged, SetIsLogged] = useState(false);
     const [shoppingCart, setShoppingCart] = useState([]);
     const [products, setProducts] = useState(getProducts(20));
+    const [signInOpen, setSignInOpen] = useState(false);
+    
 
     function addToshoppingCartHandler(product) {
         setShoppingCart([...shoppingCart, product]);
-    }
+    } 
 
     return (
         <Box>
-            <CommerceHeaderBar isLogged={isLogged} shoppingCart={shoppingCart}/>
+            <CommerceHeaderBar 
+                isLogged={isLogged} 
+                shoppingCart={shoppingCart}
+                openSignIn={() => {setSignInOpen(!signInOpen)}}/>
             <main>
-                {/* Hero unit */}
+                <SignInSide anchor="right" 
+                            toggled={signInOpen} 
+                            setToggled={setSignInOpen} />
                 <Box
                     sx={{
                         bgcolor: 'background.paper',
@@ -52,10 +60,7 @@ function Commerce() {
                     <Grid container spacing={2}>
                         {products.map((product) => (
                             <Grid item key={product.id} xs={12} sm={6} md={3}>
-                                <ProductCard id={product.id}
-                                    name={product.name}
-                                    img={product.img}
-                                    price={product.price}
+                                <ProductCard {...product}
                                     addToCartHandler={addToshoppingCartHandler} />
                             </Grid>
                         ))}
