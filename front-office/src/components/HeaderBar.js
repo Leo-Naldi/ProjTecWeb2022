@@ -73,7 +73,7 @@ function CommerceHeaderBar({isLogged, shoppingCart}) {
                             placeholder="Search..."
                             type="text" />
                     </SearchField>
-
+                    
                     <Stack direction="row">
                         
                             <IconButton

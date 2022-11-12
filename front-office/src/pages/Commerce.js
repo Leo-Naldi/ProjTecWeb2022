@@ -1,12 +1,8 @@
 import { React, useState } from "react";
 import Box from '@mui/material/Box';
-import {Typography} from "@mui/material";
-import {Grid} from "@mui/material";
-import { Card, CardContent, CardMedia, CardAction, CardActions } from "@mui/material";
-import {Button} from "@mui/material";
-import { Container } from "@mui/material";
+import { Typography, Grid, Container } from "@mui/material";
 
-import CommerceHeaderBar from "../components/CommerceHeaderBar";
+import CommerceHeaderBar from "../components/HeaderBar";
 import ProductCard from "../components/ProductCard";
 
 import getProducts from "../utils/getProducts";
