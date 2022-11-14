@@ -51,7 +51,7 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
     alignItems: "center",
 }));
 
-function HeaderBar({isLogged, shoppingCart, openSignIn}) {
+function HeaderBar({user, shoppingCart, openSignIn}) {
 
     return (
         <Box>
@@ -86,7 +86,7 @@ function HeaderBar({isLogged, shoppingCart, openSignIn}) {
                                     <ShoppingCartIcon />
                                 </Badge>
                             </IconButton>
-                        {isLogged ? null :
+                        {user ? null :
                             <IconButton
                                 size="large"
                                 edge="start"

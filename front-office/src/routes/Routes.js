@@ -2,14 +2,14 @@ import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 
 import Commerce from '../pages/Commerce';
-import App from '../components/App';
+import Home from '../pages/Home';
 import SignIn from '../pages/SignIn';
 import SignUp from '../pages/SignUp';
 
 export const routerData = [
     {
         path: '/',
-        element: <App />,
+        element: <Home />,
     },
     {
         path: 'commerce',
