@@ -17,8 +17,7 @@ function Copyright() {
     );
 }
 
-function Footer(props) {
-    const { description, title } = props;
+function Footer({ description, title }) {
 
     return (
         <Box component="footer" sx={{ bgcolor: 'background.paper', py: 6 }}>

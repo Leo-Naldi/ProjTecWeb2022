@@ -8,8 +8,7 @@ import Link from '@mui/material/Link';
 import SearchIcon from '@mui/icons-material/Search';
 import PetsIcon from '@mui/icons-material/Pets';
 
-function Header(props) {
-    const { sections, title } = props;
+function Header({ sections, title }) {
 
     return (
         <React.Fragment>

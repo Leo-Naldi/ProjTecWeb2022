@@ -2,9 +2,9 @@ import * as React from 'react';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
+import Review from './Review';
 
-function Main(props) {
-    const { posts, title } = props;
+function Main({ reviews, title }) {
 
     return (
         <Grid
@@ -12,17 +12,15 @@ function Main(props) {
             xs={12}
             md={8}
             sx={{
-                '& .markdown': {
-                    py: 3,
-                },
+                py: 3,
             }}
         >
             <Typography variant="h6" gutterBottom>
                 {title}
             </Typography>
             <Divider />
-            {posts.map((post) => (
-                <p>{post}</p>
+            {reviews.map((review) => (
+                <Review key={review.id} {...review} />
             ))}
         </Grid>
     );
