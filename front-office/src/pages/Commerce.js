@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { React, useState, useContext } from "react";
 import { Typography, Grid, Container } from "@mui/material";
 import Box from '@mui/material/Box';
 
@@ -10,7 +10,6 @@ import getProducts from "../utils/getProducts";
 
 function Commerce() {
 
-    const [isLogged, SetIsLogged] = useState(false);
     const [shoppingCart, setShoppingCart] = useState([]);
     const [products, setProducts] = useState(getProducts(20));
     const [signInOpen, setSignInOpen] = useState(false);
@@ -23,7 +22,6 @@ function Commerce() {
     return (
         <Box>
             <HeaderBar 
-                isLogged={isLogged} 
                 shoppingCart={shoppingCart}
                 openSignIn={() => {setSignInOpen(!signInOpen)}}/>
             <main>
@@ -56,7 +54,7 @@ function Commerce() {
                     </Container>
                 </Box>
                 <Container sx={{ py: 2 }} maxWidth="lg">
-                    {/* End hero unit */}
+                    
                     <Grid container spacing={2}>
                         {products.map((product) => (
                             <Grid item key={product.id} xs={12} sm={6} md={3}>

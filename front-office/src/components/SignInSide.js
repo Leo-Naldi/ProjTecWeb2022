@@ -1,4 +1,4 @@
-import * as React from 'react';
+import {React} from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -8,19 +8,36 @@ import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import { Drawer } from '@mui/material';
+import Typography from '@mui/material/Typography';
 
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
+
+import { useDispatchUser } from '../context/UserContext';
+
 
 function SignInSide({anchor, toggled, setToggled}) {
 
+    const userDispatch = useDispatchUser();
+
     const handleSubmit = (event) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
+
+        // TODO link form data to dis
+        /*const data = new FormData(event.currentTarget);
+
+        console.log("hello");
+
         console.log({
             email: data.get('email'),
             password: data.get('password'),
         });
+        */
+        userDispatch({
+            type: 'USER_CHANGED',
+            username: 'leo',
+            email: 'leo@leo.leo',
+        });
+        setToggled(false);
     };
 
     return (
@@ -43,7 +60,7 @@ function SignInSide({anchor, toggled, setToggled}) {
                 <Typography component="h1" variant="h5">
                     Sign in
                 </Typography>
-                <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
                     <TextField
                         margin="normal"
                         required

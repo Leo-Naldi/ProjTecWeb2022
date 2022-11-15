@@ -1,8 +1,8 @@
-import { React } from "react";
+import { React, useContext, useEffect } from "react";
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import { Badge, InputBase } from "@mui/material";
+import { Badge, InputBase, Typography } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
 import { Stack } from "@mui/system";
 
@@ -11,6 +11,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
 import Search from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+
+import { useUser } from '../context/UserContext';
 
 
 const SearchField = styled('div')(({ theme }) => ({
@@ -51,7 +53,9 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
     alignItems: "center",
 }));
 
-function HeaderBar({user, shoppingCart, openSignIn}) {
+function HeaderBar({ shoppingCart, openSignIn}) {
+
+    const user = useUser();
 
     return (
         <Box>
@@ -86,14 +90,13 @@ function HeaderBar({user, shoppingCart, openSignIn}) {
                                     <ShoppingCartIcon />
                                 </Badge>
                             </IconButton>
-                        {user ? null :
-                            <IconButton
+                        { user.username === 'default' ? (<IconButton
                                 size="large"
                                 edge="start"
                                 color="inherit"
-                                onClick={() => { openSignIn() }}>
+                                onClick={openSignIn}>
                                 <AccountCircleTwoToneIcon />
-                            </IconButton>}
+                        </IconButton>) : (<Typography>{user.username}</Typography>)}
                     </Stack>
                 </Toolbar>
             </AppBar>
