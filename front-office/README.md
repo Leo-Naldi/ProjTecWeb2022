@@ -21,4 +21,21 @@ Sito pubblico per Animal House.
 
 # Implementazione
 
-L'app e' stata implementata utilizzando React, React-Bootstrap e Material-UI.
+L'app e' stata implementata utilizzando React e Material-UI.
+
+## Project Tree
+```
+src
+├── assets              // Asset statici 
+│   ├── images          // Immagini
+│   └── stylesheets     // CSS
+├── components          // Singoli Componenti  
+├── context             // App-Wide Context (Theme, Account)
+├── index.js            // Component-Tree root
+├── pages               // Page root components
+├── reportWebVitals.js  // I dont know and at this point i'm too afraid to ask
+├── routes              // Router data
+├── setupTests.js       // I swear to god one day i'll use it
+├── tests               // Same as above
+└── utils               // Misk utility, mostly server comms
+```
