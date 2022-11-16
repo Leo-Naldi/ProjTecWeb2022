@@ -12,32 +12,36 @@ import Typography from '@mui/material/Typography';
 
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
-import { useDispatchUser } from '../context/UserContext';
+import { useDispatchAccount } from '../context/CurrentAccountContext';
+import validateSignIn from '../utils/signInUser';
 
 
 function SignInSide({anchor, toggled, setToggled}) {
 
-    const userDispatch = useDispatchUser();
+    const accountDispatch = useDispatchAccount();
 
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        // TODO link form data to dis
-        /*const data = new FormData(event.currentTarget);
+        const data = new FormData(event.currentTarget);
 
-        console.log("hello");
+        validateSignIn(data)
+            .then((username) => {  // login success
+                    accountDispatch({
+                        type: 'USER_CHANGED',
+                        username: username,
+                        email: data.get('email'),
+                    });
+                    setToggled(false);
+                }
+            )
+            .catch(() => {  // login failiure
+                    // TODO add an error box
+                    
+                    alert("Login failed");
+                }
+            );
 
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
-        */
-        userDispatch({
-            type: 'USER_CHANGED',
-            username: 'leo',
-            email: 'leo@leo.leo',
-        });
-        setToggled(false);
     };
 
     return (

@@ -2,7 +2,7 @@ import { React, useContext, useEffect } from "react";
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import { Badge, InputBase, Typography } from "@mui/material";
+import { Avatar, Badge, InputBase, Typography } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
 import { Stack } from "@mui/system";
 
@@ -12,7 +12,7 @@ import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
 import Search from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
-import { useUser } from '../context/UserContext';
+import { useAccount } from '../context/CurrentAccountContext';
 
 
 const SearchField = styled('div')(({ theme }) => ({
@@ -55,7 +55,7 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
 
 function HeaderBar({ shoppingCart, openSignIn}) {
 
-    const user = useUser();
+    const user = useAccount();
 
     return (
         <Box>
@@ -96,7 +96,10 @@ function HeaderBar({ shoppingCart, openSignIn}) {
                                 color="inherit"
                                 onClick={openSignIn}>
                                 <AccountCircleTwoToneIcon />
-                        </IconButton>) : (<Typography>{user.username}</Typography>)}
+                        </IconButton>) : (<Avatar>
+                            {user.username[0].toUpperCase()} 
+                            {/* TODO the feking letter is not centered */}
+                        </Avatar>)}
                     </Stack>
                 </Toolbar>
             </AppBar>

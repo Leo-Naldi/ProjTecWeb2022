@@ -7,15 +7,15 @@ import { ThemeContext, ThemeProvider } from '@emotion/react';
 
 import router from './routes/Routes';
 import { Theme } from './context/ThemeContext';
-import UserContextProvider from './context/UserContext';
+import AccountContextProvider from './context/CurrentAccountContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <ThemeProvider theme={Theme}>
-      <UserContextProvider>
+      <AccountContextProvider>
         <RouterProvider router={router} />
-      </UserContextProvider>
+      </AccountContextProvider>
     </ThemeProvider>
   </React.StrictMode>
 );
