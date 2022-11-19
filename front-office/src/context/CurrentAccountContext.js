@@ -1,18 +1,21 @@
 import { React, createContext, useReducer, useContext } from 'react';
 
 function accountReducer(state, action){
+
+    console.log(JSON.stringify(action));
+
     switch (action.type) {
         case ('USER_CHANGED') : {
             return {
                 username: action.username,
                 email: action.email,
-                animals: [...action.animals],
+                pets: [...action.pets],
             };
         }
-        case ('ADD_ANIMAL') : {
+        case ('ADD_PET') : {
             return {
                 ...state,
-                animals: [action.animal, ...state.animals],
+                pets: [action.pet, ...state.pets],
             };
         }
         default: {
@@ -30,7 +33,7 @@ export function AccountContextProvider({ children }){
     const [user, accountDispatch] = useReducer(accountReducer, {
         username: 'default',
         email: 'default',
-        animals: [],
+        pets: [],
     });
 
     return (
