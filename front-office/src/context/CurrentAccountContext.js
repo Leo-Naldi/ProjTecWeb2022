@@ -1,8 +1,8 @@
 import { React, createContext, useReducer, useContext } from 'react';
 
-function accountReducer(state, action){
+import default_user from '../utils/defaultData';
 
-    console.log(JSON.stringify(action));
+function accountReducer(state, action){
 
     switch (action.type) {
         case ('USER_CHANGED') : {
@@ -30,11 +30,7 @@ const AccountDispatchContext = createContext(null);
 
 export function AccountContextProvider({ children }){
 
-    const [user, accountDispatch] = useReducer(accountReducer, {
-        username: 'default',
-        email: 'default',
-        pets: [],
-    });
+    const [user, accountDispatch] = useReducer(accountReducer, default_user);
 
     return (
         <AccountContext.Provider value={user}>
