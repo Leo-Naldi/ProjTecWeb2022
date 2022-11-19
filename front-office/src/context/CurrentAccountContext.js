@@ -8,6 +8,12 @@ function accountReducer(state, action){
                 email: action.email,
             };
         }
+        case ('ADD_ANIMAL') : {
+            return {
+                ...state,
+                animals: [action.animal, ...state.animals],
+            };
+        }
         default: {
             throw Error('User Reducer: Unknown action type "' + action.type + '"');
         }
@@ -23,6 +29,7 @@ export function AccountContextProvider({ children }){
     const [user, accountDispatch] = useReducer(accountReducer, {
         username: 'default',
         email: 'default',
+        animals: [],
     });
 
     return (
