@@ -6,6 +6,7 @@ function accountReducer(state, action){
             return {
                 username: action.username,
                 email: action.email,
+                animals: [...action.animals],
             };
         }
         case ('ADD_ANIMAL') : {

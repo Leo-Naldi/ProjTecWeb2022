@@ -26,11 +26,12 @@ function SignInSide({anchor, toggled, setToggled}) {
         const data = new FormData(event.currentTarget);
 
         validateSignIn(data)
-            .then((username) => {  // login success
+            .then((username, animals) => {  // login success
                     accountDispatch({
                         type: 'USER_CHANGED',
                         username: username,
                         email: data.get('email'),
+                        animals: [...animals],
                     });
                     setToggled(false);
                 }
