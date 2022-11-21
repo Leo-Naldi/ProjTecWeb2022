@@ -5,6 +5,7 @@ import Commerce from '../pages/Commerce';
 import Home from '../pages/Home';
 import SignIn from '../pages/SignIn';
 import SignUp from '../pages/SignUp';
+import Services from '../pages/Services';
 
 export const routerData = [
     {
@@ -22,6 +23,10 @@ export const routerData = [
     {
         path: 'signup',
         element: <SignUp />
+    },
+    {
+        path: 'services',
+        element: <Services />
     }
 ];
 

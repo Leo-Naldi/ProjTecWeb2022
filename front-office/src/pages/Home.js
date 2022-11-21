@@ -80,10 +80,9 @@ const sidebar = {
 
 const reviews = getReviews();
 
-export default function Blog() {
+export default function Home() {
   return (
     <>
-      <CssBaseline />
       <Container maxWidth="lg">
         <Header title="Animal House" sections={sections} />
         <main>

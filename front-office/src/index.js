@@ -1,19 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './assets/stylesheets/index.css';
 import reportWebVitals from './reportWebVitals';
+
 import { RouterProvider } from 'react-router-dom';
 import { ThemeContext, ThemeProvider } from '@emotion/react';
+
+import './assets/stylesheets/index.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import router from './routes/Routes';
 import { Theme } from './context/ThemeContext';
 import AccountContextProvider from './context/CurrentAccountContext';
+import { CssBaseline } from '@mui/material';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <ThemeProvider theme={Theme}>
       <AccountContextProvider>
+        <CssBaseline />
         <RouterProvider router={router} />
       </AccountContextProvider>
     </ThemeProvider>
