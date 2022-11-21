@@ -1,10 +1,10 @@
 import { React, useState, useContext } from "react";
-import { Typography, Grid, Container } from "@mui/material";
+import { Typography, Grid, Container, Drawer } from "@mui/material";
 import Box from '@mui/material/Box';
 
 import HeaderBar from "../components/HeaderBar";
 import ProductCard from "../components/ProductCard";
-import SignInSide from "../components/SignInSide";
+import SignInForm from "../components/SignInForm";
 
 import getProducts from "../utils/getProducts";
 
@@ -25,9 +25,13 @@ function Commerce() {
                 shoppingCart={shoppingCart}
                 openSignIn={() => {setSignInOpen(!signInOpen)}}/>
             <main>
-                <SignInSide anchor="right" 
-                            toggled={signInOpen} 
-                            setToggled={setSignInOpen} />
+                <Drawer 
+                    anchor="right" 
+                    open={signInOpen} 
+                    onClose={() => setSignInOpen(false)}
+                >
+                    <SignInForm afterSignInSuccess={() => { setSignInOpen(false) }} />    
+                </Drawer>
                 <Box
                     sx={{
                         bgcolor: 'background.paper',

@@ -30,7 +30,14 @@ const AccountDispatchContext = createContext(null);
 
 export function AccountContextProvider({ children }){
 
-    const [user, accountDispatch] = useReducer(accountReducer, default_user);
+    //const [user, accountDispatch] = useReducer(accountReducer, default_user);
+    const [user, accountDispatch] = useReducer(accountReducer, {
+        username: 'default',
+        email: 'default',
+        pets: [],
+    });
+
+
 
     return (
         <AccountContext.Provider value={user}>

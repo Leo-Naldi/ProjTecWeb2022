@@ -6,6 +6,7 @@ import Home from '../pages/Home';
 import SignIn from '../pages/SignIn';
 import SignUp from '../pages/SignUp';
 import Services from '../pages/Services';
+import Sandbox from '../pages/Sandbox';
 
 export const routerData = [
     {
@@ -27,6 +28,10 @@ export const routerData = [
     {
         path: 'services',
         element: <Services />
+    },
+    {
+        path: 'sandbox',
+        element: <Sandbox />,
     }
 ];
 

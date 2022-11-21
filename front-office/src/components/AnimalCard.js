@@ -3,17 +3,17 @@ import { IconButton, Card, CardContent, CardMedia, Typography, CardActions } fro
 
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 
-function AnimalCard({ id, name, type, age, onClick, onRemove }) {
+function AnimalCard({ id, name, img, type, age, onClick, onRemove }) {
+
     return (
         <Card id={id}
             sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
             onClick={onClick}
         >
-            {/*<CardMedia
+            {<CardMedia
                 component="img"
                 image={img}
-                alt="random"
-    />*/}
+                alt="random"/>}
             <CardContent sx={{ flexGrow: 1 }}>
                 <Typography gutterBottom variant="h5" component="h2">
                     {name}
