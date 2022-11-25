@@ -1,33 +1,41 @@
 import React from 'react';
-
-import { Container, Grid, Typography } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
+import { Container, Box } from '@mui/system';
 
 import { useAccount } from '../context/CurrentAccountContext';
-import AnimalCard from './AnimalCard';
+import AnimalCard from '../components/AnimalCard';
 
-function AnimalGallery(){
- 
+export default function AnimalGallery() {
+
     const account = useAccount();
 
     return (
-        <Container sx={{ py: 2 }} maxWidth="lg">
-            
-            {account.animals === [] ? 'empty': 'full'}
-            {console.log(account)}
-
-            <Grid container spacing={2}>
-                {account.animals.map((animal) => (
-                    <Grid item key={animal.id} xs={12} sm={6} md={3}>
-                        Retard
-                        <AnimalCard {...animal}
-                            onClick={() => {alert("clicker")}} 
-                            onRemove={() => { alert("removed") }} />
-                    </Grid>
-                ))}
-            </Grid>
+        <Container>
+            <Box sx={{ maxWidth: 'lg', mt: 2 }}>
+                <Box>
+                    <Container>
+                        <Typography component="h2" variant="h5">
+                            Galleria
+                        </Typography>
+                        <Typography variant="subtitle1" paragraph>
+                            Qui puoi aggiuntere i tuoi animaletti maledetti!
+                        </Typography>
+                    </Container>
+                </Box >
+                <Grid container
+                    sx={{
+                        justifyContent: 'space-between',
+                        mt: 1,
+                    }}
+                    spacing={4}>
+                    {account.pets.map((pet) => (
+                        <Grid item xs={12} sm={6} md={3}>
+                            <AnimalCard id={pet.name} {...pet} onClick={() => { }} onRemove={() => { }} />
+                        </Grid>
+                    ))}
+                </Grid>
+            </Box>
         </Container>
     );
 
 }
-
-export default AnimalGallery;

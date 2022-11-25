@@ -1,34 +1,69 @@
-import React from 'react';
-import { Grid, Typography } from '@mui/material';
+import React, {useState} from 'react';
+import { AccordionDetails, Grid, Typography, Accordion, FormControlLabel, FormControl, Checkbox } from '@mui/material';
 import { Container, Box } from '@mui/system';
 
 import { useAccount } from '../context/CurrentAccountContext';
-import AnimalCard from '../components/AnimalCard';
 
 export default function Sandbox(){
 
     const account = useAccount();
 
+    // { pet.name: false }, minikui naa.........
+    const [checkedPets, setCheckedPets] = useState(
+        account.pets.reduce((o, pet) => (o[pet.name] = false, o), {})
+    );
+    
+    const handleSubmit = (e) => {
+    
+    };
+
+    const handleCheck = (e) => {
+        setCheckedPets({
+            ...checkedPets,
+            [e.target.name]: e.target.checked,
+        });
+    }
+
     return (
         <Container>
             <Box sx={{ maxWidth: 'lg', mt: 2 }}>
-                <Box>
-                    <Container>
-                        <Typography component="h2" variant="h5">
-                            Galleria
-                        </Typography>
-                        <Typography variant="subtitle1" paragraph>
-                            Qui puoi aggiuntere i tuoi animaletti maledetti!
-                        </Typography>
-                    </Container>
-                </Box >
-                <Grid container sx={{ justifyContent: 'space-between', mt: 1 }} spacing={4}>
-                    {account.pets.map((pet) => (
-                        <Grid item xs={12} sm={6} md={3}>
-                            <AnimalCard id={pet.name} {...pet} onClick={() => { }} onRemove={() => { }}/>
-                        </Grid>
-                    ))}
-                </Grid>
+                <Typography>
+                    <Typography
+                        component="h1"
+                        variant="h2"
+                        align="center"
+                        color="text.primary"
+                        gutterBottom
+                    >
+                        Prenotazione
+                    </Typography>
+                    <Typography variant="h5" align="center" color="text.secondary" paragraph>
+                        Seleziona la brestia, scegli luogo, giorno e prenota! Qualcuno i uccida hahahahahhaha.
+                    </Typography>
+                </Typography> 
+
+                <Box component='form' onSubmit={handleSubmit}>
+                 
+                    <Accordion>
+                        <AccordionDetails>
+                            <FormControl>
+                                {account.pets.map((pet) => (
+                                    <FormControlLabel 
+                                        control={
+                                            <Checkbox 
+                                                checked={checkedPets[pet.name]}
+                                                onChange={handleCheck}
+                                                name={pet.name} />
+                                        }
+                                        label={pet.name} />
+                                ))}
+                            </FormControl>
+                        </AccordionDetails>
+                    </Accordion>
+                             
+                </Box>
+                
+            
             </Box>
         </Container>
     );
