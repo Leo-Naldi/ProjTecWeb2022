@@ -1,8 +1,10 @@
 import React, {useState} from 'react';
-import { AccordionDetails, Grid, Typography, Accordion, FormControlLabel, FormControl, Checkbox } from '@mui/material';
+import { AccordionDetails, Grid, Typography, Accordion, FormControlLabel, FormControl, Checkbox, AccordionSummary } from '@mui/material';
 import { Container, Box } from '@mui/system';
 
 import { useAccount } from '../context/CurrentAccountContext';
+
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 export default function Sandbox(){
 
@@ -42,26 +44,51 @@ export default function Sandbox(){
                     </Typography>
                 </Typography> 
 
-                <Box component='form' onSubmit={handleSubmit}>
-                 
-                    <Accordion>
-                        <AccordionDetails>
-                            <FormControl>
-                                {account.pets.map((pet) => (
-                                    <FormControlLabel 
+                    <Box component='form' onSubmit={handleSubmit}>
+
+                        <Accordion>
+                            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                <Typography variant='h5'>Pet Selection</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <FormControl>
+                                    {account.pets.map((pet) => (
+                                        <FormControlLabel 
                                         control={
                                             <Checkbox 
-                                                checked={checkedPets[pet.name]}
-                                                onChange={handleCheck}
-                                                name={pet.name} />
+                                            checked={checkedPets[pet.name]}
+                                            onChange={handleCheck}
+                                            name={pet.name} />
                                         }
                                         label={pet.name} />
-                                ))}
-                            </FormControl>
+                                    ))}
+                                </FormControl>
+                            </AccordionDetails>
+                        </Accordion>
+
+                    <Accordion>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography variant='h5'>Orario e Luogo</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            
+                            {/* TODO */}
+                            
                         </AccordionDetails>
                     </Accordion>
-                             
-                </Box>
+
+                    <Accordion>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography variant='h5'>Prenota</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+
+                            {/* TODO */}
+
+                        </AccordionDetails>
+                    </Accordion>
+                    
+                    </Box>
                 
             
             </Box>
