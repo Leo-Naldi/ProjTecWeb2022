@@ -3,7 +3,9 @@ import ReactDOM from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
 
 import { RouterProvider } from 'react-router-dom';
-import { ThemeContext, ThemeProvider } from '@emotion/react';
+import { ThemeProvider } from '@emotion/react';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 import './assets/stylesheets/index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -17,10 +19,12 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <ThemeProvider theme={Theme}>
-      <AccountContextProvider>
-        <CssBaseline />
-        <RouterProvider router={router} />
-      </AccountContextProvider>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <AccountContextProvider>
+          <CssBaseline />
+          <RouterProvider router={router} />
+        </AccountContextProvider>
+      </LocalizationProvider>
     </ThemeProvider>
   </React.StrictMode>
 );

@@ -3,7 +3,6 @@ import { Container, Box } from '@mui/system';
 import { Button, Grid, Typography } from '@mui/material';
 import { Stepper, Step, StepLabel, FormControl, FormControlLabel, Checkbox } from '@mui/material';
 
-
 import { useAccount } from '../context/CurrentAccountContext';
 
 
@@ -32,7 +31,9 @@ const steps = [
 ];
 
 
-export default function Sandbox(){
+
+
+export default function Booking(){
 
     const account = useAccount();
 
@@ -40,6 +41,8 @@ export default function Sandbox(){
     const [checkedPets, setCheckedPets] = useState(
         account.pets.reduce((o, pet) => (o[pet.name] = false, o), {})
     );
+    
+
 
     const [activeStep, setActiveStep] = useState(0);
 

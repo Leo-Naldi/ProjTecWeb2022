@@ -6,7 +6,7 @@ import Home from '../pages/Home';
 import SignIn from '../pages/SignIn';
 import SignUp from '../pages/SignUp';
 import Services from '../pages/Services';
-import Sandbox from '../pages/Sandbox';
+import Booking from '../pages/Booking';
 
 export const routerData = [
     {
@@ -30,8 +30,8 @@ export const routerData = [
         element: <Services />
     },
     {
-        path: 'sandbox',
-        element: <Sandbox />,
+        path: 'booking',
+        element: <Booking />,
     }
 ];
 
