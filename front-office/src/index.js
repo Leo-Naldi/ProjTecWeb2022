@@ -9,6 +9,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 import './assets/stylesheets/index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'dayjs/locale/it';
 
 import router from './routes/Routes';
 import { Theme } from './context/ThemeContext';
@@ -19,7 +20,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <ThemeProvider theme={Theme}>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='it'>
         <AccountContextProvider>
           <CssBaseline />
           <RouterProvider router={router} />

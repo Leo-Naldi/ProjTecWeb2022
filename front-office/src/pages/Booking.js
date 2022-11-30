@@ -1,9 +1,14 @@
 import React, {useState} from 'react';
-import { Container, Box } from '@mui/system';
-import { Button, Grid, Typography } from '@mui/material';
-import { Stepper, Step, StepLabel, FormControl, FormControlLabel, Checkbox } from '@mui/material';
+import { Container, Box, Stack } from '@mui/system';
+import { Card, Button, CardContent, Grid, Typography } from '@mui/material';
+import { Autocomplete, TextField, Stepper, Step, StepLabel, FormControl, FormControlLabel, Checkbox } from '@mui/material';
+
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
 
 import { useAccount } from '../context/CurrentAccountContext';
+import { getCities } from '../utils/getCities';
+import { services } from '../utils/getServices';
 
 
 const steps = [
@@ -13,7 +18,7 @@ const steps = [
         optional: false,
     },
     {
-        label: "Seleziona Data e Luogo (Opzionali)",
+        label: "Seleziona Data e Luogo",
         description: `Seleziona le date la citta'`,
         optional: true,
     },
@@ -31,18 +36,20 @@ const steps = [
 ];
 
 
-
-
 export default function Booking(){
 
     const account = useAccount();
+    const cities = getCities();
 
     // { pet.name: false }, minikui naa.........
     const [checkedPets, setCheckedPets] = useState(
         account.pets.reduce((o, pet) => (o[pet.name] = false, o), {})
     );
     
-
+    const [startDate, setStartDate] = useState(dayjs());
+    const [endDate, setEndDate] = useState(null);
+    
+    const [selectedService, setSelectedService] = useState(null);
 
     const [activeStep, setActiveStep] = useState(0);
 
@@ -76,7 +83,7 @@ export default function Booking(){
                             {steps.map((step, index) => (
                                 <Step key={step.label}>
                                     <StepLabel optional={step.optional ? (
-                                        <Typography variant="caption">Optional</Typography>
+                                        <Typography variant="caption">Opzionale</Typography>
                                     ) : null}>
                                         {step.label}
                                     </StepLabel>
@@ -124,9 +131,57 @@ export default function Booking(){
                     </FormControl>
                 );
             case 1:
-                return (<></>);
+                return (
+                    <Grid container sx={{
+                        pt: 2,
+                        pl: 2,
+                    }} spacing={4}>
+                        <Grid key="startDate" item sm={12} md={6}>
+                            <DatePicker 
+                                disablePast
+                                label="Data Inizio"
+                                value={startDate}
+                                onChange={(newDate) => {
+                                    setStartDate(newDate);
+                                    if (endDate === null)
+                                        setEndDate(newDate);
+                                }}
+                                renderInput={(params) => <TextField {...params}/>} />
+                        </Grid>
+                        <Grid key="endDate" item sm={12} md={6}>
+                            <DatePicker
+                                disablePast
+                                shouldDisableDate={(date) => date.isBefore(startDate)}
+                                shouldDisableMonth={(date) => date.isBefore(startDate)}
+                                label="Data Fine"
+                                value={(endDate === null) ? (startDate) : (endDate)}
+                                onChange={(newDate) => setEndDate(newDate)}
+                                renderInput={(params) => <TextField {...params} />} />
+                        </Grid>
+                        <Grid key="location" item sm={12} md={6}>
+                            <Autocomplete
+                                sx={{ width: 280, }}
+                                disablePortal
+                                id="city-select"
+                                options={cities}
+                                renderInput={(params) => <TextField {...params} label="Citta'" />}
+                            />
+                        </Grid>
+                    </Grid>
+                );
             case 2:
-                return (<></>);
+                return (<Stack spacing={2}>
+                    {services.map((service) => (
+                        <Card 
+                            onClick={() => setSelectedService(service)}
+                            sx={selectedService === service && ({
+                                border: 3,
+                                borderColor: 'primary.dark',
+                            })}>
+                            <CardContent>{service}</CardContent>
+                        </Card>
+                    ))}
+                </Stack>);
             case 3:
                 return (<></>);
         }
