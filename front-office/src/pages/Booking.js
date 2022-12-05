@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { Container, Box, Stack } from '@mui/system';
 import { Card, Button, CardContent, Grid, Typography, typographyClasses } from '@mui/material';
 import { Autocomplete, TextField, Stepper, Step, StepLabel, FormControl, FormControlLabel, Checkbox } from '@mui/material';
@@ -10,8 +10,6 @@ import { useAccount } from '../context/CurrentAccountContext';
 import { getCities } from '../utils/getCities';
 import { services, getProviders } from '../utils/getServices';
 
-
-const providers = getProviders();
 
 const steps = [
     {
@@ -53,6 +51,8 @@ export default function Booking(){
         account.pets.reduce((o, pet) => (o[pet.name] = false, o), {})
     );
     
+    const [providers, setProviders] = useState([]);
+
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
@@ -77,6 +77,21 @@ export default function Booking(){
             [e.target.name]: e.target.checked,
         });
     }
+
+    // fetch shiet from server
+    useEffect(() => {
+
+        let ignore = false;
+
+        getProviders().then((providers) => {
+            setTimeout(() => {if (!ignore) {
+                setProviders(providers);
+            }}, 10000);
+        });
+
+        return (() => { ignore = false; });
+
+    }, []);
 
     return (
         <Container>

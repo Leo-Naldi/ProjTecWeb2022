@@ -111,9 +111,9 @@ export function getProviders(type='Veterinario', start_date=null, end_date=null,
         };
     }
 
-    console.log(dayjs().day())
+    //console.log(dayjs().day())
 
-    return providers;
+    return new Promise((resolve, reject) => resolve(providers));
 }
 
 
