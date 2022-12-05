@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import { Container, Box, Stack } from '@mui/system';
-import { Card, Button, CardContent, Grid, Typography } from '@mui/material';
+import { Card, Button, CardContent, Grid, Typography, typographyClasses } from '@mui/material';
 import { Autocomplete, TextField, Stepper, Step, StepLabel, FormControl, FormControlLabel, Checkbox } from '@mui/material';
 
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -8,8 +8,10 @@ import dayjs from 'dayjs';
 
 import { useAccount } from '../context/CurrentAccountContext';
 import { getCities } from '../utils/getCities';
-import { services } from '../utils/getServices';
+import { services, getProviders } from '../utils/getServices';
 
+
+const providers = getProviders();
 
 const steps = [
     {
@@ -26,6 +28,11 @@ const steps = [
         label: "Seleziona Servizio",
         description: `Seleziona la tipologia di servizio di cui necessiti, o scegli dal
                         catalogo dei servizi disponibili.`,
+        optional: false,
+    },
+    {
+        label: "Seleziona Operatore",
+        // description: `Seleziona l'operatore presso il quale vuoi farti serviziare`,
         optional: false,
     },
     {
@@ -46,10 +53,12 @@ export default function Booking(){
         account.pets.reduce((o, pet) => (o[pet.name] = false, o), {})
     );
     
-    const [startDate, setStartDate] = useState(dayjs());
+    const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
+    const [selectedCity, setSelectedCity] = useState(null);
     
     const [selectedService, setSelectedService] = useState(null);
+    const [selectedProvider, setSelectedProvider] = useState(null);
 
     const [activeStep, setActiveStep] = useState(0);
 
@@ -99,11 +108,11 @@ export default function Booking(){
 
                     <Grid key="buttons" item xs={12} sm={12} md={12} border={1} padding={1}>
                         <Button onClick={previousStep} disabled={activeStep === 0}>Prev</Button>
-                        <Button onClick={nextStep} disabled={activeStep === steps.length - 1}>
+                        <Button onClick={nextStep} disabled={disableNextStep()}>
                             Next
                         </Button>
                         {(activeStep === steps.length - 1) ? (<Button type="submit">
-                            Submit
+                            Prenota
                         </Button>) : null}
                     </Grid>
                 </Grid>
@@ -154,7 +163,7 @@ export default function Booking(){
                                 shouldDisableDate={(date) => date.isBefore(startDate)}
                                 shouldDisableMonth={(date) => date.isBefore(startDate)}
                                 label="Data Fine"
-                                value={(endDate === null) ? (startDate) : (endDate)}
+                                value={(endDate === null && startDate !== null) ? (startDate) : (endDate)}
                                 onChange={(newDate) => setEndDate(newDate)}
                                 renderInput={(params) => <TextField {...params} />} />
                         </Grid>
@@ -164,6 +173,7 @@ export default function Booking(){
                                 disablePortal
                                 id="city-select"
                                 options={cities}
+                                onChange={(e, city) => setSelectedCity(city)}
                                 renderInput={(params) => <TextField {...params} label="Citta'" />}
                             />
                         </Grid>
@@ -183,9 +193,81 @@ export default function Booking(){
                     ))}
                 </Stack>);
             case 3:
-                return (<></>);
+                return (<Stack spacing={2}>
+                    {providers.map((provider) => (
+                        <Card
+                            onClick={() => setSelectedProvider(provider)}
+                            sx={selectedProvider === provider && ({
+                                border: 3,
+                                borderColor: 'primary.dark',
+                            })}>
+                            <CardContent>
+                                <Typography variant="h5">
+                                    {provider.service_name}
+                                </Typography>
+                                <Typography variant="subtle1">
+                                    {provider.city}
+                                </Typography>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </Stack>);
+            case 4:
+                return (<Box>
+                    <Grid container sx={{
+                        pt: 2,
+                        pl: 2,
+                    }} spacing={4}>
+                        <Grid key="startDate" item sm={12} md={6}>
+                            <DatePicker
+                                readOnly
+                                label="Data Inizio"
+                                value={startDate}
+                                renderInput={(params) => <TextField {...params} />} />
+                        </Grid>
+                        <Grid key="endDate" item sm={12} md={6}>
+                            <DatePicker
+                                readOnly
+                                label="Data Fine"
+                                value={(endDate === null) ? (startDate) : (endDate)}
+                                renderInput={(params) => <TextField {...params} />} />
+                        </Grid>
+                        <Grid key="location" item sm={12} md={6}>
+                            <Autocomplete
+                                readOnly
+                                sx={{ width: 280, }}
+                                value={selectedCity}
+                                options={cities}
+                                disablePortal
+                                id="city-selected"
+                                renderInput={(params) => <TextField {...params} label="Citta'" />}
+                            />
+                        </Grid>
+                    </Grid> 
+                </Box>);
         }
         
+    }
+
+    function disableNextStep() {
+
+        if (steps[activeStep].optional) return false;
+
+        switch (activeStep) {
+            case 0:
+                return !Object.values(checkedPets).some(x => x === true);
+            case 1:
+                return true;
+            case 2:
+                return selectedService === null;
+            case 3:
+                return selectedProvider === null;
+            case 4: 
+            default:
+                return true;
+
+        }
+
     }
 
 }
