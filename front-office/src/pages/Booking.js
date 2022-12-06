@@ -4,11 +4,12 @@ import { Card, Button, CardContent, Grid, Typography, typographyClasses } from '
 import { Autocomplete, TextField, Stepper, Step, StepLabel, FormControl, FormControlLabel, Checkbox } from '@mui/material';
 
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import dayjs from 'dayjs';
 
 import { useAccount } from '../context/CurrentAccountContext';
 import { getCities } from '../utils/getCities';
-import { services, getProviders } from '../utils/getServices';
+import { services, getProviders, shouldDisableDate } from '../utils/getServices';
 
 
 const steps = [
@@ -16,11 +17,6 @@ const steps = [
         label: "Pet Selection",
         description: `Seleziona le bestie per cui vuoi prenotare un servizio`,
         optional: false,
-    },
-    {
-        label: "Seleziona Data e Luogo",
-        description: `Seleziona le date la citta'`,
-        optional: true,
     },
     {
         label: "Seleziona Servizio",
@@ -32,6 +28,11 @@ const steps = [
         label: "Seleziona Operatore",
         // description: `Seleziona l'operatore presso il quale vuoi farti serviziare`,
         optional: false,
+    },
+    {
+        label: "Data e Ora",
+        description: `Scegli data e orario`,
+        optional: true,
     },
     {
         label: "Prenota",
@@ -53,12 +54,14 @@ export default function Booking(){
     
     const [providers, setProviders] = useState([]);
 
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
+    const [filterStartDate, setFilterStartDate] = useState(null);
+    const [filterEndDate, setFilterEndDate] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
     
     const [selectedService, setSelectedService] = useState(null);
     const [selectedProvider, setSelectedProvider] = useState(null);
+
+    const [selectedDate, setSelectedDate] = useState(null);
 
     const [activeStep, setActiveStep] = useState(0);
 
@@ -86,7 +89,7 @@ export default function Booking(){
         getProviders().then((providers) => {
             setTimeout(() => {if (!ignore) {
                 setProviders(providers);
-            }}, 10000);
+            }}, 1000);
         });
 
         return (() => { ignore = false; });
@@ -154,47 +157,8 @@ export default function Booking(){
                         ))}
                     </FormControl>
                 );
+                
             case 1:
-                return (
-                    <Grid container sx={{
-                        pt: 2,
-                        pl: 2,
-                    }} spacing={4}>
-                        <Grid key="startDate" item sm={12} md={6}>
-                            <DatePicker 
-                                disablePast
-                                label="Data Inizio"
-                                value={startDate}
-                                onChange={(newDate) => {
-                                    setStartDate(newDate);
-                                    if (endDate === null)
-                                        setEndDate(newDate);
-                                }}
-                                renderInput={(params) => <TextField {...params}/>} />
-                        </Grid>
-                        <Grid key="endDate" item sm={12} md={6}>
-                            <DatePicker
-                                disablePast
-                                shouldDisableDate={(date) => date.isBefore(startDate)}
-                                shouldDisableMonth={(date) => date.isBefore(startDate)}
-                                label="Data Fine"
-                                value={(endDate === null && startDate !== null) ? (startDate) : (endDate)}
-                                onChange={(newDate) => setEndDate(newDate)}
-                                renderInput={(params) => <TextField {...params} />} />
-                        </Grid>
-                        <Grid key="location" item sm={12} md={6}>
-                            <Autocomplete
-                                sx={{ width: 280, }}
-                                disablePortal
-                                id="city-select"
-                                options={cities}
-                                onChange={(e, city) => setSelectedCity(city)}
-                                renderInput={(params) => <TextField {...params} label="Citta'" />}
-                            />
-                        </Grid>
-                    </Grid>
-                );
-            case 2:
                 return (<Stack spacing={2}>
                     {services.map((service) => (
                         <Card 
@@ -207,7 +171,7 @@ export default function Booking(){
                         </Card>
                     ))}
                 </Stack>);
-            case 3:
+            case 2:
                 return (<Stack spacing={2}>
                     {providers.map((provider) => (
                         <Card
@@ -227,24 +191,37 @@ export default function Booking(){
                         </Card>
                     ))}
                 </Stack>);
+            case 3: 
+                return (
+                    <Box>
+                        <StaticDatePicker 
+                            disablePast
+                            shouldDisableDate={(date) => shouldDisableDate(selectedProvider, date)}
+                            value={selectedDate ?? dayjs()}
+                            onChange={(newVal) => {setSelectedDate(newVal)}}/>
+                        <Grid container spacing={1}>
+                            {}
+                        </Grid>
+                    </Box>
+                );
             case 4:
                 return (<Box>
                     <Grid container sx={{
                         pt: 2,
                         pl: 2,
                     }} spacing={4}>
-                        <Grid key="startDate" item sm={12} md={6}>
+                        <Grid key="filterStartDate" item sm={12} md={6}>
                             <DatePicker
                                 readOnly
                                 label="Data Inizio"
-                                value={startDate}
+                                value={filterStartDate}
                                 renderInput={(params) => <TextField {...params} />} />
                         </Grid>
-                        <Grid key="endDate" item sm={12} md={6}>
+                        <Grid key="filterEndDate" item sm={12} md={6}>
                             <DatePicker
                                 readOnly
                                 label="Data Fine"
-                                value={(endDate === null) ? (startDate) : (endDate)}
+                                value={(filterEndDate === null) ? (filterStartDate) : (filterEndDate)}
                                 renderInput={(params) => <TextField {...params} />} />
                         </Grid>
                         <Grid key="location" item sm={12} md={6}>
@@ -272,11 +249,11 @@ export default function Booking(){
             case 0:
                 return !Object.values(checkedPets).some(x => x === true);
             case 1:
-                return true;
-            case 2:
                 return selectedService === null;
-            case 3:
+            case 2:
                 return selectedProvider === null;
+            case 3:
+                return false;
             case 4: 
             default:
                 return true;
@@ -284,5 +261,44 @@ export default function Booking(){
         }
 
     }
-
 }
+
+/*return (
+                    <Grid container sx={{
+                        pt: 2,
+                        pl: 2,
+                    }} spacing={4}>
+                        <Grid key="filterStartDate" item sm={12} md={6}>
+                            <DatePicker 
+                                disablePast
+                                label="Data Inizio"
+                                value={startDate}
+                                onChange={(newDate) => {
+                                    setStartDate(newDate);
+                                    if (filterEndDate === null)
+                                        setFilterEndDate(newDate);
+                                }}
+                                renderInput={(params) => <TextField {...params}/>} />
+                        </Grid>
+                        <Grid key="filterEndDate" item sm={12} md={6}>
+                            <DatePicker
+                                disablePast
+                                shouldDisableDate={(date) => date.isBefore(startDate)}
+                                shouldDisableMonth={(date) => date.isBefore(startDate)}
+                                label="Data Fine"
+                                value={(filterEndDate === null && startDate !== null) ? (startDate) : (filterEndDate)}
+                                onChange={(newDate) => setFilterEndDate(newDate)}
+                                renderInput={(params) => <TextField {...params} />} />
+                        </Grid>
+                        <Grid key="location" item sm={12} md={6}>
+                            <Autocomplete
+                                sx={{ width: 280, }}
+                                disablePortal
+                                id="city-select"
+                                options={cities}
+                                onChange={(e, city) => setSelectedCity(city)}
+                                renderInput={(params) => <TextField {...params} label="Citta'" />}
+                            />
+                        </Grid>
+                    </Grid>
+                );*/

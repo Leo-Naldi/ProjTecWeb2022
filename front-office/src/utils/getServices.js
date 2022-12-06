@@ -1,87 +1,86 @@
 import dayjs from "dayjs";
 
 
-// contains dummydata, when backend is implemented it will fetch it 
-
 export const services = ['Veterinario', 'Dog Sitter'];
-
-// index is the day (0 is Sun, 6 is Sat, according to dayjs)
-const standard_workweek = [
-    {
-        start_morning: null,
-        end_morning: null,
-        start_afternoon: null,
-        end_afternoon: null,
-    },
-    {
-        start_morning: dayjs().hour(9),
-        end_morning: dayjs().hour(13),
-        start_afternoon: dayjs().hour(15).minute(30),
-        end_afternoon: dayjs().hour(19),
-    },
-    {
-        start_morning: dayjs().hour(9),
-        end_morning: dayjs().hour(13),
-        start_afternoon: dayjs().hour(15).minute(30),
-        end_afternoon: dayjs().hour(19),
-    },
-    {
-        start_morning: dayjs().hour(9),
-        end_morning: dayjs().hour(13),
-        start_afternoon: dayjs().hour(15).minute(30),
-        end_afternoon: dayjs().hour(19),
-    },
-    {
-        start_morning: dayjs().hour(9),
-        end_morning: dayjs().hour(13),
-        start_afternoon: dayjs().hour(15).minute(30),
-        end_afternoon: dayjs().hour(19),
-    },
-    {
-        start_morning: dayjs().hour(9),
-        end_morning: dayjs().hour(13),
-        start_afternoon: dayjs().hour(15).minute(30),
-        end_afternoon: dayjs().hour(19),
-    },
-    {
-        start_morning: null,
-        end_morning: null,
-        start_afternoon: null,
-        end_afternoon: null,
-    },
-]
-
-let providers = [
-    {
-        service_name: 'PaccianiPets',
-        service_type: services[0],
-        city: 'Bologna',
-        pet_types: ['cani', 'gatti'],
-        workweek: [...standard_workweek],
-        available_dates: null, 
-    },
-    {
-        service_name: 'Gianfranchi & Gianfranchi',
-        service_type: services[0],
-        city: 'Forli',
-        pet_types: [],  
-        workweek: [...standard_workweek],
-        available_dates: null,
-    },
-    {
-        service_name: 'God Please Kill Me Veterinari',
-        service_type: services[0],
-        city: 'Roma',
-        pet_types: [], 
-        workweek: [...standard_workweek],
-        available_dates: null,
-    },
-];
 
 export function getProviders(type='Veterinario', start_date=null, end_date=null, time=null) {
 
-    for (let i = 0; i < providers.length; i++) {
-        providers[i].available_dates = {
+    let providers = [
+        {
+            service_name: 'PaccianiPets',
+            service_type: services[0],
+            city: 'Bologna',
+            pet_types: ['cani', 'gatti'],
+            schedule: {
+                opening_morning: dayjs().hour(9),
+                closing_morning: dayjs().hour(13),
+                opening_afternoon: dayjs().hour(15).minute(30),
+                closing_afternoon: dayjs().hour(19),
+                available_days: [],
+            },
+        },
+        {
+            service_name: 'Gianfranchi & Gianfranchi',
+            service_type: services[0],
+            city: 'Forli',
+            pet_types: [],
+            schedule: {
+                opening_morning: dayjs().hour(9),
+                closing_morning: dayjs().hour(13),
+                opening_afternoon: dayjs().hour(15).minute(30),
+                closing_afternoon: dayjs().hour(19),
+                available_days: [],
+            },
+        },
+        {
+            service_name: 'God Please Kill Me Veterinari',
+            service_type: services[0],
+            city: 'Roma',
+            pet_types: [],
+            schedule: {
+                opening_morning: dayjs().hour(9),
+                closing_morning: dayjs().hour(13),
+                opening_afternoon: dayjs().hour(15).minute(30),
+                closing_afternoon: dayjs().hour(19),
+                available_days: [],
+            },
+        },
+    ];
+
+    // in the future the time slots will be sent by the server. maybe.
+    for (let j = 0; j < providers.length; j++) {
+
+        for (let i = 0; i < dayjs().daysInMonth(); i++) {
+
+            // for now, push all days that arent weekends, in the future itll be determined serverside
+            if ((dayjs().date(i).day() !== 0) && (dayjs().date(i).day() !== 6))
+                providers[j].schedule.available_days.push(i);
+        }
+    }
+
+    return new Promise((resolve, reject) => resolve(providers));
+}
+
+
+
+export function shouldDisableDate(provider, date) {
+    return provider.schedule.available_days.indexOf(date.date()) === -1;
+}
+
+export function getDaySchedule(provider, date) {
+
+    // TODO
+
+}
+
+export function getServices() {
+    return services;
+}
+
+export default getServices;
+
+
+/* providers[i].available_slots = {
             [dayjs().add(7, "days").toISOString()]: [
                 {
                     start: dayjs().add(7, 'day').hour(9),
@@ -108,26 +107,6 @@ export function getProviders(type='Veterinario', start_date=null, end_date=null,
                     end: dayjs().add(9, 'day').hour(10).minute(30),
                 }
             ]
-        };
-    }
 
-    //console.log(dayjs().day())
-
-    return new Promise((resolve, reject) => resolve(providers));
-}
-
-
-
-export function shouldDisableDate(provider, date) {
-
-    // True if date is not in the available dates (aka if the date is not available)
-
-    return !(Object.keys(provider.available_dates).some((dstring) => 
-        (dayjs(dstring).isSame(date, 'day'))));
-}
-
-export function getServices() {
-    return services;
-}
-
-export default getServices;
+            
+        }; */
