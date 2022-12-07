@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 
 import { useAccount } from '../context/CurrentAccountContext';
 import { getCities } from '../utils/getCities';
-import { services, getProviders, shouldDisableDate } from '../utils/getServices';
+import { services, getProviders, shouldDisableDate, getDaySchedule } from '../utils/getServices';
 
 
 const steps = [
@@ -61,7 +61,9 @@ export default function Booking(){
     const [selectedService, setSelectedService] = useState(null);
     const [selectedProvider, setSelectedProvider] = useState(null);
 
-    const [selectedDate, setSelectedDate] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(dayjs());
+    const [timeSlots, setTimeSlots] = useState(null);
+    const [selectedSlot, setSelectedSlot] = useState(null);
 
     const [activeStep, setActiveStep] = useState(0);
 
@@ -92,9 +94,21 @@ export default function Booking(){
             }}, 1000);
         });
 
-        return (() => { ignore = false; });
+        return (() => { ignore = true; });
 
     }, []);
+
+    useEffect(() => {
+
+        if ((selectedProvider !== null)) {
+            getDaySchedule(selectedProvider, selectedDate).then((slots) => {               
+                setTimeSlots(slots);
+                setSelectedSlot(null);
+            })
+        }
+
+
+    }, [selectedDate, selectedProvider]);
 
     return (
         <Container>
@@ -175,7 +189,10 @@ export default function Booking(){
                 return (<Stack spacing={2}>
                     {providers.map((provider) => (
                         <Card
-                            onClick={() => setSelectedProvider(provider)}
+                            onClick={() => {
+                                setSelectedProvider(provider); 
+                                setSelectedDate(dayjs())
+                            }}
                             sx={selectedProvider === provider && ({
                                 border: 3,
                                 borderColor: 'primary.dark',
@@ -196,11 +213,35 @@ export default function Booking(){
                     <Box>
                         <StaticDatePicker 
                             disablePast
+                            displayStaticWrapperAs="desktop"
                             shouldDisableDate={(date) => shouldDisableDate(selectedProvider, date)}
-                            value={selectedDate ?? dayjs()}
-                            onChange={(newVal) => {setSelectedDate(newVal)}}/>
-                        <Grid container spacing={1}>
-                            {}
+                            value={selectedDate}
+                            onChange={(newVal) => {setSelectedDate(newVal)}}
+                            renderInput={(params) => <TextField {...params} />}/>
+                        <Grid container spacing={2}>
+                            <Grid item>
+                                {(timeSlots === null) ? (
+                                <Typography>Loading...</Typography>) : 
+                                (<Grid container spacing={1}>
+                                    {timeSlots.map((slot, index) => (<Grid item
+                                        md={3} key={index}>
+                                        <Card sx={[
+                                                selectedSlot === index && ({
+                                                    border: 3,
+                                                    borderColor: 'primary.dark',
+                                                }),
+                                                { 
+                                                    padding: 2 
+                                                },
+                                            ]}
+                                        onClick={() => setSelectedSlot(index)}>
+                                            <Typography>
+                                                {slot.from.hour()}:{slot.from.minute()} - {slot.to.hour()}:{slot.to.minute()}
+                                            </Typography>
+                                        </Card>
+                                    </Grid>))}
+                                </Grid>)}
+                            </Grid>
                         </Grid>
                     </Box>
                 );
@@ -237,8 +278,7 @@ export default function Booking(){
                         </Grid>
                     </Grid> 
                 </Box>);
-        }
-        
+        }    
     }
 
     function disableNextStep() {

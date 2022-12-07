@@ -1,5 +1,7 @@
 import dayjs from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 
+dayjs.extend(isSameOrBefore)
 
 export const services = ['Veterinario', 'Dog Sitter'];
 
@@ -67,10 +69,32 @@ export function shouldDisableDate(provider, date) {
     return provider.schedule.available_days.indexOf(date.date()) === -1;
 }
 
+function makeTimeSlots(from, to, duration=20, unit='minute') {
+
+    let slots = [];
+    let current_start = from;
+    let new_start;
+
+    while (current_start.isSameOrBefore(to)) {
+        new_start = current_start.add(duration, unit);
+        slots.push({
+            from: current_start,
+            to: new_start,
+        });
+
+        current_start = new_start;
+    }
+
+    return slots;
+}
+
 export function getDaySchedule(provider, date) {
-
-    // TODO
-
+     
+    return new Promise((resolve, reject) => {
+        
+        resolve([...makeTimeSlots(provider.schedule.opening_morning, provider.schedule.closing_morning),
+            ...makeTimeSlots(provider.schedule.opening_afternoon, provider.schedule.closing_afternoon)]);
+    });
 }
 
 export function getServices() {
@@ -80,33 +104,3 @@ export function getServices() {
 export default getServices;
 
 
-/* providers[i].available_slots = {
-            [dayjs().add(7, "days").toISOString()]: [
-                {
-                    start: dayjs().add(7, 'day').hour(9),
-                    end: dayjs().add(7, 'day').hour(11).minute(30),
-                },
-                {
-                    start: dayjs().add(7, 'day').hour(16),
-                    end: dayjs().add(7, 'day').hour(18).minute(15),
-                }
-            ],
-            [dayjs().add(8, "days").toISOString()]: [
-                {
-                    start: dayjs().add(8, 'day').hour(10).minute(30),
-                    end: dayjs().add(8, 'day').hour(12),
-                },
-                {
-                    start: dayjs().add(8, 'day').hour(15),
-                    end: dayjs().add(8, 'day').hour(17).minute(30),
-                },
-            ],
-            [dayjs().add(9, "days").toISOString()]: [
-                {
-                    start: dayjs().add(9, 'day').hour(9),
-                    end: dayjs().add(9, 'day').hour(10).minute(30),
-                }
-            ]
-
-            
-        }; */
