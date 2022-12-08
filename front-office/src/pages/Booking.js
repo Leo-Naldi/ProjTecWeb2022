@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 
 import { useAccount } from '../context/CurrentAccountContext';
 import { getCities } from '../utils/getCities';
-import { services, getProviders, shouldDisableDate, getDaySchedule } from '../utils/getServices';
+import { services, getProviders, shouldDisableDate, getDaySchedule, getMonthSchedule } from '../utils/getServices';
 
 
 const steps = [
@@ -59,7 +59,7 @@ export default function Booking(){
     const [selectedCity, setSelectedCity] = useState(null);
     
     const [selectedService, setSelectedService] = useState(null);
-    const [selectedProvider, setSelectedProvider] = useState(null);
+    const [selectedProvider, setSelectedProvider] = useState(null); // index in providers
 
     const [selectedDate, setSelectedDate] = useState(dayjs());
     const [timeSlots, setTimeSlots] = useState(null);
@@ -83,6 +83,25 @@ export default function Booking(){
         });
     }
 
+    const handleMonthChange = (month) => {
+        const newProviders = structuredClone(providers);
+        getMonthSchedule(newProviders[selectedProvider], month).then((newAvalDays) => {
+            newProviders[selectedProvider].schedule.available_days = newAvalDays;
+            newProviders[selectedProvider].schedule.date = month;
+            setProviders(newProviders);
+        });
+    }
+
+    const changeSelectedProvider = (newProv) => {
+        
+        // unselecta date
+
+        // if necessary, make available dates
+
+        // make time slots
+
+    }
+
     // fetch shiet from server
     useEffect(() => {
 
@@ -101,7 +120,7 @@ export default function Booking(){
     useEffect(() => {
 
         if ((selectedProvider !== null)) {
-            getDaySchedule(selectedProvider, selectedDate).then((slots) => {               
+            getDaySchedule(providers[selectedProvider], selectedDate).then((slots) => {               
                 setTimeSlots(slots);
                 setSelectedSlot(null);
             })
@@ -187,13 +206,13 @@ export default function Booking(){
                 </Stack>);
             case 2:
                 return (<Stack spacing={2}>
-                    {providers.map((provider) => (
+                    {providers.map((provider, index) => (
                         <Card
                             onClick={() => {
-                                setSelectedProvider(provider); 
+                                setSelectedProvider(index); 
                                 setSelectedDate(dayjs())
                             }}
-                            sx={selectedProvider === provider && ({
+                            sx={providers[selectedProvider] === provider && ({
                                 border: 3,
                                 borderColor: 'primary.dark',
                             })}>
@@ -214,9 +233,10 @@ export default function Booking(){
                         <StaticDatePicker 
                             disablePast
                             displayStaticWrapperAs="desktop"
-                            shouldDisableDate={(date) => shouldDisableDate(selectedProvider, date)}
+                            shouldDisableDate={(date) => shouldDisableDate(providers[selectedProvider], date)}
                             value={selectedDate}
                             onChange={(newVal) => {setSelectedDate(newVal)}}
+                            onMonthChange={handleMonthChange}
                             renderInput={(params) => <TextField {...params} />}/>
                         <Grid container spacing={2}>
                             <Grid item>
@@ -236,7 +256,7 @@ export default function Booking(){
                                             ]}
                                         onClick={() => setSelectedSlot(index)}>
                                             <Typography>
-                                                {slot.from.hour()}:{slot.from.minute()} - {slot.to.hour()}:{slot.to.minute()}
+                                                {slot.from.format('HH:mm')} - {slot.to.format('HH:mm')}
                                             </Typography>
                                         </Card>
                                     </Grid>))}

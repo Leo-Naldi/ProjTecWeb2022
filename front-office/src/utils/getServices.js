@@ -5,6 +5,22 @@ dayjs.extend(isSameOrBefore)
 
 export const services = ['Veterinario', 'Dog Sitter'];
 
+export function getMonthSchedule(provider, monthDate) {
+
+    let res = [];
+
+    for (let i = 1; i < monthDate.daysInMonth() + 1; i++) {
+
+        // for now, push all days that arent weekends, in the future itll be determined serverside
+        if ((monthDate.date(i).day() !== 0) && (monthDate.date(i).day() !== 6))
+            res.push(i);
+    }
+
+    return new Promise((resolve, reject) => {
+        resolve(res);
+    })
+}
+
 export function getProviders(type='Veterinario', start_date=null, end_date=null, time=null) {
 
     let providers = [
@@ -19,6 +35,7 @@ export function getProviders(type='Veterinario', start_date=null, end_date=null,
                 opening_afternoon: dayjs().hour(15).minute(30),
                 closing_afternoon: dayjs().hour(19),
                 available_days: [],
+                date: dayjs(),  // month and year of the schedule
             },
         },
         {
@@ -32,6 +49,7 @@ export function getProviders(type='Veterinario', start_date=null, end_date=null,
                 opening_afternoon: dayjs().hour(15).minute(30),
                 closing_afternoon: dayjs().hour(19),
                 available_days: [],
+                date: dayjs(),
             },
         },
         {
@@ -45,19 +63,16 @@ export function getProviders(type='Veterinario', start_date=null, end_date=null,
                 opening_afternoon: dayjs().hour(15).minute(30),
                 closing_afternoon: dayjs().hour(19),
                 available_days: [],
+                date: dayjs(),
             },
         },
     ];
 
     // in the future the time slots will be sent by the server. maybe.
-    for (let j = 0; j < providers.length; j++) {
-
-        for (let i = 0; i < dayjs().daysInMonth(); i++) {
-
-            // for now, push all days that arent weekends, in the future itll be determined serverside
-            if ((dayjs().date(i).day() !== 0) && (dayjs().date(i).day() !== 6))
-                providers[j].schedule.available_days.push(i);
-        }
+    for (let j = 0; j < providers.length; j++) { 
+        getMonthSchedule(providers[j], dayjs()).then((days) => {
+            providers[j].schedule.available_days = days;
+        })
     }
 
     return new Promise((resolve, reject) => resolve(providers));
@@ -75,7 +90,7 @@ function makeTimeSlots(from, to, duration=20, unit='minute') {
     let current_start = from;
     let new_start;
 
-    while (current_start.isSameOrBefore(to)) {
+    while (current_start.isSameOrBefore(to, unit)) {
         new_start = current_start.add(duration, unit);
         slots.push({
             from: current_start,
