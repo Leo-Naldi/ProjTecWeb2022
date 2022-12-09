@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 
 import { useAccount } from '../context/CurrentAccountContext';
 import { getCities } from '../utils/getCities';
-import { services, getProviders, shouldDisableDate, getDaySchedule, getMonthSchedule } from '../utils/getServices';
+import { services, getProviders, shouldDisableDate, getDaySchedule, getMonthSchedule, getEarliestAvailable } from '../utils/getServices';
 
 
 const steps = [
@@ -52,14 +52,16 @@ export default function Booking(){
         account.pets.reduce((o, pet) => (o[pet.name] = false, o), {})
     );
     
+    const [selectedService, setSelectedService] = useState(null);
     const [providers, setProviders] = useState([]);
 
     const [filterStartDate, setFilterStartDate] = useState(null);
     const [filterEndDate, setFilterEndDate] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
     
-    const [selectedService, setSelectedService] = useState(null);
+    
     const [selectedProvider, setSelectedProvider] = useState(null); // index in providers
+    const [schedule, setSchedule] = useState(null);
 
     const [selectedDate, setSelectedDate] = useState(dayjs());
     const [timeSlots, setTimeSlots] = useState(null);
@@ -81,53 +83,56 @@ export default function Booking(){
             ...checkedPets,
             [e.target.name]: e.target.checked,
         });
+
+        setSelectedService(null);
+        setProviders([]);
+        setSelectedProvider(null);
+        setSchedule(null);
+        setSelectedDate(null);
+        setTimeSlots(null);
+        setSelectedSlot(null);
+    }
+
+    const handleSelectService = (service) => {
+        setSelectedService(service);
+        setProviders([]);
+        setSelectedProvider(null);
+        setSchedule(null);
+        setSelectedDate(null);
+        setTimeSlots(null);
+        setSelectedSlot(null);
+
+        getProviders().then((providers) => { setProviders(providers) })
+    }
+
+    const handleSelectProvider = (provider) => {
+        setSelectedProvider(provider.id);
+        setSchedule(null);
+        setSelectedDate(null);
+        setTimeSlots(null);
+        setSelectedSlot(null);
+
+        getMonthSchedule(provider, dayjs()).then((schedule) => {
+            setSchedule(schedule);
+            setSelectedDate(getEarliestAvailable(schedule));
+        })
+    }
+
+    const handleSelectDate = (date) => {
+        setSelectedDate(date);
+        setTimeSlots(null);
+        setSelectedSlot(null);
+
+        getDaySchedule(schedule, date).then((time_slots) => {
+            setTimeSlots(time_slots);
+        })
     }
 
     const handleMonthChange = (month) => {
-        const newProviders = structuredClone(providers);
-        getMonthSchedule(newProviders[selectedProvider], month).then((newAvalDays) => {
-            newProviders[selectedProvider].schedule.available_days = newAvalDays;
-            newProviders[selectedProvider].schedule.date = month;
-            setProviders(newProviders);
-        });
+        getMonthSchedule(selectedProvider, month).then((schedule) => {
+            setSchedule(schedule);
+        })
     }
-
-    const changeSelectedProvider = (newProv) => {
-        
-        // unselecta date
-
-        // if necessary, make available dates
-
-        // make time slots
-
-    }
-
-    // fetch shiet from server
-    useEffect(() => {
-
-        let ignore = false;
-
-        getProviders().then((providers) => {
-            setTimeout(() => {if (!ignore) {
-                setProviders(providers);
-            }}, 1000);
-        });
-
-        return (() => { ignore = true; });
-
-    }, []);
-
-    useEffect(() => {
-
-        if ((selectedProvider !== null)) {
-            getDaySchedule(providers[selectedProvider], selectedDate).then((slots) => {               
-                setTimeSlots(slots);
-                setSelectedSlot(null);
-            })
-        }
-
-
-    }, [selectedDate, selectedProvider]);
 
     return (
         <Container>
@@ -195,7 +200,7 @@ export default function Booking(){
                 return (<Stack spacing={2}>
                     {services.map((service) => (
                         <Card 
-                            onClick={() => setSelectedService(service)}
+                            onClick={() => handleSelectService(service)}
                             sx={selectedService === service && ({
                                 border: 3,
                                 borderColor: 'primary.dark',
@@ -209,10 +214,9 @@ export default function Booking(){
                     {providers.map((provider, index) => (
                         <Card
                             onClick={() => {
-                                setSelectedProvider(index); 
-                                setSelectedDate(dayjs())
+                                handleSelectProvider(provider)
                             }}
-                            sx={providers[selectedProvider] === provider && ({
+                            sx={selectedProvider == provider.id && ({
                                 border: 3,
                                 borderColor: 'primary.dark',
                             })}>
@@ -233,9 +237,9 @@ export default function Booking(){
                         <StaticDatePicker 
                             disablePast
                             displayStaticWrapperAs="desktop"
-                            shouldDisableDate={(date) => shouldDisableDate(providers[selectedProvider], date)}
+                            shouldDisableDate={(date) => shouldDisableDate(schedule, date)}
                             value={selectedDate}
-                            onChange={(newVal) => {setSelectedDate(newVal)}}
+                            onChange={(newVal) => {handleSelectDate(newVal)}}
                             onMonthChange={handleMonthChange}
                             renderInput={(params) => <TextField {...params} />}/>
                         <Grid container spacing={2}>

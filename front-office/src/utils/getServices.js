@@ -1,19 +1,28 @@
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
 dayjs.extend(isSameOrBefore)
+dayjs.extend(isSameOrAfter)
 
 export const services = ['Veterinario', 'Dog Sitter'];
 
 export function getMonthSchedule(provider, monthDate) {
 
-    let res = [];
+    let res = [{
+        opening_morning: dayjs().hour(9),
+        closing_morning: dayjs().hour(13),
+        opening_afternoon: dayjs().hour(15).minute(30),
+        closing_afternoon: dayjs().hour(19),
+        available_days: [],
+        date: monthDate,  // month and year of the schedule
+    }];
 
     for (let i = 1; i < monthDate.daysInMonth() + 1; i++) {
 
         // for now, push all days that arent weekends, in the future itll be determined serverside
         if ((monthDate.date(i).day() !== 0) && (monthDate.date(i).day() !== 6))
-            res.push(i);
+            res[0].available_days.push(i);
     }
 
     return new Promise((resolve, reject) => {
@@ -25,46 +34,25 @@ export function getProviders(type='Veterinario', start_date=null, end_date=null,
 
     let providers = [
         {
+            id: 1,
             service_name: 'PaccianiPets',
             service_type: services[0],
             city: 'Bologna',
             pet_types: ['cani', 'gatti'],
-            schedule: {
-                opening_morning: dayjs().hour(9),
-                closing_morning: dayjs().hour(13),
-                opening_afternoon: dayjs().hour(15).minute(30),
-                closing_afternoon: dayjs().hour(19),
-                available_days: [],
-                date: dayjs(),  // month and year of the schedule
-            },
         },
         {
+            id: 2,
             service_name: 'Gianfranchi & Gianfranchi',
             service_type: services[0],
             city: 'Forli',
             pet_types: [],
-            schedule: {
-                opening_morning: dayjs().hour(9),
-                closing_morning: dayjs().hour(13),
-                opening_afternoon: dayjs().hour(15).minute(30),
-                closing_afternoon: dayjs().hour(19),
-                available_days: [],
-                date: dayjs(),
-            },
         },
         {
+            id: 3,
             service_name: 'God Please Kill Me Veterinari',
             service_type: services[0],
             city: 'Roma',
-            pet_types: [],
-            schedule: {
-                opening_morning: dayjs().hour(9),
-                closing_morning: dayjs().hour(13),
-                opening_afternoon: dayjs().hour(15).minute(30),
-                closing_afternoon: dayjs().hour(19),
-                available_days: [],
-                date: dayjs(),
-            },
+            pet_types: [],    
         },
     ];
 
@@ -78,10 +66,13 @@ export function getProviders(type='Veterinario', start_date=null, end_date=null,
     return new Promise((resolve, reject) => resolve(providers));
 }
 
+// TODO this fails if no date is available
+export function getEarliestAvailable(schedule) {
+    return schedule.available_days.filter((day) => day.isSameOrAfter(dayjs(), 'day'))[0];
+}
 
-
-export function shouldDisableDate(provider, date) {
-    return provider.schedule.available_days.indexOf(date.date()) === -1;
+export function shouldDisableDate(schedule, date) {
+    return schedule[0].available_days.indexOf(date.date()) === -1;
 }
 
 function makeTimeSlots(from, to, duration=20, unit='minute') {
@@ -103,12 +94,12 @@ function makeTimeSlots(from, to, duration=20, unit='minute') {
     return slots;
 }
 
-export function getDaySchedule(provider, date) {
+export function getDaySchedule(schedule, date) {
      
     return new Promise((resolve, reject) => {
         
-        resolve([...makeTimeSlots(provider.schedule.opening_morning, provider.schedule.closing_morning),
-            ...makeTimeSlots(provider.schedule.opening_afternoon, provider.schedule.closing_afternoon)]);
+        resolve([...makeTimeSlots(schedule[0].opening_morning, schedule[0].closing_morning),
+            ...makeTimeSlots(schedule[0].opening_afternoon, schedule[0].closing_afternoon)]);
     });
 }
 
