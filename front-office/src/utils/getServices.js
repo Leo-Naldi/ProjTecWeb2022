@@ -68,9 +68,13 @@ export function getProviders(type='Veterinario', start_date=null, end_date=null,
 
 // TODO this fails if no date is available
 export function getEarliestAvailable(schedule) {
-    return schedule.available_days.filter((day) => day.isSameOrAfter(dayjs(), 'day'))[0];
+    
+    return Math.min(schedule.map((s) => {
+        return Math.min(s.available_days.filter(d => s.date.date(d).isSameOrAfter(dayjs(), 'day')));
+    }));
 }
 
+// TODO make this work using all the schedule
 export function shouldDisableDate(schedule, date) {
     return schedule[0].available_days.indexOf(date.date()) === -1;
 }

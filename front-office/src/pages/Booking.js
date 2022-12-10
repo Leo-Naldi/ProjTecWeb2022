@@ -47,27 +47,37 @@ export default function Booking(){
     const account = useAccount();
     const cities = getCities();
 
-    // { pet.name: false }, minikui naa.........
+
+    // step 0
     const [checkedPets, setCheckedPets] = useState(
         account.pets.reduce((o, pet) => (o[pet.name] = false, o), {})
     );
     
+    // step 1
     const [selectedService, setSelectedService] = useState(null);
     const [providers, setProviders] = useState([]);
 
-    const [filterStartDate, setFilterStartDate] = useState(null);
-    const [filterEndDate, setFilterEndDate] = useState(null);
-    const [selectedCity, setSelectedCity] = useState(null);
-    
-    
+    // step 2
     const [selectedProvider, setSelectedProvider] = useState(null); // index in providers
     const [schedule, setSchedule] = useState(null);
 
+    // step 3
     const [selectedDate, setSelectedDate] = useState(dayjs());
     const [timeSlots, setTimeSlots] = useState(null);
     const [selectedSlot, setSelectedSlot] = useState(null);
+    
+    // generally speaking if you change something at step x, all state variables in the following 
+    // steps should be unset. Schedule can be changed on its own to keep the available dates in the
+    // datepicker at step 3 consistent.
+    // TODO This avoids any illegal state configurations (i hope) but is stricter than it needs to be 
 
+    
     const [activeStep, setActiveStep] = useState(0);
+
+    // TODO search filters
+    const [filterStartDate, setFilterStartDate] = useState(null);
+    const [filterEndDate, setFilterEndDate] = useState(null);
+    const [selectedCity, setSelectedCity] = useState(null);
 
     const nextStep = () => setActiveStep(activeStep + 1);
     const previousStep = () => setActiveStep(activeStep - 1);
@@ -326,43 +336,3 @@ export default function Booking(){
 
     }
 }
-
-/*return (
-                    <Grid container sx={{
-                        pt: 2,
-                        pl: 2,
-                    }} spacing={4}>
-                        <Grid key="filterStartDate" item sm={12} md={6}>
-                            <DatePicker 
-                                disablePast
-                                label="Data Inizio"
-                                value={startDate}
-                                onChange={(newDate) => {
-                                    setStartDate(newDate);
-                                    if (filterEndDate === null)
-                                        setFilterEndDate(newDate);
-                                }}
-                                renderInput={(params) => <TextField {...params}/>} />
-                        </Grid>
-                        <Grid key="filterEndDate" item sm={12} md={6}>
-                            <DatePicker
-                                disablePast
-                                shouldDisableDate={(date) => date.isBefore(startDate)}
-                                shouldDisableMonth={(date) => date.isBefore(startDate)}
-                                label="Data Fine"
-                                value={(filterEndDate === null && startDate !== null) ? (startDate) : (filterEndDate)}
-                                onChange={(newDate) => setFilterEndDate(newDate)}
-                                renderInput={(params) => <TextField {...params} />} />
-                        </Grid>
-                        <Grid key="location" item sm={12} md={6}>
-                            <Autocomplete
-                                sx={{ width: 280, }}
-                                disablePortal
-                                id="city-select"
-                                options={cities}
-                                onChange={(e, city) => setSelectedCity(city)}
-                                renderInput={(params) => <TextField {...params} label="Citta'" />}
-                            />
-                        </Grid>
-                    </Grid>
-                );*/
