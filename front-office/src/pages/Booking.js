@@ -59,16 +59,16 @@ export default function Booking(){
 
     // step 2
     const [selectedProvider, setSelectedProvider] = useState(null); // index in providers
-    const [schedule, setSchedule] = useState(null);
-
+    
     // step 3
-    const [selectedDate, setSelectedDate] = useState(dayjs());
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [schedule, setSchedule] = useState(null);  // schedule of the selected date's month
+    const [displaySchedule, setDisplaySchedule] = useState(null);  // schedule of the displayed month
     const [timeSlots, setTimeSlots] = useState(null);
     const [selectedSlot, setSelectedSlot] = useState(null);
     
     // generally speaking if you change something at step x, all state variables in the following 
-    // steps should be unset. Schedule can be changed on its own to keep the available dates in the
-    // datepicker at step 3 consistent.
+    // steps should be unset. The only exception is displaySchedule.
     // TODO This avoids any illegal state configurations (i hope) but is stricter than it needs to be 
 
     
@@ -112,7 +112,7 @@ export default function Booking(){
         setTimeSlots(null);
         setSelectedSlot(null);
 
-        getProviders().then((providers) => { setProviders(providers) })
+        getProviders().then(setProviders)
     }
 
     const handleSelectProvider = (provider) => {
@@ -122,26 +122,20 @@ export default function Booking(){
         setTimeSlots(null);
         setSelectedSlot(null);
 
-        getMonthSchedule(provider, dayjs()).then((schedule) => {
-            setSchedule(schedule);
-            setSelectedDate(getEarliestAvailable(schedule));
-        })
+        getMonthSchedule(provider, dayjs()).then(setDisplaySchedule);
     }
 
     const handleSelectDate = (date) => {
         setSelectedDate(date);
+        setSchedule(displaySchedule);
         setTimeSlots(null);
         setSelectedSlot(null);
 
-        getDaySchedule(schedule, date).then((time_slots) => {
-            setTimeSlots(time_slots);
-        })
+        getDaySchedule(displaySchedule, date).then(setTimeSlots)
     }
 
     const handleMonthChange = (month) => {
-        getMonthSchedule(selectedProvider, month).then((schedule) => {
-            setSchedule(schedule);
-        })
+        getMonthSchedule(selectedProvider, month).then(setDisplaySchedule);
     }
 
     return (
@@ -155,7 +149,7 @@ export default function Booking(){
 
                     <Grid key="stepper" item xs={0} sm={2} md={4} border={1} padding={1}>
                         <Stepper activeStep={activeStep} orientation="vertical">
-                            {steps.map((step, index) => (
+                            {steps.map((step) => (
                                 <Step key={step.label}>
                                     <StepLabel optional={step.optional ? (
                                         <Typography variant="caption">Opzionale</Typography>
@@ -247,7 +241,7 @@ export default function Booking(){
                         <StaticDatePicker 
                             disablePast
                             displayStaticWrapperAs="desktop"
-                            shouldDisableDate={(date) => shouldDisableDate(schedule, date)}
+                            shouldDisableDate={(date) => shouldDisableDate(displaySchedule, date)}
                             value={selectedDate}
                             onChange={(newVal) => {handleSelectDate(newVal)}}
                             onMonthChange={handleMonthChange}
