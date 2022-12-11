@@ -10,12 +10,11 @@ export const services = ['Veterinario', 'Dog Sitter'];
 export function getMonthSchedule(provider, monthDate) {
 
     let res = [{
-        opening_morning: dayjs().hour(9),
-        closing_morning: dayjs().hour(13),
-        opening_afternoon: dayjs().hour(15).minute(30),
-        closing_afternoon: dayjs().hour(19),
+        opening_morning: monthDate.hour(9),
+        closing_morning: monthDate.hour(13),
+        opening_afternoon: monthDate.hour(15).minute(30),
+        closing_afternoon: monthDate.hour(19),
         available_days: [],
-        date: monthDate,  // month and year of the schedule
     }];
 
     for (let i = 1; i < monthDate.daysInMonth() + 1; i++) {
@@ -66,17 +65,25 @@ export function getProviders(type='Veterinario', start_date=null, end_date=null,
     return new Promise((resolve, reject) => resolve(providers));
 }
 
-// TODO this fails if no date is available
-export function getEarliestAvailable(schedule) {
-    
-    return Math.min(schedule.map((s) => {
-        return Math.min(s.available_days.filter(d => s.date.date(d).isSameOrAfter(dayjs(), 'day')));
-    }));
+export function getAllAvailableDays(schedule) {
+    return schedule.reduce((c, s) => c.concat(s.available_days), []);
 }
 
-// TODO make this work using all the schedule
+export function getEarliestAvailable(schedule) {
+
+    if (schedule.length == 0) return -1;
+    
+    const days = getAllAvailableDays(schedule);
+
+    const future = days.filter(d => schedule[0].opening_afternoon.date(d)
+        .isSameOrAfter(dayjs(), 'day'));
+
+    return ((future.length === 0) ? -1: Math.min(...future));
+}
+
+
 export function shouldDisableDate(schedule, date) {
-    return schedule[0].available_days.indexOf(date.date()) === -1;
+    return getAllAvailableDays(schedule).indexOf(date.date()) === -1;
 }
 
 function makeTimeSlots(from, to, duration=20, unit='minute') {
