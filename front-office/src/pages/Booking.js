@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useReducer, useState} from 'react';
 import { Container, Box, Stack } from '@mui/system';
 import { Card, Button, CardContent, Grid, Typography, typographyClasses } from '@mui/material';
 import { Autocomplete, TextField, Stepper, Step, StepLabel, FormControl, FormControlLabel, Checkbox } from '@mui/material';
@@ -10,6 +10,7 @@ import dayjs from 'dayjs';
 import { useAccount } from '../context/CurrentAccountContext';
 import { getCities } from '../utils/getCities';
 import { services, getProviders, shouldDisableDate, getDaySchedule, getMonthSchedule, getEarliestAvailable } from '../utils/getServices';
+import bookingReducer from '../reducers/bookingReducer';
 
 
 const steps = [
@@ -47,41 +48,41 @@ export default function Booking(){
     const account = useAccount();
     const cities = getCities();
 
+    const initial_state = {
+        checkedPets: account.pets.reduce((o, pet) => (o[pet.name] = false, o), {}),
+        selectedService: null,
+        providers: null,
+        selectedProvider: null,
+        selectedDate: null,
+        schedule: null,
+        displaySchedule: null,
+        timeSlots: null,
+        selectedTimeSlot: null,
+        activeStep: 0,
+    };
 
-    // step 0
-    const [checkedPets, setCheckedPets] = useState(
-        account.pets.reduce((o, pet) => (o[pet.name] = false, o), {})
-    );
-    
-    // step 1
-    const [selectedService, setSelectedService] = useState(null);
-    const [providers, setProviders] = useState([]);
+    const [state, dispatch] = useReducer(bookingReducer, initial_state);
 
-    // step 2
-    const [selectedProvider, setSelectedProvider] = useState(null); // index in providers
     
-    // step 3
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [schedule, setSchedule] = useState(null);
-    const [displaySchedule, setDisplaySchedule] = useState(null);
-    const [timeSlots, setTimeSlots] = useState(null);
-    const [selectedSlot, setSelectedSlot] = useState(null);
     
     // generally speaking if you change something at step x, all state variables in the following 
     // steps should be unset. The only exception is displaySchedule.
     // TODO This avoids any illegal state configurations (i hope) but is stricter than it needs to be 
 
-    
-    const [activeStep, setActiveStep] = useState(0);
-
     // TODO search filters
-    const [filterStartDate, setFilterStartDate] = useState(null);
-    const [filterEndDate, setFilterEndDate] = useState(null);
-    const [selectedCity, setSelectedCity] = useState(null);
 
-    const nextStep = () => setActiveStep(activeStep + 1);
-    const previousStep = () => setActiveStep(activeStep - 1);
-    const resetStep = () => setActiveStep(0);
+    const nextStep = () => dispatch({ 
+        type: 'CHANGE_STEP', 
+        value: (state.activeStep + 1),
+    });
+    const previousStep = () => dispatch({ 
+        type: 'CHANGE_STEP', 
+        value: state.activeStep - 1,
+    });
+    const resetStep = () => dispatch({ 
+        type: 'CHANGE_STEP', 
+        value: 0 ,
+    });
 
     
     const handleSubmit = (e) => {
@@ -89,53 +90,65 @@ export default function Booking(){
     };
 
     const handleCheck = (e) => {
-        setCheckedPets({
-            ...checkedPets,
-            [e.target.name]: e.target.checked,
-        });
 
-        setSelectedService(null);
-        setProviders([]);
-        setSelectedProvider(null);
-        setSchedule(null);
-        setSelectedDate(null);
-        setTimeSlots(null);
-        setSelectedSlot(null);
+        dispatch({ 
+            type: 'CHECK_PET', 
+            value: e.target.checked, 
+            id: e.target.name 
+        });
     }
 
     const handleSelectService = (service) => {
-        setSelectedService(service);
-        setProviders([]);
-        setSelectedProvider(null);
-        setSchedule(null);
-        setSelectedDate(null);
-        setTimeSlots(null);
-        setSelectedSlot(null);
+        
+        dispatch({ 
+            type: 'SELECT_SERVICE', 
+            value: service 
+        });
 
-        getProviders().then(setProviders)
+        getProviders().then(p => dispatch({
+            type: 'FETCHED_PROVIDERS',
+            value: p,
+        }));
     }
 
     const handleSelectProvider = (provider) => {
-        setSelectedProvider(provider.id);
-        setSchedule(null);
-        setSelectedDate(null);
-        setTimeSlots(null);
-        setSelectedSlot(null);
+        
+        dispatch({
+            type: 'SELECT_PROVIDER',
+            value: provider.id,
+        });
 
-        getMonthSchedule(provider, dayjs()).then(setDisplaySchedule);
+        getMonthSchedule(provider, dayjs()).then(s => dispatch({
+            type: 'FETCHED_DISPLAY_SCHEDULE',
+            value: s,
+        }));
     }
 
     const handleSelectDate = (date) => {
-        setSelectedDate(date);
-        setSchedule(displaySchedule);
-        setTimeSlots(null);
-        setSelectedSlot(null);
+        
+        dispatch({
+            type: 'SELECT_DATE',
+            value: date,
+        });
 
-        getDaySchedule(displaySchedule, date).then(setTimeSlots)
+        getDaySchedule(state.displaySchedule, date).then(s => dispatch({
+            type: 'FETCHED_TIME_SLOTS',
+            value: s,
+        }));
+    }
+
+    const selectTimeSlot = (slot) => {
+        dispatch({
+            type: 'SELECT_TIME_SLOT',
+            value: slot,
+        });
     }
 
     const handleMonthChange = (month) => {
-        getMonthSchedule(selectedProvider, month).then(setDisplaySchedule);
+        getMonthSchedule(state.selectedProvider, month).then(s => dispatch({
+            type: 'CHANGE_DISPLAY_MONTH',
+            value: s,
+        }));
     }
 
     return (
@@ -148,7 +161,7 @@ export default function Booking(){
                 <Grid container spacing={0}>
 
                     <Grid key="stepper" item xs={0} sm={2} md={4} border={1} padding={1}>
-                        <Stepper activeStep={activeStep} orientation="vertical">
+                        <Stepper activeStep={state.activeStep} orientation="vertical">
                             {steps.map((step) => (
                                 <Step key={step.label}>
                                     <StepLabel optional={step.optional ? (
@@ -163,15 +176,16 @@ export default function Booking(){
                     </Grid>
 
                     <Grid key="steps" item xs={12} sm={10} md={8} border={1} padding={1}>
-                        {getActiveStepComponent(activeStep)}
+                        {getActiveStepComponent(state.activeStep)}
                     </Grid>
 
                     <Grid key="buttons" item xs={12} sm={12} md={12} border={1} padding={1}>
-                        <Button onClick={previousStep} disabled={activeStep === 0}>Prev</Button>
+                        <Button onClick={previousStep} disabled={state.activeStep === 0}>Prev</Button>
+                        <Button onClick={resetStep}>Clear</Button>
                         <Button onClick={nextStep} disabled={disableNextStep()}>
                             Next
                         </Button>
-                        {(activeStep === steps.length - 1) ? (<Button type="submit">
+                        {(state.activeStep === steps.length - 1) ? (<Button type="submit">
                             Prenota
                         </Button>) : null}
                     </Grid>
@@ -191,7 +205,7 @@ export default function Booking(){
                             <FormControlLabel
                                 control={
                                     <Checkbox
-                                        checked={checkedPets[pet.name]}
+                                        checked={state.checkedPets[pet.name]}
                                         onChange={handleCheck}
                                         name={pet.name} />
                                 }
@@ -205,7 +219,7 @@ export default function Booking(){
                     {services.map((service) => (
                         <Card 
                             onClick={() => handleSelectService(service)}
-                            sx={selectedService === service && ({
+                            sx={state.selectedService === service && ({
                                 border: 3,
                                 borderColor: 'primary.dark',
                             })}>
@@ -215,12 +229,12 @@ export default function Booking(){
                 </Stack>);
             case 2:
                 return (<Stack spacing={2}>
-                    {providers.map((provider) => (
+                    {state.providers.map((provider) => (
                         <Card
                             onClick={() => {
                                 handleSelectProvider(provider)
                             }}
-                            sx={selectedProvider == provider.id && ({
+                            sx={state.selectedProvider == provider.id && ({
                                 border: 3,
                                 borderColor: 'primary.dark',
                             })}>
@@ -241,20 +255,20 @@ export default function Booking(){
                         <StaticDatePicker 
                             disablePast
                             displayStaticWrapperAs="desktop"
-                            shouldDisableDate={(date) => shouldDisableDate(displaySchedule, date)}
-                            value={selectedDate}
+                            shouldDisableDate={(date) => shouldDisableDate(state.displaySchedule, date)}
+                            value={state.selectedDate}
                             onChange={(newVal) => {handleSelectDate(newVal)}}
                             onMonthChange={handleMonthChange}
                             renderInput={(params) => <TextField {...params} />}/>
                         <Grid container spacing={2}>
                             <Grid item>
-                                {(timeSlots === null) ? (
+                                {(state.timeSlots === null) ? (
                                 <Typography>Loading...</Typography>) : 
                                 (<Grid container spacing={1}>
-                                    {timeSlots.map((slot, index) => (<Grid item
+                                        {state.timeSlots.map((slot, index) => (<Grid item
                                         md={3} key={index}>
                                         <Card sx={[
-                                                selectedSlot === index && ({
+                                            state.selectedTimeSlot === index && ({
                                                     border: 3,
                                                     borderColor: 'primary.dark',
                                                 }),
@@ -262,7 +276,7 @@ export default function Booking(){
                                                     padding: 2 
                                                 },
                                             ]}
-                                        onClick={() => setSelectedSlot(index)}>
+                                        onClick={() => selectTimeSlot(index)}>
                                             <Typography>
                                                 {slot.from.format('HH:mm')} - {slot.to.format('HH:mm')}
                                             </Typography>
@@ -282,23 +296,16 @@ export default function Booking(){
                         <Grid key="filterStartDate" item sm={12} md={6}>
                             <DatePicker
                                 readOnly
-                                label="Data Inizio"
-                                value={filterStartDate}
-                                renderInput={(params) => <TextField {...params} />} />
-                        </Grid>
-                        <Grid key="filterEndDate" item sm={12} md={6}>
-                            <DatePicker
-                                readOnly
-                                label="Data Fine"
-                                value={(filterEndDate === null) ? (filterStartDate) : (filterEndDate)}
+                                label="Data"
+                                value={state.selectedDate}
                                 renderInput={(params) => <TextField {...params} />} />
                         </Grid>
                         <Grid key="location" item sm={12} md={6}>
                             <Autocomplete
                                 readOnly
                                 sx={{ width: 280, }}
-                                value={selectedCity}
-                                options={cities}
+                                value={"Citta'"}
+                                options={['TODO', 'todo', 'tOdO']}
                                 disablePortal
                                 id="city-selected"
                                 renderInput={(params) => <TextField {...params} label="Citta'" />}
@@ -311,15 +318,17 @@ export default function Booking(){
 
     function disableNextStep() {
 
-        if (steps[activeStep].optional) return false;
+        console.log(state.activeStep);
 
-        switch (activeStep) {
+        if (steps[state.activeStep].optional) return false;
+
+        switch (state.activeStep) {
             case 0:
-                return !Object.values(checkedPets).some(x => x === true);
+                return !Object.values(state.checkedPets).some(x => x === true);
             case 1:
-                return selectedService === null;
+                return state.selectedService === null;
             case 2:
-                return selectedProvider === null;
+                return state.selectedProvider === null;
             case 3:
                 return false;
             case 4: 

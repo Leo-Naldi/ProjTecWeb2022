@@ -2,11 +2,19 @@ import dayjs from "dayjs";
 
 export function bookingReducer(state, action) {
     switch (action.type) {
+
+        case('CHANGE_STEP') : {
+            return {
+                ...state,
+                activeStep: action.value,
+            };
+        }
+
         case ('CHECK_PET') : {
             return {
                 ...state,
                 checkedPets: {
-                    ...state.checked_pets,
+                    ...state.checkedPets,
                     [action.id]: action.value
                 },
                 selectedService: null,
@@ -37,7 +45,7 @@ export function bookingReducer(state, action) {
         case ('FETCHED_PROVIDERS'): {
             return {
                 ...state,
-                providers: [...action.value],
+                providers: action.value,
                 selectedProvider: null,
                 schedule: null,
                 displaySchedule: null,
@@ -98,11 +106,22 @@ export function bookingReducer(state, action) {
             };
         }
 
+        case ('SELECT_TIME_SLOT') : {
+            return {
+                ...state,
+                selectedTimeSlot: action.value,
+            };
+        }
+
         case ('CHANGE_DISPLAY_MONTH') : {
             return {
                 ...state,
                 displaySchedule: action.value,
             };
+        }
+
+        default : {
+            throw Error("bookingReducer, unknown action with type: " + action.type);
         }
     }
 }
