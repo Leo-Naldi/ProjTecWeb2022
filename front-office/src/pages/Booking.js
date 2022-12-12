@@ -62,8 +62,8 @@ export default function Booking(){
     
     // step 3
     const [selectedDate, setSelectedDate] = useState(null);
-    const [schedule, setSchedule] = useState(null);  // schedule of the selected date's month
-    const [displaySchedule, setDisplaySchedule] = useState(null);  // schedule of the displayed month
+    const [schedule, setSchedule] = useState(null);
+    const [displaySchedule, setDisplaySchedule] = useState(null);
     const [timeSlots, setTimeSlots] = useState(null);
     const [selectedSlot, setSelectedSlot] = useState(null);
     
@@ -215,7 +215,7 @@ export default function Booking(){
                 </Stack>);
             case 2:
                 return (<Stack spacing={2}>
-                    {providers.map((provider, index) => (
+                    {providers.map((provider) => (
                         <Card
                             onClick={() => {
                                 handleSelectProvider(provider)

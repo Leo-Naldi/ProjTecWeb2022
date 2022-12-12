@@ -11,7 +11,7 @@ dayjs.extend(isSameOrAfter)
 chai.use(chaiAsPromised);
 chai.should();
 
-// TODO fix this horseshit
+
 describe("getServices Test Suite", function() {
 
     describe("#getMonthSchedule", function(){
