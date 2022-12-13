@@ -40,4 +40,6 @@ export const default_user = {
     pets: default_pets,
 };
 
+export const services = ['Veterinario', 'Dog Sitter'];
+
 export default default_user;

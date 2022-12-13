@@ -1,6 +1,11 @@
 import dayjs from "dayjs";
 
 export function bookingReducer(state, action) {
+
+    /* Setting a form field resets most of the fields that come after it.
+       This should hopefully prevent illegal states (like selecting a date that
+       wasnt actually available) */
+
     switch (action.type) {
 
         case('CHANGE_STEP') : {
@@ -120,8 +125,49 @@ export function bookingReducer(state, action) {
             };
         }
 
+        case ('FETCHED_SERVICES') : {
+            return {
+                ...state,
+                services: action.value,
+            };
+        }
+
+        case ('CHANGE_MODAL') : {
+            return {
+                ...state,
+                openFiltersModal: action.value,
+            }
+        }
+
+        case ('FILTER_DATE') : {
+            return {
+                ...state,
+                filterDate: action.value,
+            };
+        }
+
+        case ('FILTER_CITY'): {
+            return {
+                ...state,
+                filterCity: action.value,
+            };
+        }
+
+        case ('CLEAR_FILTERS') : {
+            return {
+                ...state,
+                filterCity: null,
+                filterDate: null,
+            };
+        }
+
+
+        case ('CLEAR') : {
+            return action.value;
+        }
+
         default : {
-            throw Error("bookingReducer, unknown action with type: " + action.type);
+            throw Error("bookingReducer, unknown action type: " + action.type);
         }
     }
 }

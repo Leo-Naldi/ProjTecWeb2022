@@ -1,16 +1,18 @@
-import React, {useEffect, useReducer, useState} from 'react';
+import React, { useEffect, useReducer } from 'react';
 import { Container, Box, Stack } from '@mui/system';
-import { Card, Button, CardContent, Grid, Typography, typographyClasses } from '@mui/material';
+import { Modal, Card, Button, CardContent, Grid, Typography } from '@mui/material';
 import { Autocomplete, TextField, Stepper, Step, StepLabel, FormControl, FormControlLabel, Checkbox } from '@mui/material';
 
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
-import dayjs from 'dayjs';
 
 import { useAccount } from '../context/CurrentAccountContext';
 import { getCities } from '../utils/getCities';
-import { services, getProviders, shouldDisableDate, getDaySchedule, getMonthSchedule, getEarliestAvailable } from '../utils/getServices';
+import { getServices, getProviders, shouldDisableDate, getDaySchedule, getMonthSchedule } from '../utils/getServices';
+
 import bookingReducer from '../reducers/bookingReducer';
+
+import dayjs from 'dayjs';
 
 
 const steps = [
@@ -48,7 +50,12 @@ export default function Booking(){
     const account = useAccount();
     const cities = getCities();
 
-    const initial_state = {
+    let booking_reducer_init_state = {
+        activeStep: 0,
+        services: [],
+        filterDate: null,
+        filterCity: null,
+        openFiltersModal: false,
         checkedPets: account.pets.reduce((o, pet) => (o[pet.name] = false, o), {}),
         selectedService: null,
         providers: null,
@@ -58,18 +65,12 @@ export default function Booking(){
         displaySchedule: null,
         timeSlots: null,
         selectedTimeSlot: null,
-        activeStep: 0,
     };
 
-    const [state, dispatch] = useReducer(bookingReducer, initial_state);
+    const [state, dispatch] = useReducer(bookingReducer, booking_reducer_init_state);
 
-    
-    
-    // generally speaking if you change something at step x, all state variables in the following 
-    // steps should be unset. The only exception is displaySchedule.
-    // TODO This avoids any illegal state configurations (i hope) but is stricter than it needs to be 
-
-    // TODO search filters
+    /* TODO search filters: nel select servces, vanno aggiunti due campi data e sede,
+       che filtrino i servizi disponibili. Sto filtraggio probabilmente e' meglio farlo server-side */
 
     const nextStep = () => dispatch({ 
         type: 'CHANGE_STEP', 
@@ -79,11 +80,17 @@ export default function Booking(){
         type: 'CHANGE_STEP', 
         value: state.activeStep - 1,
     });
-    const resetStep = () => dispatch({ 
-        type: 'CHANGE_STEP', 
-        value: 0 ,
-    });
-
+    const resetStep = () => dispatch({ type: 'CLEAR', value: booking_reducer_init_state });
+    const openFilters = () => dispatch({ type: 'CHANGE_MODAL', value: true });
+    const closeFilters = (keep = false) => {
+        if (!keep) {
+            dispatch({
+                type: 'CLEAR_FILTERS',
+                value: null,
+            })
+        }
+        dispatch({ type: 'CHANGE_MODAL', value: false });
+    }
     
     const handleSubmit = (e) => {
         alert("submitted! yay!");
@@ -151,14 +158,89 @@ export default function Booking(){
         }));
     }
 
+    useEffect(() => {
+        
+        let ignore = false;
+        
+        getServices(state.filterDate, state.filterCity, state.checkedPets).then((s) => {
+            if (!ignore) {
+                dispatch({
+                    type: 'FETCHED_SERVICES',
+                    value: s,
+                });
+            }
+        });
+
+        return (() => (ignore = true));
+    }, []);
+
     return (
         <Container>
             <Box sx={{ 
                 maxWidth: 'lg', 
                 mt: 2 }}
                 component="form" onSubmit={handleSubmit}>
+                
+                <Modal 
+                    open={state.openFiltersModal}
+                    onClose={closeFilters}>
+                    <Box sx={{
+                        bgcolor: '#fff',
+                        border: '2px solid',
+                        borderColor: 'primary.dark',
+                        boxShadow: 20,
+                        borderRadius: 2,
+                        p: 3,
+                        mx: 60,
+                        mt: 4,
+                    }}>
+                        <Typography component="h4">Filtri Ricerca</Typography>
+                        <Stack spacing={2}>
+                            <DatePicker 
+                                value={state.filterDate}
+                                onChange={(date) => {dispatch({
+                                    type: 'FILTER_DATE', 
+                                    value: date,
+                                })}}
+                                renderInput={(params) => <TextField {...params} />}>
+                                    Data
+                                </DatePicker>
+                            <Autocomplete
+                                disablePortal
+                                id="cities"
+                                options={cities}
+                                value={state.filterCity}
+                                onChange={(e, val, reason) => dispatch({
+                                    type: 'FILTER_CITY',
+                                    value: val,
+                                })}
+                                renderInput={(params) => <TextField {...params} label="City" />}
+                            />
+                            <Grid container spacing={1}>
+                                <Grid item key="apply-filters-button" xs={6}>
+                                    <Button onClick={() => {closeFilters(true)}}>
+                                        Apply
+                                    </Button>
+                                </Grid>
+                                <Grid item key="clear-filters-button" xs={6}>
+                                    <Button onClick={() => dispatch({ type: 'CLEAR_FILTERS' })}>
+                                        Clear
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </Stack>
+                    </Box>
+                </Modal>
 
                 <Grid container spacing={0}>
+
+                    <Grid item key="top" xs={12} padding={1} border={1}>
+                        <Grid item key="filters">
+                            <Button onClick={() => openFilters()}>
+                                Filters
+                            </Button>
+                        </Grid>
+                    </Grid>
 
                     <Grid key="stepper" item xs={0} sm={2} md={4} border={1} padding={1}>
                         <Stepper activeStep={state.activeStep} orientation="vertical">
@@ -216,7 +298,7 @@ export default function Booking(){
                 
             case 1:
                 return (<Stack spacing={2}>
-                    {services.map((service) => (
+                    {state.services.map((service) => (
                         <Card 
                             onClick={() => handleSelectService(service)}
                             sx={state.selectedService === service && ({

@@ -2,10 +2,11 @@ import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
+import { services } from './defaultData';
+
 dayjs.extend(isSameOrBefore)
 dayjs.extend(isSameOrAfter)
 
-export const services = ['Veterinario', 'Dog Sitter'];
 
 export function getMonthSchedule(provider, monthDate) {
 
@@ -29,7 +30,9 @@ export function getMonthSchedule(provider, monthDate) {
     })
 }
 
-export function getProviders(type='Veterinario', start_date=null, end_date=null, time=null) {
+export function getProviders(type='Veterinario', date=null, city=null, pet_types=null) {
+
+    /* Fetches all providers that satidsfy the criteria.  */
 
     let providers = [
         {
@@ -114,8 +117,9 @@ export function getDaySchedule(schedule, date) {
     });
 }
 
-export function getServices() {
-    return services;
+
+export function getServices(date = null, city = null, pets = null) {
+    return new Promise((resolve, reject) => { resolve(services) });
 }
 
 export default getServices;
