@@ -11,11 +11,24 @@ const pet_types = [
     'pesce', 
     'ragno',
     'orrore lovecraftiano',
-    'criceto'
+    'criceto',
+];
+
+const pet_sizes = [
+    'subatomico',
+    'microscopico',
+    'minuscolo',
+    'piccolo',
+    'medio',
+    'grande',
+    'immenso',
+    'colossale',
+    'gargantuesco',
+    'apocalittico',
 ];
 
 const dog_images = [Dog1, Dog2, Dog3];
-const dog_names = ['Fido', 'Pippo', 'Gatto']
+const dog_names = ['Fido', 'Pippo', 'Gatto'];
 
 function makeDogs() {
     let dogs = [];
@@ -26,6 +39,7 @@ function makeDogs() {
             name: dog_names[i],
             type: pet_types[0],
             age: i+1,
+            size: pet_sizes[i + 3],
         });
     }
 

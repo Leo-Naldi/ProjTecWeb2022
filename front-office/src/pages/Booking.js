@@ -112,7 +112,8 @@ export default function Booking(){
             value: service 
         });
 
-        getProviders().then(p => dispatch({
+        getProviders(service, state.filterDate, state.filterCity, state.checkedPets)
+        .then(p => dispatch({
             type: 'FETCHED_PROVIDERS',
             value: p,
         }));

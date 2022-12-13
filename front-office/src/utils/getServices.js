@@ -30,9 +30,9 @@ export function getMonthSchedule(provider, monthDate) {
     })
 }
 
-export function getProviders(type='Veterinario', date=null, city=null, pet_types=null) {
+export function getProviders(type='Veterinario', date=null, city=null, pets=null) {
 
-    /* Fetches all providers that satidsfy the criteria.  */
+    /* TODO Fetches all providers that satidsfy the criteria.  */
 
     let providers = [
         {
@@ -41,6 +41,8 @@ export function getProviders(type='Veterinario', date=null, city=null, pet_types
             service_type: services[0],
             city: 'Bologna',
             pet_types: ['cani', 'gatti'],
+            pet_sizes_min: null,
+            pet_sizes_max: null,
         },
         {
             id: 2,
@@ -48,13 +50,35 @@ export function getProviders(type='Veterinario', date=null, city=null, pet_types
             service_type: services[0],
             city: 'Forli',
             pet_types: [],
+            pet_sizes_min: null,
+            pet_sizes_max: null,
         },
         {
             id: 3,
             service_name: 'God Please Kill Me Veterinari',
             service_type: services[0],
             city: 'Roma',
-            pet_types: [],    
+            pet_types: [],
+            pet_sizes_min: null,
+            pet_sizes_max: null,    
+        },
+        {
+            id: 4,
+            service_name: 'Piero Angela PetSitter',
+            service_type: services[1],
+            city: 'Roma',
+            pet_types: [],
+            pet_sizes_min: null,
+            pet_sizes_max: null,
+        },
+        {
+            id: 5,
+            service_name: 'Gesu cristo',
+            service_type: services[1],
+            city: 'Roma',
+            pet_types: [],
+            pet_sizes_min: null,
+            pet_sizes_max: null,
         },
     ];
 
@@ -64,6 +88,8 @@ export function getProviders(type='Veterinario', date=null, city=null, pet_types
             providers[j].schedule.available_days = days;
         })
     }
+
+
 
     return new Promise((resolve, reject) => resolve(providers));
 }
