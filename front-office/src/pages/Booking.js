@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer } from 'react';
 import { Container, Box, Stack } from '@mui/system';
-import { Modal, Card, Button, CardContent, Grid, Typography } from '@mui/material';
+import { Modal, Card, Button, CardContent, Grid, Typography, getNativeSelectUtilityClasses } from '@mui/material';
 import { Autocomplete, TextField, Stepper, Step, StepLabel, FormControl, FormControlLabel, Checkbox } from '@mui/material';
 
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -11,6 +11,7 @@ import { getCities } from '../utils/getCities';
 import { getServices, getProviders, shouldDisableDate, getDaySchedule, getMonthSchedule } from '../utils/getServices';
 
 import bookingReducer from '../reducers/bookingReducer';
+import { filterProviders, filterAvailableServices } from '../utils/filters';
 
 import dayjs from 'dayjs';
 
@@ -52,35 +53,60 @@ export default function Booking(){
 
     let booking_reducer_init_state = {
         activeStep: 0,
-        services: [],
-        filterDate: null,
-        filterCity: null,
-        openFiltersModal: false,
-        checkedPets: account.pets.reduce((o, pet) => (o[pet.name] = false, o), {}),
-        selectedService: null,
-        providers: null,
-        selectedProvider: null,
-        selectedDate: null,
-        schedule: null,
-        displaySchedule: null,
-        timeSlots: null,
-        selectedTimeSlot: null,
+        services: [],             // list of all available services
+        filterDate: null,         // date filter value
+        filterCity: null,         // city filter value
+        openFiltersModal: false,  // open filters modal
+        checkedPets: account.pets // { pet.name: true/false }
+        .   reduce((o, pet) => (o[pet.name] = false, o), {}),
+        selectedService: null,    // chosen service type
+        providers: [],            // list of all providers
+        selectedProvider: null,   // selected provider
+        selectedDate: null,       
+        schedule: null,           // will be deprecated
+        displaySchedule: null,    // schedule currently used in the datepicker  
+        timeSlots: null,          // list of all available time slots in the selected date
+        selectedTimeSlot: null,   
+        filteredServices: [],     // list of filtered available services 
+        filteredProviders: [],    // list of filtered available providers
     };
 
     const [state, dispatch] = useReducer(bookingReducer, booking_reducer_init_state);
 
-    /* TODO search filters: nel select servces, vanno aggiunti due campi data e sede,
-       che filtrino i servizi disponibili. Sto filtraggio probabilmente e' meglio farlo server-side */
+    /* Filtered providers/services have to be recomputed in the following cases:
+       - Checked Pets changes (only applied when you move past the step)
+       - When the Apply button in the filters modal is pressed
+       - When a new service type is selected
+    */
 
-    const nextStep = () => dispatch({ 
-        type: 'CHANGE_STEP', 
-        value: (state.activeStep + 1),
-    });
+    const nextStep = () => {
+
+        if (state.activeStep == 0) {  // filter based on selected pets
+            dispatch({
+                type: 'APPLY_FILTERS',
+                pets: {},
+                providerOnly: false,
+            });
+        }
+        dispatch({ 
+            type: 'CHANGE_STEP', 
+            value: (state.activeStep + 1),
+        })
+    };
     const previousStep = () => dispatch({ 
         type: 'CHANGE_STEP', 
         value: state.activeStep - 1,
     });
-    const resetStep = () => dispatch({ type: 'CLEAR', value: booking_reducer_init_state });
+    const resetStep = () => dispatch({ 
+        type: 'CLEAR', 
+        value: {
+            ...booking_reducer_init_state,
+            providers: state.providers,
+            services: state.services,
+            filteredProviders: state.providers,
+            filteredServices: state.services,
+        }, 
+    });
     const openFilters = () => dispatch({ type: 'CHANGE_MODAL', value: true });
     const closeFilters = (keep = false) => {
         if (!keep) {
@@ -88,7 +114,13 @@ export default function Booking(){
                 type: 'CLEAR_FILTERS',
                 value: null,
             })
-        }
+        } else {
+            dispatch({
+                type: 'APPLY_FILTERS',
+                pets: {},
+                providerOnly: false,
+            });
+        } 
         dispatch({ type: 'CHANGE_MODAL', value: false });
     }
     
@@ -112,11 +144,12 @@ export default function Booking(){
             value: service 
         });
 
-        getProviders(service, state.filterDate, state.filterCity, state.checkedPets)
-        .then(p => dispatch({
-            type: 'FETCHED_PROVIDERS',
-            value: p,
-        }));
+        // Filter by service type
+        dispatch({
+            type: 'APPLY_FILTERS',
+            pets: {},
+            providerOnly: true,
+        });
     }
 
     const handleSelectProvider = (provider) => {
@@ -163,7 +196,8 @@ export default function Booking(){
         
         let ignore = false;
         
-        getServices(state.filterDate, state.filterCity, state.checkedPets).then((s) => {
+        // these will also set the filteredProviders/services
+        getServices().then((s) => {
             if (!ignore) {
                 dispatch({
                     type: 'FETCHED_SERVICES',
@@ -171,6 +205,16 @@ export default function Booking(){
                 });
             }
         });
+
+        getProviders()
+        .then(p => {
+            if (!ignore) {
+                dispatch({
+                    type: 'FETCHED_PROVIDERS',
+                    value: p,
+                })
+            }
+        })
 
         return (() => (ignore = true));
     }, []);
@@ -299,7 +343,7 @@ export default function Booking(){
                 
             case 1:
                 return (<Stack spacing={2}>
-                    {state.services.map((service) => (
+                    {state.filteredServices.map((service) => (
                         <Card 
                             onClick={() => handleSelectService(service)}
                             sx={state.selectedService === service && ({
@@ -312,7 +356,7 @@ export default function Booking(){
                 </Stack>);
             case 2:
                 return (<Stack spacing={2}>
-                    {state.providers.map((provider) => (
+                    {state.filteredProviders.map((provider) => (
                         <Card
                             onClick={() => {
                                 handleSelectProvider(provider)
@@ -400,8 +444,6 @@ export default function Booking(){
     }
 
     function disableNextStep() {
-
-        console.log(state.activeStep);
 
         if (steps[state.activeStep].optional) return false;
 

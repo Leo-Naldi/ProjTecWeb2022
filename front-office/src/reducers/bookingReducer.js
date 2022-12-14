@@ -1,5 +1,7 @@
 import dayjs from "dayjs";
 
+import { filterProviders, filterAvailableServices } from '../utils/filters';
+
 export function bookingReducer(state, action) {
 
     /* Setting a form field resets most of the fields that come after it.
@@ -20,24 +22,22 @@ export function bookingReducer(state, action) {
                 ...state,
                 checkedPets: {
                     ...state.checkedPets,
-                    [action.id]: action.value
+                    [action.id]: action.value,
+                    selectedProvider: null,
+                    schedule: null,
+                    displaySchedule: null,
+                    selectedDate: null,
+                    timeSlots: null,
+                    selectedTimeSlot: null,
                 },
-                selectedService: null,
-                providers: [],
-                selectedProvider: null,
-                schedule: null,
-                displaySchedule: null,
-                selectedDate: null,
-                timeSlots: null,
-                selectedTimeSlot: null,
             };
         }
 
         case ('SELECT_SERVICE'): {
-            return {
+
+            let res = {
                 ...state,
-                selectedService: action.value,
-                providers: [],
+                selectedService: null,
                 selectedProvider: null,
                 schedule: null,
                 displaySchedule: null,
@@ -45,6 +45,12 @@ export function bookingReducer(state, action) {
                 timeSlots: null,
                 selectedTimeSlot: null,
             };
+
+            if (state.selectedService != action.value){
+                res.selectedService = action.value;
+            }
+
+            return res;
         }
 
         case ('FETCHED_PROVIDERS'): {
@@ -57,19 +63,27 @@ export function bookingReducer(state, action) {
                 selectedDate: null,
                 timeSlots: null,
                 selectedTimeSlot: null,
+                filteredProviders: action.value,
             };
         }
 
         case ('SELECT_PROVIDER') : {
-            return {
+
+            let res = {
                 ...state,
-                selectedProvider: action.value,
+                selectedProvider: null,
                 schedule: null,
                 displaySchedule: null,
                 selectedDate: null,
                 timeSlots: null,
                 selectedTimeSlot: null,
             };
+
+            if (state.selectedProvider != action.value) {
+                res.selectedProvider = action.value;
+            }
+
+            return res;
         }
 
         case('FETCHED_DISPLAY_SCHEDULE') : {
@@ -129,6 +143,7 @@ export function bookingReducer(state, action) {
             return {
                 ...state,
                 services: action.value,
+                filteredServices: action.value,
             };
         }
 
@@ -158,9 +173,42 @@ export function bookingReducer(state, action) {
                 ...state,
                 filterCity: null,
                 filterDate: null,
+                // TODO unfilter
             };
         }
 
+        case ('APPLY_FILTERS') : {
+
+            let filtered_services = state.filteredServices;
+            let res = {...state};
+
+            const filtered_providers = filterProviders([...state.providers], state.selectedService,
+                state.filterDate, state.filterCity, action.pets);
+            
+            if (!action.providerOnly) {
+                filtered_services = filterAvailableServices(state.services, filtered_providers);
+            }
+
+            if ((state.selectedService !== null) && 
+                (filtered_services.indexOf(state.selectedService) == -1)) {
+                res.selectedService = null;
+                res.selectedProvider = null;
+                res.selectedDate = null;
+                res.selectedTimeSlot = null;
+            }
+
+            if ((state.selectedProvider !== null) && 
+                (filtered_providers.find(p => p.id == state.selectedProvider.id))){
+                res.selectedProvider = null;
+                res.selectedDate = null;
+                res.selectedTimeSlot = null;
+            }
+
+            res.filteredProviders = filtered_providers;
+            res.filteredServices = filtered_services;
+
+            return res;
+        }
 
         case ('CLEAR') : {
             return action.value;

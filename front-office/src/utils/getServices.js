@@ -10,6 +10,8 @@ dayjs.extend(isSameOrAfter)
 
 export function getMonthSchedule(provider, monthDate) {
 
+    /* the schedule will be vaid for monthDate's month and year.
+       each object represents the hour for a set of days (available_days) */
     let res = [{
         opening_morning: monthDate.hour(9),
         closing_morning: monthDate.hour(13),
@@ -30,10 +32,9 @@ export function getMonthSchedule(provider, monthDate) {
     })
 }
 
-export function getProviders(type='Veterinario', date=null, city=null, pets=null) {
-
-    /* TODO Fetches all providers that satidsfy the criteria.  */
-
+// TODO put the schedule back in the providers
+export function getProviders(type=null, date=null, city=null, pets=null) {
+    
     let providers = [
         {
             id: 1,
@@ -82,14 +83,11 @@ export function getProviders(type='Veterinario', date=null, city=null, pets=null
         },
     ];
 
-    // in the future the time slots will be sent by the server. maybe.
-    for (let j = 0; j < providers.length; j++) { 
-        getMonthSchedule(providers[j], dayjs()).then((days) => {
-            providers[j].schedule.available_days = days;
-        })
-    }
+    if (type !== null) providers = providers.filter(provider => provider.service_type == type);
 
+    if (date !== null) { /* this is a pain in the ass to do client side so i wont */ }
 
+    if (city !== null) providers = providers.filter(provider => provider.city == city);
 
     return new Promise((resolve, reject) => resolve(providers));
 }

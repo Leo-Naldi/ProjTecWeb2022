@@ -19,9 +19,9 @@ Sito pubblico per Animal House.
 - [Servizi Online]: 
     -videoconf con esperti, veterinari, con il proprio animale in ospedale o in pensione.
 
-# Implementazione
+# Framewirks
 
-L'app e' stata implementata utilizzando React e Material-UI.
+L'app e' stata implementata utilizzando React, Material-UI e un paio di componenti di React-Bootstrap.
 
 ## Project Tree
 ```
@@ -34,8 +34,19 @@ src
 ├── index.js            // Component-Tree root
 ├── pages               // Page root components
 ├── reportWebVitals.js  // I dont know and at this point i'm too afraid to ask
-├── routes              // Router data
+├── routes              // Router and router data (URIs)
+├── reducers            // Component reducers (for context and large component states)
+├── tests
+│   └── mocha           // Unit tests, mosty for util files
 ├── setupTests.js       // I swear to god one day i'll use it
 ├── tests               // Same as above
 └── utils               // Misk utility, mostly server comms
+    ├── defaultData.js  // App defaults and server-data mocks
+    ├── getCities.js    // Fetch CitiesList
+    ├── getProducts.js  // Fetch e-commerce products
+    ├── getReviews.js   // probably useless
+    ├── getServices.js  // Service fetching and filtering
+    ├── httpService.js  // HTTP requests wrappers TODO
+    ├── signInUser.js
+    └── signUpUser.js
 ```
