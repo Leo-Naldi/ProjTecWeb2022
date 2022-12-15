@@ -1,6 +1,12 @@
 import Dog1 from '../assets/images/dog.jpeg';
 import Dog2 from '../assets/images/dog2.jpg';
 import Dog3 from '../assets/images/dog3.jpg';
+import getCities from './getCities';
+
+import dayjs from 'dayjs';
+
+
+export const services = ['Veterinario', 'Dog Sitter'];
 
 const pet_types = [
     'cane', 
@@ -30,11 +36,69 @@ const pet_sizes = [
 const dog_images = [Dog1, Dog2, Dog3];
 const dog_names = ['Fido', 'Pippo', 'Gatto'];
 
-function makeDogs() {
-    let dogs = [];
+function makeDefaultProviders() {
+
+    let id = 0;
+    const cities = getCities();
+
+    const providers = [
+        {
+            id: id++,
+            service_name: 'PaccianiPets',
+            service_type: services[0],
+            city: 'Bologna',
+            pet_types: ['cani', 'gatti'],
+            pet_sizes_min: null,
+            pet_sizes_max: null,
+        },
+        {
+            id: id++,
+            service_name: 'Gianfranchi & Gianfranchi',
+            service_type: services[0],
+            city: 'Forli',
+            pet_types: [],
+            pet_sizes_min: null,
+            pet_sizes_max: null,
+        },
+        {
+            id: id++,
+            service_name: 'God Please Kill Me Veterinari',
+            service_type: services[0],
+            city: 'Roma',
+            pet_types: [],
+            pet_sizes_min: null,
+            pet_sizes_max: null,
+        },
+        {
+            id: id++,
+            service_name: 'Piero Angela PetSitter',
+            service_type: services[1],
+            city: 'Roma',
+            pet_types: [],
+            pet_sizes_min: null,
+            pet_sizes_max: null,
+        },
+        {
+            id: id++,
+            service_name: 'Gesu cristo',
+            service_type: services[1],
+            city: 'Roma',
+            pet_types: [],
+            pet_sizes_min: null,
+            pet_sizes_max: null,
+        },
+    ];
+
+    return providers;
+}
+
+function makeDefaultPets() {
+    let pets = [];
+    let id = 0;
 
     for (let i = 0; i < dog_images.length; i++) {
-        dogs.push({
+        pets.push({
+            id: id++,
             img: dog_images[i],
             name: dog_names[i],
             type: pet_types[0],
@@ -43,17 +107,48 @@ function makeDogs() {
         });
     }
 
-    return dogs.sort(() => Math.random() - 0.5); // shuffle the array
+    pets.push({
+        id: id++,
+        img: null,
+        name: "Ryl'p-gewahcht",
+        type: pet_types[7],
+        age: NaN,
+        size: pet_sizes[pet_sizes.length - 1],
+    });
+
+
+    return pets.sort(() => Math.random() - 0.5); // shuffle the array
 }
 
-export const default_pets = makeDogs();
+export function makeDefaultSchedule(monthDate) {
+    let res = [{
+        opening_morning: monthDate.hour(9),
+        closing_morning: monthDate.hour(13),
+        opening_afternoon: monthDate.hour(15).minute(30),
+        closing_afternoon: monthDate.hour(19),
+        available_days: [], // 1 - 31
+    }];
+
+    for (let i = 1; i < monthDate.daysInMonth() + 1; i++) {
+
+        // for now, push all days that arent weekends, in the future itll be determined serverside
+        if ((monthDate.date(i).day() !== 0) && (monthDate.date(i).day() !== 6))
+            res[0].available_days.push(i);
+    }
+
+    return res;
+}
+
+export const default_pets = makeDefaultPets();
+
+export const default_providers = makeDefaultProviders();
+
+export const default_schedule = makeDefaultSchedule(dayjs());
 
 export const default_user = {
     username: 'leonaldi',
     email: 'lnaldi99@gmail.com',
     pets: default_pets,
 };
-
-export const services = ['Veterinario', 'Dog Sitter'];
 
 export default default_user;

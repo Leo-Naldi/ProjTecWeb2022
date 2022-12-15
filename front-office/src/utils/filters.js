@@ -1,6 +1,6 @@
 
 export function filterProviders(providers, type, date, city, pets) {
-    let res = [...providers];
+    let res = [...providers];  // TODO make structured clone
 
     if (!res) {
         return [];
@@ -10,9 +10,11 @@ export function filterProviders(providers, type, date, city, pets) {
         res = res.filter(provider => provider.service_type == type);
     }
 
-    if (date !== null) { /* TODO */ }
+    if (date !== null) { /* TODO serverside */ }
 
     if (city !== null) { res = res.filter(provider => provider.city == city) }
+
+    if (pets) { /* TODO */ }
 
     return res;
 }

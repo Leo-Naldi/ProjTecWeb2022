@@ -66,7 +66,7 @@ export function bookingReducer(state, action) {
             };
 
             if (action.value.indexOf(state.selectedProvider) == -1) res.selectedProvider = null;
-            
+
             return res;
         }
 
@@ -190,39 +190,6 @@ export function bookingReducer(state, action) {
                 filterDate: null,
                 // TODO unfilter
             };
-        }
-
-        case ('APPLY_FILTERS') : {
-
-            let filtered_services = state.filteredServices;
-            let res = {...state};
-
-            const filtered_providers = filterProviders([...state.providers], state.selectedService,
-                state.filterDate, state.filterCity, action.pets);
-            
-            if (!action.providerOnly) {
-                filtered_services = filterAvailableServices(state.services, filtered_providers);
-            }
-
-            if ((state.selectedService !== null) && 
-                (filtered_services.indexOf(state.selectedService) == -1)) {
-                res.selectedService = null;
-                res.selectedProvider = null;
-                res.selectedDate = null;
-                res.selectedTimeSlot = null;
-            }
-
-            if ((state.selectedProvider !== null) && 
-                (filtered_providers.find(p => p.id == state.selectedProvider.id))){
-                res.selectedProvider = null;
-                res.selectedDate = null;
-                res.selectedTimeSlot = null;
-            }
-
-            res.filteredProviders = filtered_providers;
-            res.filteredServices = filtered_services;
-
-            return res;
         }
 
         case ('CLEAR') : {

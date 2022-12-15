@@ -7,6 +7,7 @@ export function getCities(){
         'Venezia',
         'Bari',
         'Napoli',
+        'Frosinone',
     ];
 }
 

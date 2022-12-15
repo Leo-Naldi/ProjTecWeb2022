@@ -58,7 +58,7 @@ export default function Booking(){
         filterCity: null,         // city filter value
         openFiltersModal: false,  // open filters modal
         checkedPets: account.pets // { pet.name: true/false }
-        .   reduce((o, pet) => (o[pet.name] = false, o), {}),
+        .   reduce((o, pet) => (o[pet.id] = false, o), {}),
         selectedService: null,    // chosen service type
         providers: [],            // list of all providers
         selectedProvider: null,   // selected provider
@@ -79,7 +79,8 @@ export default function Booking(){
     */
 
     const applyFliters = () => {
-        getProviders(state.selectedService, state.filterDate, state.filterCity, null)
+        console.log(getPets());
+        getProviders(state.selectedService, state.filterDate, state.filterCity, getPets())
             .then(p => {
                 dispatch({ type: 'FETCHED_PROVIDERS', value: p })
                 getServices(p).then(s => dispatch({
@@ -131,12 +132,12 @@ export default function Booking(){
         alert("submitted! yay!");
     };
 
-    const handleCheck = (e) => {
+    const handleCheck = (e, id) => {
 
         dispatch({ 
             type: 'CHECK_PET', 
             value: e.target.checked, 
-            id: e.target.name 
+            id: id, 
         });
     }
 
@@ -328,8 +329,8 @@ export default function Booking(){
                             <FormControlLabel
                                 control={
                                     <Checkbox
-                                        checked={state.checkedPets[pet.name]}
-                                        onChange={handleCheck}
+                                        checked={state.checkedPets[pet.id]}
+                                        onChange={(e) => handleCheck(e, pet.id)}
                                         name={pet.name} />
                                 }
                                 label={pet.name} />
@@ -459,5 +460,9 @@ export default function Booking(){
 
         }
 
+    }
+
+    function getPets() {
+        return account.pets.filter(pet => state.checkedPets[pet.id]);
     }
 }
