@@ -48,6 +48,9 @@ const steps = [
 
 export default function Booking(){
 
+    // TODO style
+    // TODO clear doesnt clear
+
     const account = useAccount();
     const cities = getCities();
 

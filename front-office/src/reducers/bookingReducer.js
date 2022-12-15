@@ -1,6 +1,5 @@
 import dayjs from "dayjs";
 
-import { filterProviders, filterAvailableServices } from '../utils/filters';
 
 export function bookingReducer(state, action) {
 

@@ -5,6 +5,7 @@ import getCities from './getCities';
 
 import dayjs from 'dayjs';
 
+// TODO comments
 
 export const services = ['Veterinario', 'Dog Sitter'];
 
@@ -20,7 +21,7 @@ const pet_types = [
     'criceto',
 ];
 
-const pet_sizes = [
+export const pet_sizes = [
     'subatomico',
     'microscopico',
     'minuscolo',
@@ -47,7 +48,7 @@ function makeDefaultProviders() {
             service_name: 'PaccianiPets',
             service_type: services[0],
             city: 'Bologna',
-            pet_types: ['cani', 'gatti'],
+            pet_types: pet_types.slice(0, 3),
             pet_sizes_min: null,
             pet_sizes_max: null,
         },
@@ -88,6 +89,15 @@ function makeDefaultProviders() {
             pet_sizes_max: null,
         },
     ];
+
+    for (let i = 0; i < providers.length; i++) {
+        providers[i].pet_sizes_min = pet_sizes.slice(0, 4)[Math.floor(Math.random() * 4)];
+        providers[i].pet_sizes_max = pet_sizes.slice(5, pet_sizes.length - 1)[Math.floor(Math.random() * 4)];
+        
+        if (providers[i].pet_types.length == 0) providers[i].pet_types = [...pet_types];
+    }
+
+    providers[1].pet_sizes_max = pet_sizes[pet_sizes.length - 1];
 
     return providers;
 }
