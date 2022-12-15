@@ -54,10 +54,9 @@ export function bookingReducer(state, action) {
         }
 
         case ('FETCHED_PROVIDERS'): {
-            return {
+            let res =  {
                 ...state,
                 providers: action.value,
-                selectedProvider: null,
                 schedule: null,
                 displaySchedule: null,
                 selectedDate: null,
@@ -65,6 +64,10 @@ export function bookingReducer(state, action) {
                 selectedTimeSlot: null,
                 filteredProviders: action.value,
             };
+
+            if (action.value.indexOf(state.selectedProvider) == -1) res.selectedProvider = null;
+            
+            return res;
         }
 
         case ('SELECT_PROVIDER') : {
@@ -140,11 +143,23 @@ export function bookingReducer(state, action) {
         }
 
         case ('FETCHED_SERVICES') : {
-            return {
+            let res = {
                 ...state,
                 services: action.value,
                 filteredServices: action.value,
             };
+
+            if (res.services.indexOf(state.selectedProvider) == -1) {
+                res.selectedService = null;
+                res.selectedProvider = null;
+                res.schedule = null;
+                res.displaySchedule = null;
+                res.selectedDate = null;
+                res.timeSlots = null;
+                res.selectedTimeSlot = null;
+            }
+
+            return res;
         }
 
         case ('CHANGE_MODAL') : {

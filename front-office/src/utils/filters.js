@@ -20,6 +20,7 @@ export function filterProviders(providers, type, date, city, pets) {
 export function filterAvailableServices(services, filtered_providers) {
 
     if (!services) return [];
+    if (!filtered_providers) return services;
 
     return services.filter(s => filtered_providers.some(p => p.service_type == s));
 }

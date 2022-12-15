@@ -3,6 +3,7 @@ import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
 import { services } from './defaultData';
+import { filterAvailableServices, filterProviders } from "./filters";
 
 dayjs.extend(isSameOrBefore)
 dayjs.extend(isSameOrAfter)
@@ -83,11 +84,8 @@ export function getProviders(type=null, date=null, city=null, pets=null) {
         },
     ];
 
-    if (type !== null) providers = providers.filter(provider => provider.service_type == type);
+    providers = filterProviders(providers, type, date, city, pets);
 
-    if (date !== null) { /* this is a pain in the ass to do client side so i wont */ }
-
-    if (city !== null) providers = providers.filter(provider => provider.city == city);
 
     return new Promise((resolve, reject) => resolve(providers));
 }
@@ -142,8 +140,9 @@ export function getDaySchedule(schedule, date) {
 }
 
 
-export function getServices(date = null, city = null, pets = null) {
-    return new Promise((resolve, reject) => { resolve(services) });
+export function getServices(providers=null) {
+
+    return new Promise((resolve, reject) => { resolve(filterAvailableServices(services, providers)) });
 }
 
 export default getServices;

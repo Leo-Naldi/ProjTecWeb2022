@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer } from 'react';
 import { Container, Box, Stack } from '@mui/system';
-import { Modal, Card, Button, CardContent, Grid, Typography, getNativeSelectUtilityClasses } from '@mui/material';
+import { Modal, Card, Button, CardContent, Grid, Typography } from '@mui/material';
 import { Autocomplete, TextField, Stepper, Step, StepLabel, FormControl, FormControlLabel, Checkbox } from '@mui/material';
 
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -11,7 +11,7 @@ import { getCities } from '../utils/getCities';
 import { getServices, getProviders, shouldDisableDate, getDaySchedule, getMonthSchedule } from '../utils/getServices';
 
 import bookingReducer from '../reducers/bookingReducer';
-import { filterProviders, filterAvailableServices } from '../utils/filters';
+
 
 import dayjs from 'dayjs';
 
@@ -67,26 +67,33 @@ export default function Booking(){
         displaySchedule: null,    // schedule currently used in the datepicker  
         timeSlots: null,          // list of all available time slots in the selected date
         selectedTimeSlot: null,   
-        filteredServices: [],     // list of filtered available services 
-        filteredProviders: [],    // list of filtered available providers
     };
 
     const [state, dispatch] = useReducer(bookingReducer, booking_reducer_init_state);
 
-    /* Filtered providers/services have to be recomputed in the following cases:
+    /* Filtered providers/services have to be refiltered (server-side) in the following cases:
        - Checked Pets changes (only applied when you move past the step)
        - When the Apply button in the filters modal is pressed
-       - When a new service type is selected
+
+       Filtering based on service type happens client side as of now
     */
+
+    const applyFliters = () => {
+        getProviders(state.selectedService, state.filterDate, state.filterCity, null)
+            .then(p => {
+                dispatch({ type: 'FETCHED_PROVIDERS', value: p })
+                getServices(p).then(s => dispatch({
+                    type: 'FETCHED_SERVICES',
+                    value: s,
+                }))
+            });
+        
+    };
 
     const nextStep = () => {
 
         if (state.activeStep == 0) {  // filter based on selected pets
-            dispatch({
-                type: 'APPLY_FILTERS',
-                pets: {},
-                providerOnly: false,
-            });
+            applyFliters();
         }
         dispatch({ 
             type: 'CHANGE_STEP', 
@@ -115,11 +122,7 @@ export default function Booking(){
                 value: null,
             })
         } else {
-            dispatch({
-                type: 'APPLY_FILTERS',
-                pets: {},
-                providerOnly: false,
-            });
+            applyFliters()
         } 
         dispatch({ type: 'CHANGE_MODAL', value: false });
     }
@@ -141,14 +144,7 @@ export default function Booking(){
         
         dispatch({ 
             type: 'SELECT_SERVICE', 
-            value: service 
-        });
-
-        // Filter by service type
-        dispatch({
-            type: 'APPLY_FILTERS',
-            pets: {},
-            providerOnly: true,
+            value: service,
         });
     }
 
@@ -343,7 +339,7 @@ export default function Booking(){
                 
             case 1:
                 return (<Stack spacing={2}>
-                    {state.filteredServices.map((service) => (
+                    {state.services.map((service) => (
                         <Card 
                             onClick={() => handleSelectService(service)}
                             sx={state.selectedService === service && ({
@@ -356,7 +352,8 @@ export default function Booking(){
                 </Stack>);
             case 2:
                 return (<Stack spacing={2}>
-                    {state.filteredProviders.map((provider) => (
+                    {state.providers.filter(p => p.service_type == state.selectedService)
+                    .map((provider) => (
                         <Card
                             onClick={() => {
                                 handleSelectProvider(provider)
