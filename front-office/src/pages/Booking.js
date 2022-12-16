@@ -12,8 +12,8 @@ import { getServices, getProviders, shouldDisableDate, getDaySchedule, getMonthS
 
 import bookingReducer from '../reducers/bookingReducer';
 
-
 import dayjs from 'dayjs';
+import { filterAvailableServices, filterProviders } from '../utils/filters';
 
 
 const steps = [
@@ -50,6 +50,7 @@ export default function Booking(){
 
     // TODO style
     // TODO clear doesnt clear
+    // TODO decide between get all providers once and filter locally or server-get them every time.
 
     const account = useAccount();
     const cities = getCities();
@@ -63,13 +64,15 @@ export default function Booking(){
         checkedPets: account.pets // { pet.name: true/false }
         .   reduce((o, pet) => (o[pet.id] = false, o), {}),
         selectedService: null,    // chosen service type
-        providers: [],            // list of all providers
+        providers: [],            // list of displayed providers
         selectedProvider: null,   // selected provider
         selectedDate: null,       
         schedule: null,           // will be deprecated
         displaySchedule: null,    // schedule currently used in the datepicker  
         timeSlots: null,          // list of all available time slots in the selected date
-        selectedTimeSlot: null,   
+        selectedTimeSlot: null,  
+        filteredServices: null,
+        filteredProviders: null, 
     };
 
     const [state, dispatch] = useReducer(bookingReducer, booking_reducer_init_state);
@@ -82,17 +85,20 @@ export default function Booking(){
     */
 
     const applyFliters = () => {
-        console.log(getPets());
-        getProviders(state.selectedService, state.filterDate, state.filterCity, getPets())
-            .then(p => {
-                dispatch({ type: 'FETCHED_PROVIDERS', value: p })
-                getServices(p).then(s => dispatch({
-                    type: 'FETCHED_SERVICES',
-                    value: s,
-                }))
-            });
+        //console.log(getPets());
         
+        dispatch({
+            type: 'APPLY_FILTERS',
+            pets: getPets(),
+        })
     };
+
+    const clearFilters = () => {
+        dispatch({
+            type: 'CLEAR_FILTERS',
+        })
+        applyFliters();
+    }
 
     const nextStep = () => {
 
@@ -120,12 +126,8 @@ export default function Booking(){
     });
     const openFilters = () => dispatch({ type: 'CHANGE_MODAL', value: true });
     const closeFilters = (keep = false) => {
-        if (!keep) {
-            dispatch({
-                type: 'CLEAR_FILTERS',
-                value: null,
-            })
-        } else {
+        // TODO when closing without keepin previous filter values should be restored
+        if (keep) {
             applyFliters()
         } 
         dispatch({ type: 'CHANGE_MODAL', value: false });
@@ -268,7 +270,7 @@ export default function Booking(){
                                     </Button>
                                 </Grid>
                                 <Grid item key="clear-filters-button" xs={6}>
-                                    <Button onClick={() => dispatch({ type: 'CLEAR_FILTERS' })}>
+                                    <Button onClick={() => clearFilters()}>
                                         Clear
                                     </Button>
                                 </Grid>
@@ -343,7 +345,13 @@ export default function Booking(){
                 
             case 1:
                 return (<Stack spacing={2}>
-                    {state.services.map((service) => (
+                    {(state.filteredServices.length == 0) ? 
+                    (<Container>
+                        <Typography variant='h5' sx={{ padding: 2 }}>
+                            Non ci sono servizi disponibili per i filtri selezionati D:
+                        </Typography>
+                    </Container>) : 
+                    (state.filteredServices.map((service) => (
                         <Card 
                             onClick={() => handleSelectService(service)}
                             sx={state.selectedService === service && ({
@@ -352,11 +360,11 @@ export default function Booking(){
                             })}>
                             <CardContent>{service}</CardContent>
                         </Card>
-                    ))}
+                    )))}
                 </Stack>);
             case 2:
                 return (<Stack spacing={2}>
-                    {state.providers.filter(p => p.service_type == state.selectedService)
+                    {filterProviders(state.filteredProviders, state.selectedService)
                     .map((provider) => (
                         <Card
                             onClick={() => {

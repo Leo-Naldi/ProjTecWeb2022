@@ -17,7 +17,7 @@ function petTypeAllowed(provider, type) {
     return provider.pet_types.indexOf(type) !== -1;
 }
 
-export function filterProviders(providers, type, date, city, pets) {
+export function filterProviders(providers, type=null, date=null, city=null, pets=null) {
     let res = [...providers];  // TODO make structured clone
 
     if (!res) {

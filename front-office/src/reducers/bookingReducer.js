@@ -1,5 +1,36 @@
 import dayjs from "dayjs";
+import { filterAvailableServices, filterProviders } from "../utils/filters";
 
+function goBack(state, step) {
+    switch(step) {
+        case (1) : {  // select service
+            return {
+                ...state,
+                activeStep: 1,
+                selectedService: null,    
+                selectedProvider: null,   
+                selectedDate: null,
+                schedule: null,           
+                displaySchedule: null,      
+                timeSlots: null,          
+                selectedTimeSlot: null,   
+            };
+        }
+
+        case (2) : { // select provider
+            return {
+                ...state,
+                activeStep: 2,
+                selectedProvider: null,
+                selectedDate: null,
+                schedule: null,
+                displaySchedule: null,
+                timeSlots: null,
+                selectedTimeSlot: null,
+            };
+        }
+    }
+}
 
 export function bookingReducer(state, action) {
 
@@ -64,7 +95,7 @@ export function bookingReducer(state, action) {
                 filteredProviders: action.value,
             };
 
-            if (action.value.indexOf(state.selectedProvider) == -1) res.selectedProvider = null;
+            if (!action.value.some(p => p.id == state.selectedProvider)) res.selectedProvider = null;
 
             return res;
         }
@@ -145,10 +176,9 @@ export function bookingReducer(state, action) {
             let res = {
                 ...state,
                 services: action.value,
-                filteredServices: action.value,
             };
 
-            if (res.services.indexOf(state.selectedProvider) == -1) {
+            if (action.value.indexOf(state.selectedProvider) == -1) {
                 res.selectedService = null;
                 res.selectedProvider = null;
                 res.schedule = null;
@@ -187,12 +217,53 @@ export function bookingReducer(state, action) {
                 ...state,
                 filterCity: null,
                 filterDate: null,
-                // TODO unfilter
             };
         }
 
         case ('CLEAR') : {
             return action.value;
+        }
+
+        case ('APPLY_FILTERS') : {
+
+            // TODO this is the stupidest shit ever written
+
+
+            let filtered_providers = filterProviders(state.providers, null,
+                state.filterDate, state.filterCity, action.pets);
+            let filtered_services = filterAvailableServices(state.services, filtered_providers);
+
+            let res = {
+                ...state,
+                filteredProviders: filtered_providers,
+                filteredServices: filtered_services,
+            };
+
+            if ((state.selectedService !== null) &&
+                (filtered_services.indexOf(state.selectedService) == -1)) {
+                
+                // filters date, city and pets have eliminated all providers with selectedService type
+                
+                res.selectedProvider = null;
+                res.selectedService = null;
+
+                return goBack(res, 1);
+
+            } else if ((state.selectedProvider !== null) && 
+                (!filtered_providers.some(p => p.id == state.selectedProvider))) {
+                
+                // there are still providers with selectedService type available, but selectedProvider si
+                // no longer one of them
+
+                res.selectedProvider = null;
+
+                return goBack(res, 2);
+            }
+
+            // selectedService and selectedProvider are still available, or they were not set 
+            // to begin with
+
+            return res;
         }
 
         default : {
