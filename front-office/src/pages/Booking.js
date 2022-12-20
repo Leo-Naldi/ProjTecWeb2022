@@ -289,13 +289,15 @@ export default function Booking(){
                 mt: 2 }}
                 component="form" onSubmit={handleSubmit}>    
 
-                <Grid container spacing={0}>
+                <Stack spacing={0}>
                     
-                    <Grid container key='top' justifyContent='space-between' alignItems='center' 
+                    <Box key='top' 
                         sx={{
                             p: 2,
                             border: 1,
                             borderBottom: 0,
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
                         }}>   
                             <Typography variant='h6'>
                                 {steps[state.activeStep].label}
@@ -305,39 +307,40 @@ export default function Booking(){
                                 Filters
                             </Button>
                         
-                    </Grid>
+                    </Box>
                     
+                    <Grid container spacing={0}>
+                        {useMediaQuery(theme.breakpoints.up('sm')) && <Grid key="stepper" item sm={3} sx={{
+                            padding: 1,
+                            border: 1,
+                            [theme.breakpoints.up('sm')]: {
+                                borderRight: 0,
+                            }
+                        }}>
+                            <Stepper 
+                                activeStep={state.activeStep} 
+                                orientation='vertical'>
+                                {steps.map((step) => (
+                                    <Step key={step.label}>
+                                        <StepLabel optional={step.optional ? (
+                                            <Typography variant="caption">Opzionale</Typography>
+                                        ) : null}>
+                                            {step.label}
+                                        </StepLabel>
+                                    </Step>
+                                ))}
+                            </Stepper>
+                        </Grid>}
 
-                    {useMediaQuery(theme.breakpoints.up('sm')) && <Grid key="stepper" item sm={3} sx={{
-                        padding: 1,
-                        border: 1,
-                        [theme.breakpoints.up('sm')]: {
-                            borderRight: 0,
-                        }
-                    }}>
-                        <Stepper 
-                            activeStep={state.activeStep} 
-                            orientation='vertical'>
-                            {steps.map((step) => (
-                                <Step key={step.label}>
-                                    <StepLabel optional={step.optional ? (
-                                        <Typography variant="caption">Opzionale</Typography>
-                                    ) : null}>
-                                        {step.label}
-                                    </StepLabel>
-                                </Step>
-                            ))}
-                        </Stepper>
-                    </Grid>}
-
-                    <Grid key="steps" item xs={12} sm={9} border={1} padding={1}>
-                        {getActiveStepComponent(state.activeStep)}
+                        <Grid key="steps" item xs={12} sm={9} border={1} padding={1}>
+                            {ActiveStepComponent(state.activeStep)}
+                        </Grid>
                     </Grid>
 
                     
                     {useMediaQuery(theme.breakpoints.up('sm')) ? 
-                        (<Grid key="buttons" item 
-                            xs={12} sm={12} md={12} sx={{
+                        (<Box key="buttons" item 
+                            sx={{
                                 padding: 1,
                                 border: 1,
                                 borderTop: 0,
@@ -350,7 +353,7 @@ export default function Booking(){
                             {(state.activeStep === steps.length - 1) ? (<Button type="submit">
                                 Prenota
                             </Button>) : null}
-                        </Grid>) : (<MobileStepper
+                        </Box>) : (<MobileStepper
                             variant='dots'
                             steps={steps.length}
                             activeStep={state.activeStep}
@@ -369,14 +372,16 @@ export default function Booking(){
                                 </Button>
                         }/>)
                     }
-                </Grid>
+                </Stack>
 
             </Box>
         </Container>
     );
 
-    function getActiveStepComponent(step) {
+    function ActiveStepComponent(step) {
 
+        const screen_size_query = useMediaQuery(theme.breakpoints.up('md'));
+        
         switch (step) {
             case 0:
                 return (
@@ -439,14 +444,22 @@ export default function Booking(){
             case 3: 
                 return (
                     <Box>
-                        <StaticDatePicker 
+                        {screen_size_query ? 
+                         (<StaticDatePicker 
                             disablePast
                             displayStaticWrapperAs="desktop"
                             shouldDisableDate={(date) => shouldDisableDate(state.displaySchedule, date)}
                             value={state.selectedDate}
                             onChange={(newVal) => {handleSelectDate(newVal)}}
                             onMonthChange={handleMonthChange}
-                            renderInput={(params) => <TextField {...params} />}/>
+                            renderInput={(params) => <TextField {...params} />}/>) : 
+                            (<DatePicker
+                                disablePast
+                                shouldDisableDate={(date) => shouldDisableDate(state.displaySchedule, date)}
+                                value={state.selectedDate}
+                                onChange={(newVal) => { handleSelectDate(newVal) }}
+                                onMonthChange={handleMonthChange}
+                                renderInput={(params) => <TextField {...params} />} />)}
                         <Grid container spacing={2}>
                             <Grid item>
                                 {(state.timeSlots === null) ? (
