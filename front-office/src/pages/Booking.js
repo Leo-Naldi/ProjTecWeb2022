@@ -34,9 +34,14 @@ const steps = [
         optional: false,
     },
     {
-        label: "Data e Ora",
-        description: `Scegli data e orario`,
-        optional: true,
+        label: "Seleziona Data",
+        description: `Scegli data`,
+        optional: false,
+    },
+    {
+        label: 'Seleziona Orario',
+        description: "Seleziona l'orario della prenotazione",
+        optional: false,
     },
     {
         label: "Prenota",
@@ -460,34 +465,34 @@ export default function Booking(){
                                 onChange={(newVal) => { handleSelectDate(newVal) }}
                                 onMonthChange={handleMonthChange}
                                 renderInput={(params) => <TextField {...params} />} />)}
-                        <Grid container spacing={2}>
-                            <Grid item>
-                                {(state.timeSlots === null) ? (
-                                <Typography>Loading...</Typography>) : 
-                                (<Grid container spacing={1}>
-                                        {state.timeSlots.map((slot, index) => (<Grid item
-                                        md={3} key={index}>
-                                        <Card sx={[
-                                            state.selectedTimeSlot === index && ({
-                                                    border: 3,
-                                                    borderColor: 'primary.dark',
-                                                }),
-                                                { 
-                                                    padding: 2 
-                                                },
-                                            ]}
-                                        onClick={() => selectTimeSlot(index)}>
-                                            <Typography>
-                                                {slot.from.format('HH:mm')} - {slot.to.format('HH:mm')}
-                                            </Typography>
-                                        </Card>
-                                    </Grid>))}
-                                </Grid>)}
-                            </Grid>
+                        
+                    </Box>
+                );
+            case 4: 
+                return (
+                    <Box>
+                        <Grid container spacing={1}>
+                            {state.timeSlots.map((slot, index) => (<Grid item
+                                md={3} key={index}>
+                                <Card sx={[
+                                    state.selectedTimeSlot === index && ({
+                                        border: 3,
+                                        borderColor: 'primary.dark',
+                                    }),
+                                    {
+                                        padding: 2
+                                    },
+                                ]}
+                                    onClick={() => selectTimeSlot(index)}>
+                                    <Typography>
+                                        {slot.from.format('HH:mm')} - {slot.to.format('HH:mm')}
+                                    </Typography>
+                                </Card>
+                            </Grid>))}
                         </Grid>
                     </Box>
                 );
-            case 4:
+            case 5:
                 return (<Box>
                     <Grid container sx={{
                         pt: 2,
@@ -528,8 +533,10 @@ export default function Booking(){
             case 2:
                 return state.selectedProvider === null;
             case 3:
-                return false;
-            case 4: 
+                return state.selectedDate === null;
+            case 4:
+                return state.selectTimeSlot === null;
+            case 5: 
             default:
                 return true;
 
