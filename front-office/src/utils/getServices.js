@@ -4,6 +4,7 @@ import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
 import { default_providers, makeDefaultSchedule, services } from './defaultData';
 import { filterAvailableServices, filterProviders } from "./filters";
+import getCities from "./getCities";
 
 dayjs.extend(isSameOrBefore)
 dayjs.extend(isSameOrAfter)

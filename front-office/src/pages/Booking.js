@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer } from 'react';
 import { Container, Box, Stack } from '@mui/system';
-import { Modal, Card, Button, CardContent, Grid, Typography, useTheme, useMediaQuery, MobileStepper } from '@mui/material';
+import { Modal, Card, Button, CardContent, Grid, Typography, useTheme, useMediaQuery, MobileStepper, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import { Autocomplete, TextField, Stepper, Step, StepLabel, FormControl, FormControlLabel, Checkbox } from '@mui/material';
 
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -9,6 +9,8 @@ import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import { useAccount } from '../context/CurrentAccountContext';
 import { getCities } from '../utils/getCities';
 import { getServices, getProviders, shouldDisableDate, getDaySchedule, getMonthSchedule } from '../utils/getServices';
+
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import bookingReducer from '../reducers/bookingReducer';
 
@@ -155,23 +157,31 @@ export default function Booking(){
 
     const handleSelectService = (service) => {
         
+        
         dispatch({ 
             type: 'SELECT_SERVICE', 
             value: service,
         });
     }
 
-    const handleSelectProvider = (provider) => {
+    const handleSelectProvider = (e, provider) => {
         
-        dispatch({
-            type: 'SELECT_PROVIDER',
-            value: provider.id,
-        });
+        if (e.target.checked) {
+            dispatch({
+                type: 'SELECT_PROVIDER',
+                value: provider.id,
+            });
 
-        getMonthSchedule(provider, dayjs()).then(s => dispatch({
-            type: 'FETCHED_DISPLAY_SCHEDULE',
-            value: s,
-        }));
+            getMonthSchedule(provider, dayjs()).then(s => dispatch({
+                type: 'FETCHED_DISPLAY_SCHEDULE',
+                value: s,
+            }));
+        } else {
+            dispatch({
+                type: 'SELECT_PROVIDER',
+                value: null,
+            });
+        }
     }
 
     const handleSelectDate = (date) => {
@@ -423,29 +433,36 @@ export default function Booking(){
                         </Card>
                     )))}
                 </Stack>);
-            case 2:
-                return (<Stack spacing={2}>
-                    {filterProviders(state.filteredProviders, state.selectedService)
-                    .map((provider) => (
-                        <Card
-                            onClick={() => {
-                                handleSelectProvider(provider)
-                            }}
-                            sx={state.selectedProvider == provider.id && ({
-                                border: 3,
-                                borderColor: 'primary.dark',
-                            })}>
-                            <CardContent>
-                                <Typography variant="h5">
-                                    {provider.service_name}
-                                </Typography>
-                                <Typography variant="subtle1">
-                                    {provider.city}
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </Stack>);
+            case 2: {
+                const filtered_providers = filterProviders(state.filteredProviders, state.selectedService);
+
+                return (<Stack spacing={1}>
+
+                    {cities.filter(c => filtered_providers.some(p => p.city == c)).map(city => <Accordion>
+                        <AccordionSummary
+                            expandIcon={<ExpandMoreIcon />}
+                            id={`${city}-header`}>
+                            <Typography>
+                                {city}
+                            </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Stack>
+                                <FormControl>
+                                {filtered_providers.filter(p => p.city == city).map(p => 
+                                    <FormControlLabel
+                                        control={<Checkbox
+                                            checked={state.selectedProvider === p.id}
+                                            onChange={(e) => handleSelectProvider(e, p)}
+                                            name={p.service_name} />
+                                        }
+                                        label={p.service_name}/>)
+                                }
+                                </FormControl>
+                            </Stack>
+                        </AccordionDetails>
+                    </Accordion>)}
+                </Stack>);}
             case 3: 
                 return (
                     <Box>
@@ -527,7 +544,7 @@ export default function Booking(){
 
         switch (state.activeStep) {
             case 0:
-                return !Object.values(state.checkedPets).some(x => x === true);
+                return !Object.values(state.checkedPets).some(x => x);
             case 1:
                 return state.selectedService === null;
             case 2:
@@ -548,3 +565,34 @@ export default function Booking(){
         return account.pets.filter(pet => state.checkedPets[pet.id]);
     }
 }
+
+
+
+
+
+
+
+
+/*
+{filterProviders(state.filteredProviders, state.selectedService)
+                    .map((provider) => (
+                        <Card
+                            onClick={() => {
+                                handleSelectProvider(provider)
+                            }}
+                            sx={state.selectedProvider == provider.id && ({
+                                border: 3,
+                                borderColor: 'primary.dark',
+                            })}>
+                            <CardContent>
+                                <Typography variant="h5">
+                                    {provider.service_name}
+                                </Typography>
+                                <Typography variant="subtle1">
+                                    {provider.city}
+                                </Typography>
+                            </CardContent>
+                        </Card>
+                    ))}
+
+*/

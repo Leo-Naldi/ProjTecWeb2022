@@ -104,7 +104,6 @@ export function bookingReducer(state, action) {
 
             let res = {
                 ...state,
-                selectedProvider: null,
                 schedule: null,
                 displaySchedule: null,
                 selectedDate: null,
@@ -112,7 +111,7 @@ export function bookingReducer(state, action) {
                 selectedTimeSlot: null,
             };
 
-            if (state.selectedProvider != action.value) {
+            if (state.selectedProvider !== action.value) {
                 res.selectedProvider = action.value;
             }
 
