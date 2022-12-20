@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer } from 'react';
 import { Container, Box, Stack } from '@mui/system';
-import { Modal, Card, Button, CardContent, Grid, Typography } from '@mui/material';
+import { Modal, Card, Button, CardContent, Grid, Typography, useTheme, useMediaQuery, MobileStepper } from '@mui/material';
 import { Autocomplete, TextField, Stepper, Step, StepLabel, FormControl, FormControlLabel, Checkbox } from '@mui/material';
 
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -13,7 +13,7 @@ import { getServices, getProviders, shouldDisableDate, getDaySchedule, getMonthS
 import bookingReducer from '../reducers/bookingReducer';
 
 import dayjs from 'dayjs';
-import { filterAvailableServices, filterProviders } from '../utils/filters';
+import { filterProviders } from '../utils/filters';
 
 
 const steps = [
@@ -49,11 +49,13 @@ const steps = [
 export default function Booking(){
 
     // TODO style
-    // TODO clear doesnt clear
-    // TODO decide between get all providers once and filter locally or server-get them every time.
+    // TODO once server is done decide between get all providers once and filter locally 
+    // or server-get them every time, rn is the first (note: either way date-available filter has to be
+    // implemented server side).
 
     const account = useAccount();
     const cities = getCities();
+    const theme = useTheme();
 
     let booking_reducer_init_state = {
         activeStep: 0,
@@ -223,74 +225,99 @@ export default function Booking(){
 
     return (
         <Container>
+
+            <Modal
+                open={state.openFiltersModal}
+                onClose={closeFilters}
+                sx={{
+                    position: 'absolute',
+                    left: { [theme.breakpoints.up('sm')]: '25%', },
+                    p: 1,
+                }}>
+                <Box sx={{
+                    maxWidth: 'md',
+                    bgcolor: '#fff',
+                    boxShadow: 20,
+                    borderRadius: 2,
+                    p: 3,
+                    mt: 4,
+                    position: 'static',
+                    
+                }}>
+                    <Typography component="h4">Filtri Ricerca</Typography>
+                    <Stack spacing={2}>
+                        <DatePicker
+                            value={state.filterDate}
+                            onChange={(date) => {
+                                dispatch({
+                                    type: 'FILTER_DATE',
+                                    value: date,
+                                })
+                            }}
+                            renderInput={(params) => <TextField {...params} />}>
+                            Data
+                        </DatePicker>
+                        <Autocomplete
+                            disablePortal
+                            id="cities"
+                            options={cities}
+                            value={state.filterCity}
+                            onChange={(e, val, reason) => dispatch({
+                                type: 'FILTER_CITY',
+                                value: val,
+                            })}
+                            renderInput={(params) => <TextField {...params} label="City" />}
+                        />
+                        <Grid container spacing={1}>
+                            <Grid item key="apply-filters-button" xs={6}>
+                                <Button onClick={() => { closeFilters(true) }}>
+                                    Apply
+                                </Button>
+                            </Grid>
+                            <Grid item key="clear-filters-button" xs={6}>
+                                <Button onClick={() => clearFilters()}>
+                                    Clear
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </Stack>
+                </Box>
+            </Modal>
+
             <Box sx={{ 
                 maxWidth: 'lg', 
                 mt: 2 }}
-                component="form" onSubmit={handleSubmit}>
-                
-                <Modal 
-                    open={state.openFiltersModal}
-                    onClose={closeFilters}>
-                    <Box sx={{
-                        bgcolor: '#fff',
-                        border: '2px solid',
-                        borderColor: 'primary.dark',
-                        boxShadow: 20,
-                        borderRadius: 2,
-                        p: 3,
-                        mx: 60,
-                        mt: 4,
-                    }}>
-                        <Typography component="h4">Filtri Ricerca</Typography>
-                        <Stack spacing={2}>
-                            <DatePicker 
-                                value={state.filterDate}
-                                onChange={(date) => {dispatch({
-                                    type: 'FILTER_DATE', 
-                                    value: date,
-                                })}}
-                                renderInput={(params) => <TextField {...params} />}>
-                                    Data
-                                </DatePicker>
-                            <Autocomplete
-                                disablePortal
-                                id="cities"
-                                options={cities}
-                                value={state.filterCity}
-                                onChange={(e, val, reason) => dispatch({
-                                    type: 'FILTER_CITY',
-                                    value: val,
-                                })}
-                                renderInput={(params) => <TextField {...params} label="City" />}
-                            />
-                            <Grid container spacing={1}>
-                                <Grid item key="apply-filters-button" xs={6}>
-                                    <Button onClick={() => {closeFilters(true)}}>
-                                        Apply
-                                    </Button>
-                                </Grid>
-                                <Grid item key="clear-filters-button" xs={6}>
-                                    <Button onClick={() => clearFilters()}>
-                                        Clear
-                                    </Button>
-                                </Grid>
-                            </Grid>
-                        </Stack>
-                    </Box>
-                </Modal>
+                component="form" onSubmit={handleSubmit}>    
 
                 <Grid container spacing={0}>
-
-                    <Grid item key="top" xs={12} padding={1} border={1}>
-                        <Grid item key="filters">
+                    
+                    <Grid container key='top' justifyContent='space-between' alignItems='center' 
+                        sx={{
+                            p: 2,
+                            border: 1,
+                            borderBottom: 0,
+                        }}>   
+                            <Typography variant='h6'>
+                                {steps[state.activeStep].label}
+                            </Typography>
+                        
                             <Button onClick={() => openFilters()}>
                                 Filters
                             </Button>
-                        </Grid>
+                        
                     </Grid>
+                    
 
-                    <Grid key="stepper" item xs={0} sm={2} md={4} border={1} padding={1}>
-                        <Stepper activeStep={state.activeStep} orientation="vertical">
+                    {useMediaQuery(theme.breakpoints.up('sm')) && <Grid key="stepper" item sm={3} sx={{
+                        padding: 1,
+                        border: 1,
+                        [theme.breakpoints.up('sm')]: {
+                            borderRight: 0,
+                        }
+                    }}>
+                        <Stepper 
+                            activeStep={state.activeStep} 
+                            orientation='vertical'>
                             {steps.map((step) => (
                                 <Step key={step.label}>
                                     <StepLabel optional={step.optional ? (
@@ -301,23 +328,47 @@ export default function Booking(){
                                 </Step>
                             ))}
                         </Stepper>
-                            
-                    </Grid>
+                    </Grid>}
 
-                    <Grid key="steps" item xs={12} sm={10} md={8} border={1} padding={1}>
+                    <Grid key="steps" item xs={12} sm={9} border={1} padding={1}>
                         {getActiveStepComponent(state.activeStep)}
                     </Grid>
 
-                    <Grid key="buttons" item xs={12} sm={12} md={12} border={1} padding={1}>
-                        <Button onClick={previousStep} disabled={state.activeStep === 0}>Prev</Button>
-                        <Button onClick={resetStep}>Clear</Button>
-                        <Button onClick={nextStep} disabled={disableNextStep()}>
-                            Next
-                        </Button>
-                        {(state.activeStep === steps.length - 1) ? (<Button type="submit">
-                            Prenota
-                        </Button>) : null}
-                    </Grid>
+                    
+                    {useMediaQuery(theme.breakpoints.up('sm')) ? 
+                        (<Grid key="buttons" item 
+                            xs={12} sm={12} md={12} sx={{
+                                padding: 1,
+                                border: 1,
+                                borderTop: 0,
+                            }}>
+                            <Button onClick={previousStep} disabled={state.activeStep === 0}>Prev</Button>
+                            <Button onClick={resetStep}>Clear</Button>
+                            <Button onClick={nextStep} disabled={disableNextStep()}>
+                                Next
+                            </Button>
+                            {(state.activeStep === steps.length - 1) ? (<Button type="submit">
+                                Prenota
+                            </Button>) : null}
+                        </Grid>) : (<MobileStepper
+                            variant='dots'
+                            steps={steps.length}
+                            activeStep={state.activeStep}
+                            position='static'
+                            sx={{
+                                flexGrow: 1,
+                            }}
+                            nextButton={
+                                <Button onClick={nextStep} disabled={disableNextStep()}>
+                                    Next
+                                </Button>
+                            }
+                            backButton={
+                                <Button onClick={previousStep} disabled={state.activeStep === 0}>
+                                    Prev
+                                </Button>
+                        }/>)
+                    }
                 </Grid>
 
             </Box>
