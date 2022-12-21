@@ -10,6 +10,9 @@ import getProducts from "../utils/getProducts";
 
 function Commerce() {
 
+    // TODO user menu
+    // TODO cart menu
+
     const [shoppingCart, setShoppingCart] = useState([]);
     const [products, setProducts] = useState(getProducts(20));
     const [signInOpen, setSignInOpen] = useState(false);

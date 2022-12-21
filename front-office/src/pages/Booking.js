@@ -16,6 +16,7 @@ import bookingReducer from '../reducers/bookingReducer';
 
 import dayjs from 'dayjs';
 import { filterProviders } from '../utils/filters';
+import ErrorMessage from '../components/ErrorMessage';
 
 
 const steps = [
@@ -299,20 +300,22 @@ export default function Booking(){
                 </Box>
             </Modal>
 
-            <Box sx={{ 
-                maxWidth: 'lg', 
-                mt: 2 }}
-                component="form" onSubmit={handleSubmit}>    
+            <Box 
+                sx={{ 
+                    maxWidth: 'lg', 
+                    mt: 2,
+                    borderRadius: 3,
+                    border: 1,
+                }}
+                component="form" onSubmit={handleSubmit}>   
 
-                <Stack spacing={0}>
+                <Stack> 
                     
                     <Box key='top' 
                         sx={{
                             p: 2,
-                            border: 1,
-                            borderBottom: 0,
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
+                            borderBottom: 1,
+                            flexGrow: 1,
                         }}>   
                             <Typography variant='h6'>
                                 {steps[state.activeStep].label}
@@ -327,10 +330,7 @@ export default function Booking(){
                     <Grid container spacing={0}>
                         {useMediaQuery(theme.breakpoints.up('sm')) && <Grid key="stepper" item sm={3} sx={{
                             padding: 1,
-                            border: 1,
-                            [theme.breakpoints.up('sm')]: {
-                                borderRight: 0,
-                            }
+                            borderRight: 1,
                         }}>
                             <Stepper 
                                 activeStep={state.activeStep} 
@@ -347,7 +347,7 @@ export default function Booking(){
                             </Stepper>
                         </Grid>}
 
-                        <Grid key="steps" item xs={12} sm={9} border={1} padding={1}>
+                        <Grid key="steps" item xs={12} sm={9} padding={1}>
                             {ActiveStepComponent(state.activeStep)}
                         </Grid>
                     </Grid>
@@ -357,8 +357,8 @@ export default function Booking(){
                         (<Box key="buttons" item 
                             sx={{
                                 padding: 1,
-                                border: 1,
-                                borderTop: 0,
+                                borderTop: 1,
+                                flexGrow: 1,
                             }}>
                             <Button onClick={previousStep} disabled={state.activeStep === 0}>Prev</Button>
                             <Button onClick={resetStep}>Clear</Button>
@@ -368,24 +368,25 @@ export default function Booking(){
                             {(state.activeStep === steps.length - 1) ? (<Button type="submit">
                                 Prenota
                             </Button>) : null}
-                        </Box>) : (<MobileStepper
-                            variant='dots'
-                            steps={steps.length}
-                            activeStep={state.activeStep}
-                            position='static'
-                            sx={{
-                                flexGrow: 1,
-                            }}
-                            nextButton={
-                                <Button onClick={nextStep} disabled={disableNextStep()}>
-                                    Next
-                                </Button>
-                            }
-                            backButton={
-                                <Button onClick={previousStep} disabled={state.activeStep === 0}>
-                                    Prev
-                                </Button>
-                        }/>)
+                        </Box>) : (<Box>
+                            <MobileStepper
+                                variant='dots'
+                                steps={steps.length}
+                                activeStep={state.activeStep}
+                                sx={{
+                                    flexGrow: 1,
+                                }}
+                                nextButton={
+                                    <Button onClick={nextStep} disabled={disableNextStep()}>
+                                        Next
+                                    </Button>
+                                }
+                                backButton={
+                                    <Button onClick={previousStep} disabled={state.activeStep === 0}>
+                                        Prev
+                                    </Button>
+                            }/>
+                        </Box>)
                     }
                 </Stack>
 
@@ -417,11 +418,9 @@ export default function Booking(){
             case 1:
                 return (<Stack spacing={2}>
                     {(state.filteredServices.length == 0) ? 
-                    (<Container>
-                        <Typography variant='h5' sx={{ padding: 2 }}>
-                            Non ci sono servizi disponibili per i filtri selezionati D:
-                        </Typography>
-                    </Container>) : 
+                    (<ErrorMessage 
+                        errorMessage={`Non ci sono servizi 
+                        disponibili per i filtri selezionati :(`}/>) : 
                     (state.filteredServices.map((service) => (
                         <Card 
                             onClick={() => handleSelectService(service)}
@@ -436,7 +435,11 @@ export default function Booking(){
             case 2: {
                 const filtered_providers = filterProviders(state.filteredProviders, state.selectedService);
 
-                return (<Stack spacing={1}>
+                // Im not sure if this is possible or not but ohwell.png
+                return ((filtered_providers.length === 0) ? (<ErrorMessage
+                    errorMessage={`Non ci sono provider 
+                        disponibili per i filtri selezionati :(`} />) :
+                (<Stack spacing={1}>
 
                     {cities.filter(c => filtered_providers.some(p => p.city == c)).map(city => <Accordion>
                         <AccordionSummary
@@ -462,7 +465,8 @@ export default function Booking(){
                             </Stack>
                         </AccordionDetails>
                     </Accordion>)}
-                </Stack>);}
+                </Stack>));
+            }
             case 3: 
                 return (
                     <Box>
@@ -488,7 +492,10 @@ export default function Booking(){
             case 4: 
                 return (
                     <Box>
-                        <Grid container spacing={1}>
+                        <Grid container spacing={1} sx={{
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                        }}>
                             {state.timeSlots.map((slot, index) => (<Grid item
                                 md={3} key={index}>
                                 <Card sx={[
@@ -497,7 +504,8 @@ export default function Booking(){
                                         borderColor: 'primary.dark',
                                     }),
                                     {
-                                        padding: 2
+                                        padding: 2,
+                                        margin: 1,
                                     },
                                 ]}
                                     onClick={() => selectTimeSlot(index)}>
@@ -565,34 +573,3 @@ export default function Booking(){
         return account.pets.filter(pet => state.checkedPets[pet.id]);
     }
 }
-
-
-
-
-
-
-
-
-/*
-{filterProviders(state.filteredProviders, state.selectedService)
-                    .map((provider) => (
-                        <Card
-                            onClick={() => {
-                                handleSelectProvider(provider)
-                            }}
-                            sx={state.selectedProvider == provider.id && ({
-                                border: 3,
-                                borderColor: 'primary.dark',
-                            })}>
-                            <CardContent>
-                                <Typography variant="h5">
-                                    {provider.service_name}
-                                </Typography>
-                                <Typography variant="subtle1">
-                                    {provider.city}
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    ))}
-
-*/
