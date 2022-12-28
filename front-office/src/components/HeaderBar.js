@@ -1,10 +1,12 @@
-import { React, useContext, useEffect } from "react";
+import { React, useState } from "react";
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import { Avatar, Badge, InputBase, Typography } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
 import { Stack } from "@mui/system";
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -53,19 +55,38 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
     alignItems: "center",
 }));
 
-function HeaderBar({ shoppingCart, openSignIn}) {
+function HeaderBar({ shoppingCart, openSignIn, openCart, openLeftDrawer }) {
 
     const user = useAccount();
+
+    const [userMenuAnchor, setUserMenuAnchor] = useState(null);
+
+    let open = userMenuAnchor !== null;
+
+    const openUserMenu = (e) => setUserMenuAnchor(e.currentTarget);
+    const closeUserMenu = () => setUserMenuAnchor(null);
 
     return (
         <Box>
             <AppBar position='static'>
+
+                <Menu
+                    id='user-menu'
+                    anchorEl={userMenuAnchor}
+                    open={open}
+                    onClose={closeUserMenu}>
+                    <MenuItem>Acquisti</MenuItem>
+                    <MenuItem>Prenotazioni</MenuItem>
+                    <MenuItem>Log Out</MenuItem>
+                </Menu>
+
                 <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
                     <IconButton
                         size="large"
                         edge="start"
                         color="inherit"
-                        sx={{ mr: 2 }}>
+                        sx={{ mr: 2 }}
+                        onClick={openLeftDrawer}>
                         <MenuIcon />
                     </IconButton>
 
@@ -79,14 +100,15 @@ function HeaderBar({ shoppingCart, openSignIn}) {
                             type="text" />
                     </SearchField>
                     
-                    <Stack direction="row">
-                        
+                    <Stack direction="row"> 
                             <IconButton
                                 size="large"
                                 edge="start"
                                 color="inherit"
-                                sx={{ mr: 2 }}>
-                                <Badge badgeContent={shoppingCart.length} color="secondary">
+                                sx={{ mr: 2 }}
+                                onClick={openCart}>
+                                <Badge badgeContent={Object.values(shoppingCart)
+                                    .reduce((val,cur) => val + cur, 0)} color="secondary">
                                     <ShoppingCartIcon />
                                 </Badge>
                             </IconButton>
@@ -96,10 +118,11 @@ function HeaderBar({ shoppingCart, openSignIn}) {
                                 color="inherit"
                                 onClick={openSignIn}>
                                 <AccountCircleTwoToneIcon />
-                        </IconButton>) : (<Avatar>
-                            {user.username[0].toUpperCase()} 
-                            {/* TODO the feking letter is not centered */}
-                        </Avatar>)}
+                        </IconButton>) : (<IconButton onClick={openUserMenu}>
+                            <Avatar>
+                                {user.username[0].toUpperCase()} 
+                            </Avatar>
+                        </IconButton>)}
                     </Stack>
                 </Toolbar>
             </AppBar>

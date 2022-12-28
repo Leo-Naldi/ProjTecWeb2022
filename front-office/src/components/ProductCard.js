@@ -3,7 +3,7 @@ import { IconButton, Card, CardContent, CardMedia, Typography, CardActions } fro
 
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 
-function ProductCard({ id, img, name, price, addToCartHandler }){
+function ProductCard({ id, img, name, price, categories, pet_types, addToCartHandler }){
     return (
         <Card id={id}
             sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
@@ -12,7 +12,7 @@ function ProductCard({ id, img, name, price, addToCartHandler }){
                 component="img"
                 image={img}
                 alt="random"
-            />
+                />
             <CardContent sx={{ flexGrow: 1 }}>
                 <Typography gutterBottom variant="h5" component="h2">
                     {name}
@@ -29,7 +29,7 @@ function ProductCard({ id, img, name, price, addToCartHandler }){
                 <IconButton
                     size="medium"
                     color="inherit"
-                    onClick={addToCartHandler}>
+                    onClick={() => addToCartHandler(id, 1)}>
                     <AddShoppingCartIcon />
                 </IconButton>
             </CardActions>
