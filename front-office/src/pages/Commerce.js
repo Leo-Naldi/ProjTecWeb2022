@@ -59,6 +59,9 @@ function Commerce() {
     function changeCartProductAmount(e, id) {
         let newShoppingCart = { ...shoppingCart };
         newShoppingCart[id]['amount'] = Number(e.target.value);
+
+        if (newShoppingCart[id]['amount'] === 0) newShoppingCart[id]['selected'] = false;
+
         setShoppingCart(newShoppingCart);
     }
 
@@ -141,43 +144,60 @@ function Commerce() {
                                     <Checkbox 
                                         onChange={(e) => changeSelect(e, product.id)}
                                         checked={shoppingCart[product.id].selected}/>
-                                    
-                                    <Box>
-                                        <CardContent>
-                                            <Stack>
-                                                <Typography gutterBottom variant="h5" component="h2">
-                                                    {product.name}
-                                                </Typography>
-                                                <Typography variant="body2" color='text.secondary'>
-                                                    Prezzo: {product.price}€
-                                                </Typography>
-                                            </Stack>
-                                        </CardContent>
-                                    </Box>
-                                    <CardActions>
-                                        <IconButton onClick={() => {
-                                            removeProductHandler(product.id)
-                                        }}>
-                                            <DeleteIcon />
-                                        </IconButton>
-                                        <Input
-                                            value={shoppingCart[product.id]['amount']}
-                                            onChange={(e) => changeCartProductAmount(e, product.id)}
-                                            onBlur={() => ((shoppingCart[product.id] < 0) ? 0: 999)}
-                                            inputProps={{
-                                                step: 1,
-                                                min: 0,
-                                                max: 999,
-                                                type: 'number',
-                                                'aria-labelledby': 'input-slider',
-                                            }}
-                                            sx={{
-                                                maxWidth: (shoppingCart[product.id]['amount'] > 99 ? 50: 40),
-                                                ml: 2,
-                                            }}
 
-                                        />
-                                    </CardActions>
+                                    <CardMedia
+                                        component="img"
+                                        image={product.img}
+                                        alt="Product Image"
+                                        sx={{ width: 151, height: '100%'}} />
+                                    
+                                    <Box sx={{ 
+                                        display: 'flex', 
+                                        flexDirection: 'column',
+                                        alignItems: 'space-between',
+                                    }}>
+                                        <CardContent sx={{ flex: '1 0 auto' }}>
+                                            <Grid container>
+                                                <Grid item md={12}>
+                                                    <Typography gutterBottom variant="h5" component="h2">
+                                                        {product.name}
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid item md={12}>
+                                                    <Typography variant="body2" color='text.secondary'>
+                                                        Prezzo: {product.price}€
+                                                    </Typography>
+                                                </Grid>
+                                            </Grid>
+                                        </CardContent>
+                                        <Box sx={{ 
+                                            display: 'flex',
+                                            pb: 1,
+                                        }}>
+                                            <IconButton onClick={() => {
+                                                removeProductHandler(product.id)
+                                            }}
+                                            sx={{ mr: 1, }}>
+                                                <DeleteIcon />
+                                            </IconButton>
+                                            <Input
+                                                value={shoppingCart[product.id]['amount']}
+                                                onChange={(e) => changeCartProductAmount(e, product.id)}
+                                                onBlur={() => ((shoppingCart[product.id] < 0) ? 0 : 999)}
+                                                inputProps={{
+                                                    step: 1,
+                                                    min: 0,
+                                                    max: 999,
+                                                    type: 'number',
+                                                    'aria-labelledby': 'input-slider',
+                                                }}
+                                                sx={{
+                                                    maxWidth: (shoppingCart[product.id]['amount'] > 99 ? 50 : 40),
+                                                }}
+
+                                            />
+                                        </Box>
+                                    </Box>
                                 </Card>)}
                             </Box>
                             <Grid container>
