@@ -22,7 +22,7 @@ function ProductCard({ id, img, name, price, categories, pet_types, addToCartHan
                     interesting i promise.
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                    ${price}
+                    {price}€
                 </Typography>
             </CardContent>
             <CardActions>

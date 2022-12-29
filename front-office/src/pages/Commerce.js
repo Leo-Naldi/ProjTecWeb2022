@@ -1,11 +1,13 @@
 import { React, useState, useEffect } from "react";
 import { Typography, Grid, Container, Drawer, 
          CardContent, CardActions, Button,
-        Stack, Card, Input, useMediaQuery, Box } from "@mui/material";
+        Stack, Card, Input, useMediaQuery, Box, IconButton, Checkbox, CardMedia } from "@mui/material";
 
 import HeaderBar from "../components/HeaderBar";
 import ProductCard from "../components/ProductCard";
 import SignInForm from "../components/SignInForm";
+
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import { getProducts, getCategories } from "../utils/getProducts";
 import { useTheme } from "@emotion/react";
@@ -16,21 +18,33 @@ function Commerce() {
     const theme = useTheme();
     const product_num = 20;
 
+    /* { id: { amount: num, selected: bool } } */
     const [shoppingCart, setShoppingCart] = useState({});
+
+    /* see utils/getProducts */
     const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
+
+    /* drawers opening */
     const [signInOpen, setSignInOpen] = useState(false);
     const [openCart, setOpenCart] = useState(false);
-    const [categories, setCategories] = useState([]);
     const [openCategories, setOpenCategories] = useState(false);
+    
+    /* search filters */
     const [selectedCategory, setSelectedCategory] = useState(-1);
 
     function addToshoppingCartHandler(id, amount) {
 
         let newShoppingCart = {...shoppingCart};
+        
         if (id in newShoppingCart) {
-            newShoppingCart[id] += amount;  
+            newShoppingCart[id]['amount'] += amount;  
         } else {
-            newShoppingCart[id] = amount;
+            newShoppingCart[id] = {
+                'amount': amount,
+                selected: true,
+            };
+
         }
 
         setShoppingCart(newShoppingCart);
@@ -44,14 +58,23 @@ function Commerce() {
 
     function changeCartProductAmount(e, id) {
         let newShoppingCart = { ...shoppingCart };
-        newShoppingCart[id] = Number(e.target.value);
+        newShoppingCart[id]['amount'] = Number(e.target.value);
         setShoppingCart(newShoppingCart);
     }
 
     function getTotal() {
         return Object.keys(shoppingCart).reduce((acc, cur) => {
-            return (acc + shoppingCart[cur] * products.find(p => p.id == cur).price)
+            if (shoppingCart[cur].selected)
+                return (acc + shoppingCart[cur]['amount'] * products.find(p => p.id == cur).price);
+            return acc;
         }, 0)
+    }
+
+    function changeSelect(e, id) {
+        let newShoppingCart = {...shoppingCart};
+        newShoppingCart[id].selected = e.target.checked;
+
+        setShoppingCart(newShoppingCart);
     }
 
     useEffect(() => {
@@ -64,7 +87,6 @@ function Commerce() {
 
         getCategories().then((c) => {
             if (!ignore) setCategories(c);
-            console.log(c)
         });
 
         return () => (ignore = true);
@@ -92,65 +114,88 @@ function Commerce() {
                     onClose={() => setOpenCart(false)}>
 
                     <Container>
-                        <Typography variant='h5' sx={{
-                            m: 2,
-                        }}>
+                        <Typography variant='h5' sx={{ my: 2, }}>
                             Shopping Cart
                         </Typography>
                     </Container>
-                    <Box  sx={{
-                        width: 680,
-                    }}>
+                    <Box>
                         <Stack sx={{
                             mx: 1,
-                            
-                        }}>
-                            {products.filter(p => Object.keys(shoppingCart).some(id => id == p.id)).
-                            map(product => <Card 
-                                id={product.id} 
-                                sx={{
-                                    my: 1,
-                                    mx: 2,
-                                    display: 'flex',
-                                    height: '100%'
-                                }}>
-                                
-                                <CardContent sx={{ flexGrow: 1 }}>
-                                    <Stack>
-                                        <Typography gutterBottom variant="h5" component="h2">
-                                            {product.name}
-                                        </Typography>
-                                        <Typography variant="body2" color='text.secondary'>
-                                            Price: {product.price}$
-                                        </Typography>
-                                    </Stack>
-                                </CardContent>
-                                <CardActions>
-                                    <Button onClick={() => {
-                                        removeProductHandler(product.id)
-                                    }}>Rimuovi</Button>
-                                    <Input
-                                        value={shoppingCart[product.id]}
-                                        onChange={(e) => changeCartProductAmount(e, product.id)}
-                                        onBlur={() => ((shoppingCart[product.id] < 0) ? 0: 999)}
-                                        inputProps={{
-                                            step: 1,
-                                            min: 0,
-                                            max: 999,
-                                            type: 'number',
-                                            'aria-labelledby': 'input-slider',
-                                        }}
-                                        sx={{
-                                            maxWidth: (shoppingCart[product.id] > 99 ? 50: 40),
-                                            ml: 2,
-                                        }}
 
-                                    />
-                                </CardActions>
-                            </Card>)}
-                            <Typography variant='h6' sx={{ my: 2, mx: 4 }}>
-                                Totale: {getTotal()}$
-                            </Typography>
+                        }}>
+                            <Box sx={{
+                                borderBottom: 1,
+                                borderColor: 'divider',
+                                pb: 1,
+                                mb: 1,
+                            }}>
+                                {products.filter(p => Object.keys(shoppingCart).some(id => id == p.id)).
+                                map(product => <Card 
+                                    id={product.id} 
+                                    sx={{
+                                        my: 1,
+                                        mr: 2,
+                                        display: 'flex',
+                                        height: '100%'
+                                    }}>
+                                    <Checkbox 
+                                        onChange={(e) => changeSelect(e, product.id)}
+                                        checked={shoppingCart[product.id].selected}/>
+                                    
+                                    <Box>
+                                        <CardContent>
+                                            <Stack>
+                                                <Typography gutterBottom variant="h5" component="h2">
+                                                    {product.name}
+                                                </Typography>
+                                                <Typography variant="body2" color='text.secondary'>
+                                                    Prezzo: {product.price}€
+                                                </Typography>
+                                            </Stack>
+                                        </CardContent>
+                                    </Box>
+                                    <CardActions>
+                                        <IconButton onClick={() => {
+                                            removeProductHandler(product.id)
+                                        }}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                        <Input
+                                            value={shoppingCart[product.id]['amount']}
+                                            onChange={(e) => changeCartProductAmount(e, product.id)}
+                                            onBlur={() => ((shoppingCart[product.id] < 0) ? 0: 999)}
+                                            inputProps={{
+                                                step: 1,
+                                                min: 0,
+                                                max: 999,
+                                                type: 'number',
+                                                'aria-labelledby': 'input-slider',
+                                            }}
+                                            sx={{
+                                                maxWidth: (shoppingCart[product.id]['amount'] > 99 ? 50: 40),
+                                                ml: 2,
+                                            }}
+
+                                        />
+                                    </CardActions>
+                                </Card>)}
+                            </Box>
+                            <Grid container>
+                                <Grid item>
+                                    <Typography variant='h6' sx={{ my: 2, mx: 4 }}>
+                                        Totale: {getTotal()}€
+                                    </Typography>
+                                </Grid>
+                                <Grid item>
+                                    <Button 
+                                        variant="contained" 
+                                        sx={{ 
+                                            mt: 1, 
+                                        }}>
+                                        Procedi all'ordine
+                                    </Button>
+                                </Grid>
+                            </Grid>
                         </Stack>
                     </Box>
                 </Drawer>
@@ -159,8 +204,11 @@ function Commerce() {
                     anchor="left"
                     open={openCategories}
                     onClose={() => setOpenCategories(false)}>
-                    <Box>
-                        <Typography variant='h4' sx={{ m: 2, }}>
+                    <Box sx={{
+                        borderBottom: 1,
+                        borderColor: 'divider',
+                    }}>
+                        <Typography variant='h5' sx={{ m: 2, }}>
                             Categorie Prodotti
                         </Typography>
                         <Stack sx={{ 
@@ -168,7 +216,7 @@ function Commerce() {
                             p: 1,
                          }}>
                             {categories.map((c) => 
-                                <Typography variant='h6' sx={{ my: 1, }}>
+                                <Typography variant='body1' sx={{ my: 1, }}>
                                     {c.replaceAll(/(\b\w)/g, c => c.toUpperCase())}
                                 </Typography>
                             )}
@@ -202,6 +250,7 @@ function Commerce() {
                         
                     </Container>
                 </Box>
+
                 <Container sx={{ py: 2 }} maxWidth="lg">
                     
                     <Grid container spacing={2}>

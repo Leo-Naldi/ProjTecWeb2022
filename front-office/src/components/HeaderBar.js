@@ -66,6 +66,15 @@ function HeaderBar({ shoppingCart, openSignIn, openCart, openLeftDrawer }) {
     const openUserMenu = (e) => setUserMenuAnchor(e.currentTarget);
     const closeUserMenu = () => setUserMenuAnchor(null);
 
+    function getTotalItems() {
+
+        //console.log(Object.values(shoppingCart).map(o => o.amount))
+
+        return (Object.values(shoppingCart)
+            .map(o => o.amount)
+            .reduce((val, cur) => val + cur, 0));
+    }
+
     return (
         <Box>
             <AppBar position='static'>
@@ -107,8 +116,7 @@ function HeaderBar({ shoppingCart, openSignIn, openCart, openLeftDrawer }) {
                                 color="inherit"
                                 sx={{ mr: 2 }}
                                 onClick={openCart}>
-                                <Badge badgeContent={Object.values(shoppingCart)
-                                    .reduce((val,cur) => val + cur, 0)} color="secondary">
+                                <Badge badgeContent={getTotalItems()} color="secondary">
                                     <ShoppingCartIcon />
                                 </Badge>
                             </IconButton>
