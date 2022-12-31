@@ -1,0 +1,15 @@
+require("dotenv").config({'path': './.local.env'})
+var http = require("http")
+var fs = require("fs")
+
+console.log(process.env.BACKOFFICE_PORT)
+
+fs.readFile('./pages/index.html', function(err, html) {
+    if (err) throw err;
+
+    http.createServer(function(request, response) {
+        response.writeHead(200, {"Content-Type": "text/html"});
+        response.write(html);
+        response.end();
+    }).listen(process.env.BACKOFFICE_PORT);
+});
