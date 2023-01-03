@@ -1,6 +1,7 @@
-require("dotenv").config({'path': './.local.env'})
+require("dotenv").config({'path': '../.local.env'})
 var http = require("http")
 var fs = require("fs")
+
 
 console.log(process.env.BACKOFFICE_PORT)
 
