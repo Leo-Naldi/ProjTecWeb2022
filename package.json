@@ -1,0 +1,24 @@
+{
+  "name": "projtecweb2022",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start-frontoffice": "npm --prefix ./front-office start",
+    "start-backend": "npm --prefix ./backend start",
+    "start-backoffice": "npm --prefix ./back-office start",
+    "dev-backoffice": "npm --prefix ./back-office run dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Leo-Naldi/ProjTecWeb2022.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Leo-Naldi/ProjTecWeb2022/issues"
+  },
+  "homepage": "https://github.com/Leo-Naldi/ProjTecWeb2022#readme"
+}
