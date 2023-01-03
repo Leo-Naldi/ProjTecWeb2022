@@ -8,7 +8,8 @@
     "start-frontoffice": "npm --prefix ./front-office start",
     "start-backend": "npm --prefix ./backend start",
     "start-backoffice": "npm --prefix ./back-office start",
-    "dev-backoffice": "npm --prefix ./back-office run dev"
+    "dev-backoffice": "npm --prefix ./back-office run dev",
+    "start-all": "npm run start-frontoffice && npm run start-backoffice && npm run start-backend"
   },
   "repository": {
     "type": "git",
