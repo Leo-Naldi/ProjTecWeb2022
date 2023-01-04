@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 
 // TODO comments
 
-export const services = ['Veterinario', 'Dog Sitter'];
+export const services = ['veterinario', 'pet sitter'];
 
 const pet_types = [
     'cane', 
@@ -19,6 +19,7 @@ const pet_types = [
     'ragno',
     'orrore lovecraftiano',
     'criceto',
+    'serpente',
 ];
 
 export const pet_sizes = [

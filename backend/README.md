@@ -6,6 +6,16 @@ REST (o almeno quella era l'intenzione) API per interfacciarsi con il db e gesti
 
 Occorre avere MongoDB installato ([docs](https://www.mongodb.com/docs/manual/installation/)) e aver setuppato ../.local.env con i relativi dati (host e port).
 
+Utilizzando mongosh ([docs](https://www.mongodb.com/docs/mongodb-shell/)), occorre creare il db e le collezioni:
+
+```
+use TecWebDB
+db.createCollection("users")
+db.createCollection("products")
+db.createCollection("posts")
+db.createCollection("services")
+```
+
 Per inserire dei dati di default (quelli contenuti nella directory ./data) basta lanciare
 
 ```bash
