@@ -1,0 +1,63 @@
+[
+    {
+            "service_name": "InaccioPets",
+            "service_type": "veterinario",
+            "city": "Bologna",
+            "pet_types": [
+                "cane", 
+                "gatto", 
+                "rettile", 
+                "uccello", 
+                "scoiattolo", 
+                "pesce", 
+                "ragno"
+            ],
+            "pet_sizes_min": "subatomico",
+            "pet_sizes_max": null
+    },
+    {
+            "service_name": "Gianfranchi & Gianfranchi",
+            "service_type": "veterinario",
+            "city": "Forli",
+            "pet_types": [],
+            "pet_sizes_min": "piccolo",
+            "pet_sizes_max": "gargantuesco"
+    },
+    {
+            "service_name": "God Please Kill Me Veterinari",
+            "service_type": "veterinario",
+            "city": "Roma",
+            "pet_types": [],
+            "pet_sizes_min": null,
+            "pet_sizes_max": null
+    },
+    {
+            "service_name": "Piero Angela PetSitter",
+            "service_type": "pet sitter",
+            "city": "Roma",
+            "pet_types": [],
+            "pet_sizes_min": null,
+            "pet_sizes_max": null
+    },
+    {
+            "service_name": "Gesu cristo",
+            "service_type": "pet sitter",
+            "city": "Roma",
+            "pet_types": [],
+            "pet_sizes_min": null,
+            "pet_sizes_max": null
+    },
+    {
+        "service_name": "PetSitterTM",
+        "service_type": "pet sitter",
+        "city": "Frosinone",
+        "pet_types": [
+            "scoiattolo",
+            "pesce",
+            "ragno",
+            "serpente"
+        ],
+        "pet_sizes_min": null,
+        "pet_sizes_max": null
+    }
+]

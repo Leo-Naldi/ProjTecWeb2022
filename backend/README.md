@@ -1,6 +1,24 @@
-# Database Schema
+# Backend
 
-Esempi di dati (nb: mongo crea di default un campo _id unico)
+REST (o almeno quella era l'intenzione) API per interfacciarsi con il db e gestire l'autenticazione utenti.
+
+## Setup
+
+Occorre avere MongoDB installato ([docs](https://www.mongodb.com/docs/manual/installation/)) e aver setuppato ../.local.env con i relativi dati (host e port).
+
+Per inserire dei dati di default (quelli contenuti nella directory ./data) basta lanciare
+
+```bash
+npm run setup-db
+```
+
+Nella root-dir del backend. Lo script utilizzato e' ./db/setup.js, che contiene anche una funzione per svuotare il db.S
+
+
+
+## Info sui Dati
+
+Valori costanti utilizzati nel db:
 
 ```javascript
 
@@ -40,67 +58,16 @@ const categories = [
     'cibo',
     'armi di distruzione di massa',
 ];
-
-db.createCollection('users');
-db.createCollection('services');
-db.createCollection('messages');  // TODO
-db.createCollection('products');
-
-
-db.users.insertMany([
-    {
-        "username": "Leonaldi",
-        "email": "leonardo.naldi@studio.unibo.it",
-        "password": "suppersafepassword4",
-        "pets": [
-            {
-                "name": "Alberto",
-                "size": "medio",
-                "age": 3,
-                "type": "cane",
-            },
-            {
-                "name": "Pierfrancesco",
-                "size": "medio",
-                "age": 1,
-                "type": "gatto",
-            },
-        ],
-    },
-    {
-        "username": "pieralberto",
-        "email": "pieralberto.rossi@gmail.com",
-        "password": "iloveyou",
-        "pets": [
-            {
-                "name": "Micio",
-                "size": "medio",
-                "age": 7,
-                "type": "pesce",
-            },
-            {
-                "name": "Carlo",
-                "size": "medio",
-                "age": 99,
-                "type": "cane",
-            },
-            {
-                "name": "Rhgte-k'ptah",
-                "size": "apocalittico",
-                "age": 80085,
-                "type": "orrore lovecraftiano",
-            },
-        ],
-    },
-]);
-
-db.products.insertMany([
-    {
-        "img": "https://source.unsplash.com/random",
-        "name": `Osso giocattolo placcato in oro`,
-        "price": 900,
-        "categories": ["giocattoli", "accessori"],
-        "pet_types": ["cane"],
-    },
-])
 ```
+La directory ./data contiene dei file .json con cui riempire il db.
+
+# REST API
+
+Available URIs:
+
+| **URI**   | **Description**  |
+|-----------|------------------|
+| /users/ | User Collection |
+| /products/ | Product Collection|
+| /services/ | Services Collection|
+| /posts/ | Community Posts Collection |

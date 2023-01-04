@@ -4,11 +4,15 @@
   "description": "Database API for AnimalHouse",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "test",
+    "setup-db": "node ./db/setup.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2"
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mongodb": "^4.13.0",
+    "nodemon": "^2.0.20"
   }
 }
