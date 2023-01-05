@@ -1,27 +1,49 @@
-const express = express();
-const router = express.Router();
+const express = require("express");
+const usersRouter = express.Router();
+const ObjectId = require("mongodb").ObjectId;
 
 const {
-    userAdd,
-    userModify,
-    userDelete,
-    userQuery,
-    usersGetAll } = require("../db/users");
+    tecweb_db_create,
+    tecweb_db_read,
+    tecweb_db_update,
+    tecweb_db_delete,
+    tecweb_db_get_collection,
+    tecweb_db_user_auth,
+} = require("../db/db_operations");
 
-/* /users/ uri paths */
 
+/* 
+    /users/ uri paths 
+*/
 
-router.get('/', async (req, res) => {
-    const users = await usersGetAll();
+usersRouter.get('/', async (req, res) => {
+
+    const users = await tecweb_db_get_collection("users");
+
     res.send(users);
 });
 
-router.post('/', async (req, res) => {
-    await userAdd(req.data);
+usersRouter.post('/', async (req, res) => {
 
-    // TODO check if user with this email already existed
+    const added_id = await tecweb_db_create("users", req.data, { "email": req.data.email });
+
+    if (added_id === null) res.sendStatus(409);  // Email already in use
+
+    res.send({ id: added_id });
 });
 
-router.get('/id/:id', async (req, res) => {});
+usersRouter.get('/id/:id', async (req, res) => {
 
-router.get('/email/:email', async (req, res) => {});
+    // console.log(req.params)
+    const result = await tecweb_db_read("users", unique_query = { _id: new ObjectId(req.params.id) });
+
+    //console.log(res)
+
+    res.send(result);
+});
+
+usersRouter.get('/email/:email', async (req, res) => {
+    res.send(await tecweb_db_read("users", { email: req.params.email }));
+});
+
+module.exports = { usersRouter }

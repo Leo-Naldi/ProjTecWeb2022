@@ -2,10 +2,11 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "Database API for AnimalHouse",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "test",
-    "setup-db": "node ./db/setup.js"
+    "setup-db": "node ./db/setup.js",
+    "start-dev": "nodemon -e js,json server.js"
   },
   "author": "",
   "license": "ISC",

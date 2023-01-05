@@ -2,3 +2,5 @@
 
 .local.env
 *.env
+
+tests.js

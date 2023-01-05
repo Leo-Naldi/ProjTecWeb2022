@@ -1,15 +1,30 @@
 require("dotenv").config({ 'path': '../.local.env' });
 
 const express = require('express');
-const { connectDB, disconnectDB, db } = require('./db/client');
+const client = require('./db/client');
+const { usersRouter } = require("./routes/users");
 
 const app = express();
 
-connectDB().then(() => {
+
+async function run() {
+
+    try {
+        await client.connect()
+
+    } catch (e) {
+        console.error(e);
+        await client.disconnect();
+    }
+
+    app.use("/users", usersRouter);
 
     app.listen(process.env.BACKEND_PORT, () =>
         console.log(`Listening on port ${process.env.BACKEND_PORT}`));
+}
 
-})
-.catch(e => console.error(e));
+run();
+
+
+
 

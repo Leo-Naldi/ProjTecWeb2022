@@ -6,6 +6,18 @@ REST (o almeno quella era l'intenzione) API per interfacciarsi con il db e gesti
 
 Occorre avere MongoDB installato ([docs](https://www.mongodb.com/docs/manual/installation/)) e aver setuppato ../.local.env con i relativi dati (host e port).
 
+In locale bisogna far partire mongo con systemctl
+
+```bash
+sudo systemctl start mongod
+```
+
+Si puo' controllare che sia partito correttamente con
+
+```bash
+sudo systemctl status mongod
+```
+
 Utilizzando mongosh ([docs](https://www.mongodb.com/docs/mongodb-shell/)), occorre creare il db e le collezioni:
 
 ```
