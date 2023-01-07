@@ -87,9 +87,11 @@ La directory ./data contiene dei file .json con cui riempire il db.
 
 Available URIs:
 
-| **URI**   | **Description**  |
-|-----------|------------------|
-| /users/ | User Collection |
-| /products/ | Product Collection|
-| /services/ | Services Collection|
-| /posts/ | Community Posts Collection |
+| **URI**   | **Description**  | **Methods** | **Auth** |
+|-----------|------------------|-----|-----|
+| /users/ | User Collection |||
+| /products/ | Product Collection|||
+| /services/ | Services Collection|||
+| /posts/ | Community Posts Collection |||
+| /login/ | Login endpoint |||
+| /register/ | Register endpoint |||

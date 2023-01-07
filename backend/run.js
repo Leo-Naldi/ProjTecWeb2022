@@ -1,10 +1,7 @@
 require("dotenv").config({ 'path': '../.local.env' });
 
-const express = require('express');
+const server = require('./server/server');
 const client = require('./db/client');
-const { usersRouter } = require("./routes/users");
-
-const app = express();
 
 
 async function run() {
@@ -17,9 +14,9 @@ async function run() {
         await client.disconnect();
     }
 
-    app.use("/users", usersRouter);
+    const db = client.db(process.env.MONGO_DBNAME);
 
-    app.listen(process.env.BACKEND_PORT, () =>
+    server.listen(process.env.BACKEND_PORT, () =>
         console.log(`Listening on port ${process.env.BACKEND_PORT}`));
 }
 

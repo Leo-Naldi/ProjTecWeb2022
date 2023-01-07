@@ -1,7 +1,7 @@
 [
     {
-            "service_name": "InaccioPets",
-            "service_type": "veterinario",
+            "name": "InaccioPets",
+            "type": "veterinario",
             "city": "Bologna",
             "pet_types": [
                 "cane", 
@@ -12,44 +12,44 @@
                 "pesce", 
                 "ragno"
             ],
-            "pet_sizes_min": "subatomico",
-            "pet_sizes_max": null
+            "sizes_min": "subatomico",
+            "sizes_max": null
     },
     {
-            "service_name": "Gianfranchi & Gianfranchi",
-            "service_type": "veterinario",
+            "name": "Gianfranchi & Gianfranchi",
+            "type": "veterinario",
             "city": "Forli",
             "pet_types": [],
-            "pet_sizes_min": "piccolo",
-            "pet_sizes_max": "gargantuesco"
+            "sizes_min": "piccolo",
+            "sizes_max": "gargantuesco"
     },
     {
-            "service_name": "God Please Kill Me Veterinari",
-            "service_type": "veterinario",
+            "name": "God Please Kill Me Veterinari",
+            "type": "veterinario",
             "city": "Roma",
             "pet_types": [],
-            "pet_sizes_min": null,
-            "pet_sizes_max": null
+            "sizes_min": null,
+            "sizes_max": null
     },
     {
-            "service_name": "Piero Angela PetSitter",
-            "service_type": "pet sitter",
+            "name": "Piero Angela PetSitter",
+            "type": "pet sitter",
             "city": "Roma",
             "pet_types": [],
-            "pet_sizes_min": null,
-            "pet_sizes_max": null
+            "sizes_min": null,
+            "sizes_max": null
     },
     {
-            "service_name": "Gesu cristo",
-            "service_type": "pet sitter",
+            "name": "Gesu cristo",
+            "type": "pet sitter",
             "city": "Roma",
             "pet_types": [],
-            "pet_sizes_min": null,
-            "pet_sizes_max": null
+            "sizes_min": null,
+            "sizes_max": null
     },
     {
-        "service_name": "PetSitterTM",
-        "service_type": "pet sitter",
+        "name": "PetSitterTM",
+        "type": "pet sitter",
         "city": "Frosinone",
         "pet_types": [
             "scoiattolo",
@@ -57,7 +57,7 @@
             "ragno",
             "serpente"
         ],
-        "pet_sizes_min": null,
-        "pet_sizes_max": null
+        "sizes_min": null,
+        "sizes_max": null
     }
 ]

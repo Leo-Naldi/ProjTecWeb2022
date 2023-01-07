@@ -1,9 +1,15 @@
-export const validateSignIn = (data) => new Promise((onSuccess, onFailiure) => {
+import { avatarClasses } from "@mui/material";
 
-    // send data over to server and return the promise? bah
-    let animals = ['fido', 'pino']
+export const validateSignIn = async (data) => {
 
-    onSuccess({username: 'giovanni', pets: animals});
-});
+    return fetch("http://localhost:8001/login", {
+        method: "post",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(data => { console.log(data); return data; })
+};
 
 export default validateSignIn;

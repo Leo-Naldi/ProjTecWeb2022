@@ -24,6 +24,8 @@ BACKEND_HOST="localhost"
 MONGO_HOST="localhost" # Assuming you are using a local mongodb
 MONGO_PORT=27017 # Default mongo port, if you set another one you have to change this too
 MONGO_DBNAME="TecWebDB"
+
+JWT_SECRET="some incredible secret" # Secret key to generate jw tokens in the backend
 ```
 
 With the first three variables set to any three high port (currently frontoffice auto runs on port 3000 so don't use that one).
@@ -44,9 +46,9 @@ Or you can start all of them:
 npm run start-all
 ```
 
-The backoffice can also be started with the dev script:
+backoffice and backend can also be started with the dev script:
 
 ```bash
 npm run dev-backoffice
 ```
-Which runs nodemon instead of node (aka the server will be restarted every time a relevant file changes).
+Which runs nodemon instead of node.

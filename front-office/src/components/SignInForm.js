@@ -26,15 +26,8 @@ function SignInForm({afterSignInSuccess = null, afterSignInError = null}) {
 
         validateSignIn(data)
             .then((serverdata) => {  // login success
-                console.log("called success");
-                console.log(JSON.stringify(serverdata.pets));
-                accountDispatch({
-                    type: 'USER_CHANGED',
-                    username: serverdata.username,
-                    email: data.get('email'),
-                    pets: serverdata.pets,
-                });
-                if (afterSignInSuccess !== null) afterSignInSuccess();
+                console.log(serverdata);
+                console.log(serverdata.token);
             })
             .catch((e) => {
                 console.log(e);

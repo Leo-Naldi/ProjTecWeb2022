@@ -1,6 +1,9 @@
 const client = require('./client');
 
 const db = client.db(process.env.MONGO_DBNAME);
+const user_projection = { 
+    "password": 0,
+};
 
 
 /* Inserts new document in the collection. Unique query is an obj used
@@ -26,15 +29,18 @@ async function tecweb_db_read(collection, unique_query=null, generic_query=null,
 
     const c = db.collection(collection);
 
+    console.log(generic_query)
+
     if (unique_query) { 
+        console.log("aaaaaaaaaaaaaa")
         const res = await c.findOne(unique_query);
-        delete res["password"];
+        //delete res["password"];
         return res;
     }
 
-    const index = await c.find(generic_query).project({ "password": 0 });
+    const index =  await c.find(generic_query);
 
-    return index.toArray();
+    return await index.toArray();
 }
 
 async function tecweb_db_update(collection, new_values, search_query) {
@@ -60,11 +66,12 @@ async function tecweb_db_get_collection(collection) {
 }
 
 // 10 out of 10 most secure thing you'll ever see
-async function tecweb_db_user_auth(email, password) {
+async function tecweb_db_user_auth(email, password, cb) {
     const col = db.collection("users");
-    const res = await col.findOne({ "email": email, "password": password });
+    const res = await col.findOne({ "email": email, "password": password })
+        .project(user_projection);
 
-    return res !== null;
+    return res;
 }
 
 module.exports = {

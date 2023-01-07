@@ -2,6 +2,8 @@ const express = require("express");
 const usersRouter = express.Router();
 const ObjectId = require("mongodb").ObjectId;
 
+
+
 const {
     tecweb_db_create,
     tecweb_db_read,
@@ -34,10 +36,7 @@ usersRouter.post('/', async (req, res) => {
 
 usersRouter.get('/id/:id', async (req, res) => {
 
-    // console.log(req.params)
     const result = await tecweb_db_read("users", unique_query = { _id: new ObjectId(req.params.id) });
-
-    //console.log(res)
 
     res.send(result);
 });
@@ -46,4 +45,6 @@ usersRouter.get('/email/:email', async (req, res) => {
     res.send(await tecweb_db_read("users", { email: req.params.email }));
 });
 
-module.exports = { usersRouter }
+
+
+module.exports = usersRouter;
