@@ -1,7 +1,9 @@
 const express = require("express");
-const { pet_types, pet_sizes, categories } = require("../db/db_categories");
 const productsRouter = express.Router();
 const ObjectId = require("mongodb").ObjectId;
+const passport = require("passport");
+
+const { pet_types, pet_sizes, categories } = require("../db/db_categories");
 
 const {
     tecweb_db_create,
@@ -16,13 +18,15 @@ productsRouter.get('/', async (req, res) => {
     res.send(await tecweb_db_get_collection("products"));
 })
 
-productsRouter.post('/', async (req, res) => {
-    const added_id = await tecweb_db_create("services", req.data,);
+productsRouter.post('/', passport.authenticate('jwt-admin', { session: false }), 
+    async (req, res) => {
+        const added_id = await tecweb_db_create("products", req.data);
 
-    if (added_id === null) res.sendStatus(409);  // Email already in use
+        if (added_id === null) res.sendStatus(409);
 
-    res.send({ id: added_id });
+        res.send({ id: added_id });
 })
+
 
 productsRouter.get('/id/:id', async (req, res) => {
     res.send(await tecweb_db_read("products", { "_id": new ObjectId(req.params.id) }));

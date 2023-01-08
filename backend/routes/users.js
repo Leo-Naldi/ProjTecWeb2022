@@ -1,5 +1,6 @@
 const express = require("express");
 const usersRouter = express.Router();
+const passport = require("passport");
 const ObjectId = require("mongodb").ObjectId;
 
 
@@ -18,11 +19,12 @@ const {
     /users/ uri paths 
 */
 
-usersRouter.get('/', async (req, res) => {
+usersRouter.get('/', passport.authenticate('jwt-admin', { session: false }), 
+    async (req, res) => {
 
-    const users = await tecweb_db_get_collection("users");
+        const users = await tecweb_db_get_collection("users");
 
-    res.send(users);
+        res.send(users);
 });
 
 usersRouter.post('/', async (req, res) => {
@@ -34,17 +36,24 @@ usersRouter.post('/', async (req, res) => {
     res.send({ id: added_id });
 });
 
-usersRouter.get('/id/:id', async (req, res) => {
 
-    const result = await tecweb_db_read("users", unique_query = { _id: new ObjectId(req.params.id) });
+usersRouter.get('/id/:id', passport.authenticate('jwt-user', { session: false }), 
+    async (req, res) => {
 
-    res.send(result);
+        // TODO if you have a user token then either it's your id (req.user.id methinks)
+        // or you get 409.
+        const result = await tecweb_db_read("users", unique_query = { _id: new ObjectId(req.params.id) });
+
+        res.send(result);
 });
 
-usersRouter.get('/email/:email', async (req, res) => {
-    res.send(await tecweb_db_read("users", { email: req.params.email }));
+usersRouter.get('/email/:email', passport.authenticate('jwt-user', { session: false }), 
+    async (req, res) => {
+        // TODO same as /id/:id
+        res.send(await tecweb_db_read("users", { email: req.params.email }));
 });
 
+// TODO post for single users
 
 
 module.exports = usersRouter;

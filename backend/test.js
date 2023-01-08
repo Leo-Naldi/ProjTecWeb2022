@@ -1,11 +1,10 @@
 const axios = require("axios");
 
-axios.post("http://localhost:8001/register/", {
+axios.post("http://localhost:8001/login/user", {
     email: "lnaldi@gmail.com",
     password: "password",
-    username: "lllleo"
 }).then(res => {
-    console.log(res);
+    console.log(res.data.token);
 })
 
 /* {

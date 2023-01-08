@@ -1,6 +1,6 @@
 require("dotenv").config({ 'path': '../.local.env' });
 
-const server = require('./server/server');
+const server = require('./config/server');
 const client = require('./db/client');
 
 

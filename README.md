@@ -52,3 +52,5 @@ backoffice and backend can also be started with the dev script:
 npm run dev-backoffice
 ```
 Which runs nodemon instead of node.
+
+Each sub-project has its own README.md with further info.

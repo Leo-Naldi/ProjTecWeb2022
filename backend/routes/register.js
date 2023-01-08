@@ -1,21 +1,24 @@
 const express = require("express");
-const jwt = require("jsonwebtoken");
+const passport = require("passport");
 const router = express.Router();
 
 const tecweb_db_create = require("../db/db_operations").tecweb_db_create;
+const make_token = require("../auth/make_token");
 
-router.post("/", async (req, res) => {
-    const { username, email, password } = req.body;
+
+const make_user = async (req, res, type) => {
+    const { username, email, password, pets } = req.body;
 
     const inserted = await tecweb_db_create("users", {
         username: username,
         email: email,
         password: password,
-        pets: [],
-        type: "user",
+        pets: pets,
+        type: type,
     }, { "email": email }).catch(
         (err) => {
             console.log("Error: ", err);
+            return res.status(500).json({ message: "Sum server problem ocurred :(" });
         }
     );
 
@@ -23,12 +26,15 @@ router.post("/", async (req, res) => {
         return res.status(409).json({ message: "User with email already exists!" });
     }
 
-    const jwtToken = jwt.sign(
-        { id: inserted.toHexString(), email: email },
-        process.env.JWT_SECRET
-    );
+    const jwtToken = make_token(inserted.toHexString(), email, type);
 
     res.json({ message: "Thanks for registering", token: jwtToken });
-});
+};
+
+router.post("/user", async (req, res) => make_user(req, res, "user"));
+
+// Only an admin can create another admin
+router.post("/admin", passport.authenticate('jwt-admin', { session: false }), 
+    async (req, res) => make_user(req, res, "admin"));
 
 module.exports = router;
