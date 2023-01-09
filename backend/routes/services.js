@@ -17,27 +17,31 @@ servicesRouter.get('/', async (req, res) => {
 
     //console.log("Getall called");
 
-    res.send(await tecweb_db_get_collection("services"));
+    res.json((await tecweb_db_get_collection("services")).map(s => ({ ...s, id: s._id.toString() })));
 })
 
 
 servicesRouter.post('/', passport.authenticate('jwt-admin', { session: false }), 
     async (req, res) => {
-        const added_id = await tecweb_db_create("services", req.data);
+        const added_id = await tecweb_db_create("services", req.body);
 
-        if (added_id === null) res.sendStatus(409);  // Email already in use
+        if (added_id === null) return res.sendStatus(409);  // Email already in use
 
-        res.send({ id: added_id });
+        res.json({ id: added_id.toString() });
 })
 
 servicesRouter.get('/id/:id', passport.authenticate('jwt-admin', { session: false }), 
     async (req, res) => {
-        res.send(await tecweb_db_read("services", { "_id": new ObjectId(req.params.id) }));
+
+        if (!(ObjectId.isValid(req.params.id))) return res.sendStatus(409);
+
+        const r = await tecweb_db_read("services", { "_id": new ObjectId(req.params.id) });
+
+        res.json(r.map(s => ({ ...s, id: s._id.toString() })));
 })
 
-// TODO post /id/:id
-// TODO post /
 
+// TODO fix
 servicesRouter.get(':type?&:city?&:min_size?&:max_size?', async (req, res) => {
 
     console.log(req.params)
