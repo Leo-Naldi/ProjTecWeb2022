@@ -30,7 +30,7 @@ JWT_SECRET="some incredible secret" # Secret key to generate jw tokens in the ba
 
 With the first three variables set to any three high port (currently frontoffice auto runs on port 3000 so don't use that one).
 
-Each sub-project contains extra set
+
 
 ## Usage 
 
@@ -38,12 +38,6 @@ Currently the root-level package.json contains scripts to start each individual 
 
 ```bash
 npm run start-frontoffice
-```
-
-Or you can start all of them:
-
-```bash
-npm run start-all
 ```
 
 backoffice and backend can also be started with the dev script:
