@@ -1,4 +1,6 @@
-[
+
+db = connect('mongodb://localhost/TecWebDB');
+db.products.insertMany([
     {
         "img": "https://source.unsplash.com/random",
         "name": "Osso giocattolo placcato in oro",
@@ -9,7 +11,8 @@
         ],
         "pet_types": [
             "cane"
-        ]
+        ],
+        "inStore": 100,
     },
     {
         "img": "https://source.unsplash.com/random",
@@ -22,7 +25,8 @@
         "pet_types": [
             "cane",
             "gatto"
-        ]
+        ],
+        inStore: 10,
     },
     {
         "img": "https://source.unsplash.com/random",
@@ -35,7 +39,8 @@
         "pet_types": [
             "cane",
             "gatto"
-        ]
+        ],
+        "inStore": 10,
     },
     {
         "img": "https://source.unsplash.com/random",
@@ -48,7 +53,8 @@
         "pet_types": [
             "cane",
             "gatto"
-        ]
+        ],
+        "inStore": 10,
     },
     {
         "img": "https://source.unsplash.com/random",
@@ -60,7 +66,8 @@
         "pet_types": [
             "cane",
             "orrore lovecraftiano"
-        ]
+        ],
+        "inStore": 10
     },
     {
         "img": "https://source.unsplash.com/random",
@@ -70,6 +77,7 @@
             "cibo",
             "armi di distruzione di massa"
         ],
-        "pet_types": []
+        "pet_types": [],
+        inStore: 10,
     }
-]
+]);

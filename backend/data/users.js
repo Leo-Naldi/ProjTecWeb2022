@@ -1,4 +1,6 @@
-[
+
+db = connect('mongodb://localhost/TecWebDB');
+db.users.insertMany([
     {
         "username": "Leonaldi",
         "email": "leonardo.naldi@studio.unibo.it",
@@ -51,4 +53,4 @@
         "password": "iloveyou7",
         "type": "admin"
     }
-]
+]);

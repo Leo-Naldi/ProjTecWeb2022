@@ -4,7 +4,20 @@ REST (o almeno quella era l'intenzione) API per interfacciarsi con il db e gesti
 
 ## Setup
 
-Occorre avere MongoDB installato ([docs](https://www.mongodb.com/docs/manual/installation/)) e aver setuppato ../.local.env con i relativi dati (host, port e secret).
+Occorre avere MongoDB installato ([docs](https://www.mongodb.com/docs/manual/installation/)) e mongosh ([docs](https://www.mongodb.com/docs/mongodb-shell/)) per i test.
+
+Occorre creare un file .env coi seguenti campi
+
+```bash
+MONGO_HOST="localhost"
+MONGO_PORT=27017 # O qualsiasi sia il port di mongo
+MONGO_DBNAME="TecWebDB"
+
+JWT_SECRET="Shhhhh very secret"
+
+BACKEND_HOST="localhost"
+BACKEND_PORT=8001
+```
 
 In locale e' necessario che mongo stia andando, p.e. su linux:
 
@@ -18,7 +31,7 @@ Si puo' controllare che sia partito correttamente con
 sudo systemctl status mongod
 ```
 
-Utilizzando mongosh ([docs](https://www.mongodb.com/docs/mongodb-shell/)), occorre creare il db e le collezioni:
+Utilizzando mongosh, occorre creare il db e le collezioni:
 
 ```
 use TecWebDB
@@ -27,8 +40,13 @@ db.createCollection("products")
 db.createCollection("posts")
 db.createCollection("services")
 ```
+Dopodiche il db puo' essere riempito usando 
 
-La directory ./data/ contiene valori dummy per il db (basta copiaincollarli in mongosh)
+```bash
+npm run remake-db
+```
+
+Che carica gli script di ./data in mongosh. NB remake-db svuota il db prima di riepirlo.
 
 
 ## Info sui Dati

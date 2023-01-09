@@ -1,4 +1,7 @@
-[
+
+db = connect('mongodb://localhost/TecWebDB');
+
+db.services.insertMany([
     {
             "name": "InaccioPets",
             "type": "veterinario",
@@ -60,4 +63,4 @@
         "sizes_min": null,
         "sizes_max": null
     }
-]
+]);

@@ -7,7 +7,11 @@ const make_token = require("../auth/make_token");
 
 
 const make_user = async (req, res, type) => {
-    const { username, email, password, pets } = req.body;
+
+    const username = req.body.username;
+    const email = req.body.email;
+    const password = req.body.password;
+    const pets = req.body.pets || [];
 
     const inserted = await tecweb_db_create("users", {
         username: username,
@@ -26,7 +30,7 @@ const make_user = async (req, res, type) => {
         return res.status(409).json({ message: "User with email already exists!" });
     }
 
-    const jwtToken = make_token(inserted.toHexString(), email, type);
+    const jwtToken = make_token(inserted, email, type);
 
     res.json({ message: "Thanks for registering", token: jwtToken });
 };

@@ -2,6 +2,7 @@ const passport = require("passport");
 const passportJwt = require("passport-jwt");
 const ExtractJwt = passportJwt.ExtractJwt;
 const StrategyJwt = passportJwt.Strategy;
+const ObjectID = require("mongodb").ObjectId;
 
 const tecweb_db_read = require("../db/db_operations").tecweb_db_read;
 
@@ -21,7 +22,7 @@ passport.use('jwt-user',
             if ((jwtPayload.type !== "user") && (jwtPayload.type !== "admin")) 
                 return done(null, false);
 
-            return tecweb_db_read("users", { "_id": jwtPayload.id })
+            return tecweb_db_read("users", { "_id": ObjectID(jwtPayload.id) })
                 .then((user) => {
                     if (user)
                         return done(null, user);
@@ -48,9 +49,14 @@ passport.use('jwt-admin',
         function (jwtPayload, done) {
 
             // Wrong type of token
-            if (jwtPayload.type !== "admin") return done(null, false);
+            if (jwtPayload.type !== "admin") {
+                
+                return done(null, false);
+            }
 
-            return tecweb_db_read("users", { "_id": jwtPayload.id, type: "admin" })
+            
+
+            return tecweb_db_read("users", { "_id": ObjectID(jwtPayload.id), type: "admin" })
                 .then((user) => {
                     if (user)
                         return done(null, user);

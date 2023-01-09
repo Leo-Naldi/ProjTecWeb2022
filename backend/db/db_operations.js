@@ -1,4 +1,4 @@
-const client = require('./client');
+const client = require('../config/client');
 
 const db = client.db(process.env.MONGO_DBNAME);
 const user_projection = { 
@@ -29,10 +29,10 @@ async function tecweb_db_read(collection, unique_query=null, generic_query=null,
 
     const c = db.collection(collection);
 
-    console.log(generic_query)
+    //console.log(generic_query)
 
     if (unique_query) { 
-        console.log("aaaaaaaaaaaaaa")
+      //  console.log("aaaaaaaaaaaaaa")
         const res = await c.findOne(unique_query);
         //delete res["password"];
         return res;
@@ -81,4 +81,5 @@ module.exports = {
     tecweb_db_delete,
     tecweb_db_get_collection,
     tecweb_db_user_auth,
+    db,
 }

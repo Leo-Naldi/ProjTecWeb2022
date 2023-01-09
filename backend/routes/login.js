@@ -7,13 +7,12 @@ const make_token = require("../auth/make_token");
 
 
 const login = async (req, res, type) => {
-    const { email, password } = req.body;
-
-    //console.log(req.body)
+    const email = req.body.email;
+    const password = req.body.password;
+    
 
     const userWithEmail = await tecweb_db_read("users", { 
-        "email": email, 
-        type: type 
+        "email": email,  
     }).catch(
         (err) => {
             console.log("Error: ", err);
@@ -21,19 +20,24 @@ const login = async (req, res, type) => {
                 .json({ message: "Internal Server Error" });
         }
     );
-
+    
     if (!userWithEmail)
         return res
             .status(400)
-            .json({ message: "Email or password does not match!" });
+            .json({ message: "Incorrect email or password" });
+    
+    if ((type == "admin") && (userWithEmail.type != "admin"))
+        return res
+            .status(400)
+            .json({ message: "Incorrect email or password" });
 
     if (userWithEmail.password !== password)
         return res
             .status(400)
-            .json({ message: "Email or password does not match!" });
+            .json({ message: "Incorrect email or password" });
 
     const jwtToken = make_token(
-        userWithEmail.id,
+        userWithEmail._id,
         userWithEmail.email,
         type,
     );
