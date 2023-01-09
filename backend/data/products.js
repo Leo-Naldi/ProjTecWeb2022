@@ -12,7 +12,7 @@ db.products.insertMany([
         "pet_types": [
             "cane"
         ],
-        "inStore": 100,
+        "in_store": 100,
     },
     {
         "img": "https://source.unsplash.com/random",
@@ -26,7 +26,7 @@ db.products.insertMany([
             "cane",
             "gatto"
         ],
-        inStore: 10,
+        in_store: 10,
     },
     {
         "img": "https://source.unsplash.com/random",
@@ -40,7 +40,7 @@ db.products.insertMany([
             "cane",
             "gatto"
         ],
-        "inStore": 10,
+        "in_store": 10,
     },
     {
         "img": "https://source.unsplash.com/random",
@@ -54,7 +54,7 @@ db.products.insertMany([
             "cane",
             "gatto"
         ],
-        "inStore": 10,
+        "in_store": 10,
     },
     {
         "img": "https://source.unsplash.com/random",
@@ -67,7 +67,7 @@ db.products.insertMany([
             "cane",
             "orrore lovecraftiano"
         ],
-        "inStore": 10
+        "in_store": 10
     },
     {
         "img": "https://source.unsplash.com/random",
@@ -78,6 +78,6 @@ db.products.insertMany([
             "armi di distruzione di massa"
         ],
         "pet_types": [],
-        inStore: 10,
+        in_store: 10,
     }
 ]);

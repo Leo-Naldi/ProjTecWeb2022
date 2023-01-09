@@ -29,12 +29,8 @@ async function tecweb_db_read(collection, unique_query=null, generic_query=null,
 
     const c = db.collection(collection);
 
-    //console.log(generic_query)
-
     if (unique_query) { 
-      //  console.log("aaaaaaaaaaaaaa")
         const res = await c.findOne(unique_query);
-        //delete res["password"];
         return res;
     }
 

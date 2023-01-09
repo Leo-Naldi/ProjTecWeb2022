@@ -4,16 +4,8 @@ const request = require("supertest");
 const app = require("../config/server");
 
 // Taken from ../data/users.json, the test assumes it was alreadi put in the db
-const existing_user = {
-    "username": "pieralberto",
-    "email": "pieralberto.rossi@gmail.com",
-    "password": "iloveyou",
-};
-const existing_admin = {
-    "username": "AdamoAmministratori",
-    "email": "adamo@admin.sudo",
-    "password": "iloveyou7",
-};
+const existing_user = require("../data/test_data").existing_user;
+const existing_admin = require("../data/test_data").existing_admin;
 
 describe("/login/ Test Suite", function(){
 

@@ -15,8 +15,8 @@ const existing_admin = {
 //    console.log(res.data.token);
 //});
 
-axios.post("http://localhost:8001/login/admin", existing_admin).then(res => {
-    console.log(res.data.token);
+axios.get("http://localhost:8001/products/id/63bc190a9ac1ef849a6b9240 ").then(res => {
+    console.log(res.data);
 });
 
 /* {
