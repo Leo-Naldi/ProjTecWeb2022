@@ -1,6 +1,6 @@
 const express = require("express");
 const passport = require("passport");
-const { pet_types, pet_sizes, categories } = require("../db/db_categories");
+const { pet_types, pet_sizes, categories, cities, service_types } = require("../db/db_categories");
 const servicesRouter = express.Router();
 const ObjectId = require("mongodb").ObjectId;
 
@@ -14,8 +14,6 @@ const {
 } = require("../db/db_operations");
 
 servicesRouter.get('/', async (req, res) => {
-
-    //console.log("Getall called");
 
     res.json((await tecweb_db_get_collection("services")).map(s => ({ ...s, id: s._id.toString() })));
 })
@@ -33,29 +31,43 @@ servicesRouter.post('/', passport.authenticate('jwt-admin', { session: false }),
 servicesRouter.get('/id/:id', passport.authenticate('jwt-admin', { session: false }), 
     async (req, res) => {
 
-        if (!(ObjectId.isValid(req.params.id))) return res.sendStatus(409);
+        if (!(ObjectId.isValid(req.params.id))) {
+            console.log(req.params.id)
+            return res.sendStatus(409);
+        }
 
         const r = await tecweb_db_read("services", { "_id": new ObjectId(req.params.id) });
 
-        res.json(r.map(s => ({ ...s, id: s._id.toString() })));
+        if (r !== null)
+            res.json({ ...r, id: r._id.toString() });
+        else 
+            res.json({});
 })
 
 
-// TODO fix
-servicesRouter.get(':type?&:city?&:min_size?&:max_size?', async (req, res) => {
 
-    console.log(req.params)
+servicesRouter.get('/query/', async (req, res) => {
 
+    let query = {};
+    let sizes = [];
 
-    if (Object.values(req.params).every(v => v === undefined)) 
-        res.send(await tecweb_db_get_collection("services"));
-    else {
-        res.send(await tecweb_db_read("services", null, req.params));
+    if (cities.indexOf(req.query.city) != -1) query.city = req.query.city;
+
+    if (service_types.indexOf(req.query.type) != -1) query.type = req.query.type;
+
+    if (pet_sizes.indexOf(req.query.min_size) != -1) {
+        query.sizes_min = { '$or': pet_sizes.slice(pet_sizes.indexOf(req.query.min_size)) }
     }
 
-    //const result = await tecweb_db_read("services", null, { "service_type": req.params.type });
+    if (pet_sizes.indexOf(req.query.max_size) != -1) {
+        query.sizes_max = { '$or': pet_sizes.slice(0, pet_sizes.indexOf(req.query.max_size)) }
+    }
 
-    //res.send(result);
+    if (Object.keys(query).length > 0) {
+        res.json(await tecweb_db_read("services", null, query))
+    } else {
+        res.json([]);
+    }
 })
 
 module.exports = servicesRouter;

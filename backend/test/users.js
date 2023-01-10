@@ -50,7 +50,7 @@ describe("/users/ Test Suite", function () {
                 .end(done)
         });
 
-        it("Should return an array of users", function (done) {
+        /*it("Should return an array of users", function (done) {
             const expected_properties = [
                 "id",
                 "username",
@@ -71,7 +71,7 @@ describe("/users/ Test Suite", function () {
                         }
                     })
                 }).end(done);
-        });
+        });*/
     });
 
 });

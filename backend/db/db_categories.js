@@ -35,4 +35,20 @@ const categories = [
     'armi di distruzione di massa',
 ];
 
-module.exports = { pet_types, pet_sizes, categories };
+const cities = [
+    'Forli',
+    'Bologna',
+    'Roma',
+    'Milano',
+    'Venezia',
+    'Bari',
+    'Napoli',
+    'Frosinone',
+]
+
+const service_types = [
+    'veterinario', 
+    'dog sitter'
+];
+
+module.exports = { pet_types, pet_sizes, categories, cities };
