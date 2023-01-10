@@ -7,15 +7,17 @@ const app = require("../config/server");
 const existing_user = require("../data/test_data").existing_user;
 const existing_admin = require("../data/test_data").existing_admin;
 
+const {
+    generate_none_level_ptests,
+    generate_user_level_ptests,
+    generate_admin_level_ptests
+} = require("./priviledges_generator");
+
 describe("/login/ Test Suite", function(){
 
     describe("POST /login/user", function(){
 
-        it("Should return status 200 with an existing user", function(done){
-            request(app).post("/login/user")
-            .send(existing_user)
-            .expect(200, done);
-        });
+        generate_none_level_ptests(() => "/login/user", 'post', existing_user,"POST /login/user")
 
         it("Should send a token when given an existing user", function(done){
             request(app).post("/login/user")
@@ -25,7 +27,7 @@ describe("/login/ Test Suite", function(){
                 }).end(done);
         })
 
-        it("Should reject a user that does not exist", function(done){
+        it("Should return status 400 when given a user that does not exist", function(done){
             request(app).post("/login/user")
                 .send({
                     username: "jbkijbnkj",
@@ -34,7 +36,7 @@ describe("/login/ Test Suite", function(){
                 }).expect(400, done);
         });
 
-        it("Should accept an admin account", function (done) {
+        it("Should log in an admin account", function (done) {
             request(app).post("/login/user")
                 .send(existing_admin)
                 .expect(200, done);
@@ -44,11 +46,7 @@ describe("/login/ Test Suite", function(){
 
     describe("POST /login/admin", function () {
 
-        it("Should accept an admin account that exists", function(done){
-            request(app).post("/login/admin")
-                .send(existing_admin)
-                .expect(200, done);
-        });
+        generate_none_level_ptests(() => "/login/admin", 'post', existing_admin, "POST /login/admin")
 
         it("Should send a token when given an existing admin", function(done){
             request(app).post("/login/admin")
