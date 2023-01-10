@@ -3,17 +3,21 @@ const request = require("supertest");
 const exec = require("child_process").exec;
 
 const app = require("../config/server");
-const new_product = require("../data/test_data").new_product;
+const new_product2 = require("../data/test_data").new_product2;
+const new_product1 = require("../data/test_data").new_product1;
 const existing_user = require("../data/test_data").existing_user;
 const existing_admin = require("../data/test_data").existing_admin;
 
+const {
+    generate_none_level_ptests,
+    generate_user_level_ptests,
+    generate_admin_level_ptests
+} = require("./priviledges_generator");
 
 describe("/products/ Test Suite", function(){
     describe("GET /products/", function(){
-        it("Should return status 200 to non-logged users", function(done){
-            request(app).get("/products/")
-                .expect(200, done);
-        });
+        
+        generate_none_level_ptests(() => '/products', 'get', null, "GET /products/")
 
         it("Should return an array of products", function(done){
             const expected_properties = [
@@ -40,7 +44,7 @@ describe("/products/ Test Suite", function(){
 
     describe("POST /products/", function(){
 
-        let user_token = null, admin_token = null;
+        let admin_token = null;
         // ids are remade at every run so
 
         before(function (done) {
@@ -50,35 +54,16 @@ describe("/products/ Test Suite", function(){
                 .end((err, res) => {
                     admin_token = res.body.token;
                     //console.log(token);
-                    
+                   done() 
                 });
-            request(app).post("/login/user")
-                .send(existing_user)
-                .expect(200)
-                .end((err, res) => {
-                    user_token = res.body.token;
-                    //console.log(token);
-                    done()
-                })
         })
 
-        it("Should return status 401 to non-logged users", function(done){
-            request(app).post("/products/")
-                .send(new_product)
-                .expect(401, done)
-        });
+        generate_admin_level_ptests(() => '/products/', 'post', new_product1, "POST /products/");
 
-        it("Should return status 401 to non-admin users", function(done){
-            request(app).post("/products/")
-                .set('Authentication', 'Bearer ' + user_token)
-                .send(new_product)
-                .expect(401, done)
-        });
-
-        it("Should return status 200 and the inserted id to logged admins", function(done){
+        it("Should return the new id when insertion is successfull", function(done){
             request(app).post("/products/")
                 .set('Authorization', 'Bearer ' + admin_token)
-                .send(new_product)
+                .send(new_product2)
                 .expect(200)
                 .expect(res => {
                     if (!('id' in res.body)) 
@@ -90,23 +75,20 @@ describe("/products/ Test Suite", function(){
 
     describe("GET /products/id/:id", function(){
 
-        let existing_id = null;
+        let params = { id: null };
         
         before(function(done){
             request(app).get("/products/")
                 .expect(200)
                 .end((err, res) => {
-                    existing_id = res.body[0].id;
-                    if(!existing_id) 
+                    params.id = res.body[0].id;
+                    if(!(params.id)) 
                         throw new Error("Something went wrong when fetching product id")
                     done();
                 })
         })
 
-        it("Should return status 200 to non-logged users", function (done) {
-            request(app).get("/products/id/" + existing_id)
-                .expect(200, done);
-        });
+        generate_none_level_ptests(() => ("/products/id/" + params.id), 'get', null, "GET /products/id/:id")
 
         it("Should return null if the product does not exist", function(done){
             request(app).get("/products/id/" + "63bc15adc9dc4b773e5126ca")
@@ -123,19 +105,18 @@ describe("/products/ Test Suite", function(){
                 .expect(409, done)
         });
 
-        it("Should return 200 and the correct product if the id matches", function(done){
-            request(app).get("/products/id/" + existing_id)
+        it("Should the correct product", function(done){
+            request(app).get("/products/id/" + params.id)
                 .expect(200)
-                .expect(res => res.body.id == existing_id)
+                .expect(res => res.body.id == params.id)
                 .end(done);
         });
     });
 
     describe("GET /products/category/:category", function(){
-        it("Should return status 200 to non-logged users", function(done){
-            request(app).get("/products/category/giocattoli")
-                .expect(200, done);
-        });
+        
+        generate_none_level_ptests(() => '/products/category/giocattoli', 'get',
+            null, "GET /products/category/:category")
 
         it("Should return [] if there are no products of the given category", function(done){
             request(app).get("/products/category/inshtallah")

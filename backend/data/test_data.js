@@ -21,10 +21,25 @@ const new_admin = {
     "password": "3334jd",
 }
 
-const new_product = {
+const new_product1 = {
     "img": null,
     "price": 42,
     "name": "inshtallah",
+    "categories": ['giocattoli'],
+    "pet_types": ['cane',
+        'gatto',
+        'rettile',
+        'uccello',
+        'scoiattolo',
+        'pesce',
+    ],
+    "in_store": 444.
+}
+
+const new_product2 = {
+    "img": null,
+    "price": 42,
+    "name": "inshtallah2",
     "categories": ['giocattoli'],
     "pet_types": ['cane',
         'gatto',
@@ -75,7 +90,8 @@ module.exports = {
     existing_admin, 
     new_user, 
     new_admin, 
-    new_product,
+    new_product1,
+    new_product2,
     new_service1,
     new_service2,
 }
