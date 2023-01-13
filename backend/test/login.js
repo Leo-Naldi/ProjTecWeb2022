@@ -10,14 +10,15 @@ const existing_admin = require("../data/test_data").existing_admin;
 const {
     generate_none_level_ptests,
     generate_user_level_ptests,
-    generate_admin_level_ptests
+    generate_admin_level_ptests,
+    generate_specific_user_level_ptests
 } = require("./priviledges_generator");
 
 describe("/login/ Test Suite", function(){
 
     describe("POST /login/user", function(){
 
-        generate_none_level_ptests(() => "/login/user", 'post', existing_user,"POST /login/user")
+        generate_none_level_ptests(() => "/login/user", 'post', existing_user)
 
         it("Should send a token when given an existing user", function(done){
             request(app).post("/login/user")
@@ -46,7 +47,7 @@ describe("/login/ Test Suite", function(){
 
     describe("POST /login/admin", function () {
 
-        generate_none_level_ptests(() => "/login/admin", 'post', existing_admin, "POST /login/admin")
+        generate_none_level_ptests(() => "/login/admin", 'post', existing_admin)
 
         it("Should send a token when given an existing admin", function(done){
             request(app).post("/login/admin")

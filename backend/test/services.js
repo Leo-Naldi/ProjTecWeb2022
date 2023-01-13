@@ -13,10 +13,13 @@ const new_service2 = require("../data/test_data").new_service2;
 
 const sizes = require('../db/db_categories').pet_sizes;
 
+const params = require("./hooks");
+
 const {
     generate_none_level_ptests,
     generate_user_level_ptests,
-    generate_admin_level_ptests
+    generate_admin_level_ptests,
+    generate_specific_user_level_ptests,
 } = require("./priviledges_generator");
 
 
@@ -24,12 +27,7 @@ describe("/services/ Test Suite", function(){
 
     describe("GET /services/", function(){
 
-        /*it("Should send status 200 to non-logged users", function(done){            
-            request(app).get("/services/")
-                .expect(200, done);     
-        });*/
-
-        generate_none_level_ptests(() => "/services/", 'get', null, "GET /services/");
+        generate_none_level_ptests(() => "/services/", 'get', null);
 
         it("Should return an array of services", function (done) {
             const expected_properties = [
@@ -60,26 +58,37 @@ describe("/services/ Test Suite", function(){
 
     describe("POST /services/", function(){
 
-        generate_admin_level_ptests(() => "/services/", 'post', new_service1, "POST /services/");
+        generate_admin_level_ptests(
+            () => '/services/',
+            'post',
+            () => ('Bearer ' + params.user_token),
+            () => ('Bearer ' + params.admin_token),
+            new_service1
+        );
     });
 
     describe("GET /services/id/:id", function () {
         
         // The db gets regenerated every time so you cant just copypaste an id
-        let params = { id: null } 
+        let new_p_data = { id: null, } 
 
         before(function(done){
             tecweb_db_read("users", { email: existing_user.email })
                 .then(user => {
-                    params.id = user._id.toString();
-                    done();
+                    new_p_data.id = user._id.toString();
+                    done()
                 })
             
             //console.log(existing_id);
         })
 
-        generate_admin_level_ptests(() => ("/services/id/" + params.id), 'get', null,
-            "GET /services/id/:id");
+        generate_admin_level_ptests(
+            () => ("/services/id/" + new_p_data.id),
+            'get',
+            () => ('Bearer ' + params.user_token),
+            () => ('Bearer ' + params.admin_token),
+            null
+        );
 
     });
 

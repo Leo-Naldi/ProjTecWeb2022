@@ -22,6 +22,9 @@ passport.use('jwt-user',
             if ((jwtPayload.type !== "user") && (jwtPayload.type !== "admin")) 
                 return done(null, false);
 
+            if (!(ObjectID.isValid(jwtPayload.id))) 
+                return done(null, false);
+
             return tecweb_db_read("users", { "_id": ObjectID(jwtPayload.id) })
                 .then((user) => {
                     if (user)
@@ -54,7 +57,7 @@ passport.use('jwt-admin',
                 return done(null, false);
             }
 
-            
+            if (!(ObjectID.isValid(jwtPayload.id))) return done(null, false);            
 
             return tecweb_db_read("users", { "_id": ObjectID(jwtPayload.id), type: "admin" })
                 .then((user) => {

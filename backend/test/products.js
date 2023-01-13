@@ -12,7 +12,8 @@ const existing_admin = require("../data/test_data").existing_admin;
 const {
     generate_none_level_ptests,
     generate_user_level_ptests,
-    generate_admin_level_ptests
+    generate_admin_level_ptests,
+    generate_specific_user_level_ptests
 } = require("./priviledges_generator");
 
 const get_keys_test = require("./keys_generator").get_keys_test;
@@ -20,10 +21,12 @@ const get_val_test = require("./keys_generator").get_val_test;
 const post_keys_test = require("./keys_generator").post_keys_test;
 const post_val_test = require("./keys_generator").post_val_test;
 
+const params = require("./hooks");
+
 describe("/products/ Test Suite", function(){
     describe("GET /products/", function(){
         
-        generate_none_level_ptests(() => '/products', 'get', null, "GET /products/")
+        generate_none_level_ptests(() => '/products', 'get', null)
 
         get_keys_test(
             () => '/products', 
@@ -42,27 +45,20 @@ describe("/products/ Test Suite", function(){
 
     describe("POST /products/", function(){
 
-        let admin_token = null;
-        // ids are remade at every run so
 
-        before(function (done) {
-            request(app).post("/login/admin")
-                .send(existing_admin)
-                .expect(200)
-                .end((err, res) => {
-                    admin_token = res.body.token;
-                    //console.log(token);
-                   done() 
-                });
-        })
-
-        generate_admin_level_ptests(() => '/products/', 'post', new_product1, "POST /products/");
+        generate_admin_level_ptests(
+            () => '/products/', 
+            'post',
+            () => ('Bearer ' + params.user_token),
+            () => ('Bearer ' + params.admin_token),
+            new_product1
+        );
 
         post_keys_test(
             () => '/products/',
             [new_product2],
             () => ['id'],
-            () => ('Bearer ' + admin_token),
+            () => ('Bearer ' + params.admin_token),
             'POST /products/'
         );
 
@@ -70,25 +66,25 @@ describe("/products/ Test Suite", function(){
 
     describe("GET /products/id/:id", function(){
 
-        let params = { id: null, product: null, };
+        let new_prod_data = { id: null, product: null, };
         
         before(function(done){
             request(app).get("/products/")
                 .expect(200)
                 .end((err, res) => {
-                    params.id = res.body[0].id;
-                    params.product = res.body[0];
-                    if(!(params.id)) 
+                    new_prod_data.id = res.body[0].id;
+                    new_prod_data.product = res.body[0];
+                    if(!(new_prod_data.id)) 
                         throw new Error("Something went wrong when fetching product id")
                     done();
                 })
         })
 
-        generate_none_level_ptests(() => ("/products/id/" + params.id), 'get', null, "GET /products/id/:id")
+        generate_none_level_ptests(() => ("/products/id/" + new_prod_data.id), 'get', null)
 
         get_val_test(
-            () => ("/products/id/" + params.id),
-            () => [params.product],
+            () => ("/products/id/" + new_prod_data.id),
+            () => [new_prod_data.product],
             null,
             "GET /products/id/:id"
         )
@@ -110,7 +106,7 @@ describe("/products/ Test Suite", function(){
     describe("GET /products/category/:category", function(){
         
         generate_none_level_ptests(() => '/products/category/giocattoli', 'get',
-            null, "GET /products/category/:category")
+            null)
 
         get_keys_test(
             () => '/products',

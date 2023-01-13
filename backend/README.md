@@ -129,6 +129,8 @@ Autenticazione:
 | /register/user | Permette di registrare un nuovo utente. Se la richiesta ha successo genera il token e lo spedisce nel body della risposta. | POST | None (POST) |
  /register/admin | Permette di registrare un nuovo amministratore. Se la richiesta ha successo genera il token e lo spedisce nel body della risposta. | POST | Admin (POST) |
 
+La risposta e' sempre json, il body sara' un array di oggetti se il metodo e' GET, un oggetto altrimenti. 
+
 ## Project Structure
 
 TODO

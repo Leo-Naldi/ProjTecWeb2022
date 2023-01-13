@@ -12,23 +12,20 @@ const get_val_test = require("./keys_generator").get_val_test;
 const post_keys_test = require("./keys_generator").post_keys_test;
 const post_val_test = require("./keys_generator").post_val_test;
 
+const params = require("./hooks");
+
 describe("/users/ Test Suite", function () {
 
     describe("GET /users/", function () {
         
-        let admin_token = null;
 
-        before(function (done) {
-            request(app).post("/login/admin")
-                .send(existing_admin)
-                .expect(200)
-                .end((err, res) => {
-                    admin_token = res.body.token;
-                    done()
-            });
-        })
-
-        generate_admin_level_ptests(() => '/users/', 'get', null, "GET /users/")
+        generate_admin_level_ptests(
+            () => '/users/',
+            'get',
+            () => ('Bearer ' + params.user_token),
+            () => ('Bearer ' + params.admin_token),
+            null
+        );
 
         get_keys_test(
             () => '/users/',
@@ -40,7 +37,7 @@ describe("/users/ Test Suite", function () {
                 'pets',
                 'type',
             ],
-            () => ('Bearer ' + admin_token),
+            () => ('Bearer ' + params.admin_token),
             ''
         );
     });
