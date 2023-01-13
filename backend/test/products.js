@@ -1,6 +1,7 @@
 require("dotenv").config();
 const request = require("supertest");
 const exec = require("child_process").exec;
+var expect = require('chai').expect;
 
 const app = require("../config/server");
 const new_product2 = require("../data/test_data").new_product2;
@@ -14,32 +15,29 @@ const {
     generate_admin_level_ptests
 } = require("./priviledges_generator");
 
+const get_keys_test = require("./keys_generator").get_keys_test;
+const get_val_test = require("./keys_generator").get_val_test;
+const post_keys_test = require("./keys_generator").post_keys_test;
+const post_val_test = require("./keys_generator").post_val_test;
+
 describe("/products/ Test Suite", function(){
     describe("GET /products/", function(){
         
         generate_none_level_ptests(() => '/products', 'get', null, "GET /products/")
 
-        it("Should return an array of products", function(done){
-            const expected_properties = [
+        get_keys_test(
+            () => '/products', 
+            () => [
                 "id",
                 "img",
                 "price",
+                "name",
                 "categories",
                 "pet_types",
                 "in_store",
-            ];
-
-            request(app).get("/products/")
-                .expect(res => {
-                    res.body.map(e => {
-                        for (let i = 0; i < expected_properties.length; i++) {
-                            if (!(expected_properties[i] in e)) {
-                                throw new Error(`GET /products/ Missing property:\n${expected_properties[i]}\n from product:\n ${e}\n`);
-                            }
-                        }
-                    })
-                }).end(done);
-        });
+            ],
+            null,
+            "GET /products/")
     });
 
     describe("POST /products/", function(){
@@ -60,28 +58,26 @@ describe("/products/ Test Suite", function(){
 
         generate_admin_level_ptests(() => '/products/', 'post', new_product1, "POST /products/");
 
-        it("Should return the new id when insertion is successfull", function(done){
-            request(app).post("/products/")
-                .set('Authorization', 'Bearer ' + admin_token)
-                .send(new_product2)
-                .expect(200)
-                .expect(res => {
-                    if (!('id' in res.body)) 
-                    throw new Error(`POST /products/ id not sent`);
-                })
-                .end(done)
-        });
+        post_keys_test(
+            () => '/products/',
+            [new_product2],
+            () => ['id'],
+            () => ('Bearer ' + admin_token),
+            'POST /products/'
+        );
+
     });
 
     describe("GET /products/id/:id", function(){
 
-        let params = { id: null };
+        let params = { id: null, product: null, };
         
         before(function(done){
             request(app).get("/products/")
                 .expect(200)
                 .end((err, res) => {
                     params.id = res.body[0].id;
+                    params.product = res.body[0];
                     if(!(params.id)) 
                         throw new Error("Something went wrong when fetching product id")
                     done();
@@ -90,27 +86,25 @@ describe("/products/ Test Suite", function(){
 
         generate_none_level_ptests(() => ("/products/id/" + params.id), 'get', null, "GET /products/id/:id")
 
-        it("Should return null if the product does not exist", function(done){
-            request(app).get("/products/id/" + "63bc15adc9dc4b773e5126ca")
-                .expect(200)
-                .expect(res => {
-                    if (Object.keys(res.body).length != 0) 
-                        throw new Error(`Body not empty on non existant product id: ${JSON.stringify(res.body)}`)
-                })
-                .end(done);
-        });
+        get_val_test(
+            () => ("/products/id/" + params.id),
+            () => [params.product],
+            null,
+            "GET /products/id/:id"
+        )
 
-        it("Should return 409 if the given id is not in the correct form", function(done){
-            request(app).get("/products/id/" + "notveryvalidid")
-                .expect(409, done)
-        });
+        describe("Misc Tests", function(){
+            it("Should return 409 if the product does not exist", function (done) {
+                request(app).get("/products/id/" + "63bc15adc9dc4b773e5126ca")
+                    .expect(409)
+                    .end(done);
+            });
 
-        it("Should the correct product", function(done){
-            request(app).get("/products/id/" + params.id)
-                .expect(200)
-                .expect(res => res.body.id == params.id)
-                .end(done);
-        });
+            it("Should return 409 if the given id is not in the correct form", function (done) {
+                request(app).get("/products/id/" + "notveryvalidid")
+                    .expect(409, done)
+            });
+        })
     });
 
     describe("GET /products/category/:category", function(){
@@ -118,24 +112,42 @@ describe("/products/ Test Suite", function(){
         generate_none_level_ptests(() => '/products/category/giocattoli', 'get',
             null, "GET /products/category/:category")
 
-        it("Should return [] if there are no products of the given category", function(done){
-            request(app).get("/products/category/inshtallah")
-                .expect(200)
-                .expect(res => {
-                    if (res.body.length != 0)
-                        throw new Error("Body not empty");
-                    
-                }).end(done);
-        });
+        get_keys_test(
+            () => '/products',
+            () => [
+                "id",
+                "img",
+                "price",
+                "name",
+                "categories",
+                "pet_types",
+                "in_store",
+            ],
+            null,
+            "GET /products/"
+        );
 
-        it("Should return an array of products that have the given category in their categories", function(done){
-            request(app).get("/products/category/giocattoli")
-                .expect(200)
-                .expect(res => res.body.map(product => {
-                    if (product.categories.indexOf('giocattoli') == -1)
-                        throw new Error("Category not present")
-                }))
-                .end(done);
+        describe("Misc Tests", function(){
+            it("Should return [] if there are no products of the given category", function (done) {
+                request(app).get("/products/category/inshtallah")
+                    .expect(200)
+                    .expect(res => {
+                        if (res.body.length != 0)
+                            throw new Error("Body not empty");
+
+                    }).end(done);
+            });
+
+            it("Should return an array of products that have the given category in their categories", function (done) {
+                request(app).get("/products/category/giocattoli")
+                    .expect(200)
+                    .expect(res => res.body.map(product => {
+                        product.categories.should.be.an('array')
+                            .that.is.not.empty;
+                        product.categories.should.include.members(['giocattoli']);
+                    }))
+                    .end(done);
+            });
         });
     });
 });

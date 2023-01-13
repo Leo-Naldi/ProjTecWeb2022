@@ -51,6 +51,7 @@ db.users.insertMany([
         "username": "AdamoAmministratori",
         "email": "adamo@admin.sudo",
         "password": "iloveyou7",
+        "pets": [],
         "type": "admin"
     }
 ]);

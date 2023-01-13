@@ -24,11 +24,13 @@ usersRouter.get('/', passport.authenticate('jwt-admin', { session: false }),
 
         const users = await tecweb_db_get_collection("users");
 
-        res.json(users.map(u => ({ ...u, id: u._id.toString() })));
+        res.json(users.map(u => {
+            const id = u._id.toString();
+            delete u._id;
+
+            return { ...u, id: id, };
+        }));
 });
-
-
-// TODO query for admins
 
 
 module.exports = usersRouter;

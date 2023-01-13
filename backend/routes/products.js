@@ -16,14 +16,11 @@ const {
 } = require("../db/db_operations");
 
 productsRouter.get('/', async (req, res) => {
-    res.json((await tecweb_db_get_collection("products")).map(e => ({
-        id: e._id.toString(),
-        img: e.img,
-        price: e.price,
-        categories: e.categories,
-        pet_types: e.pet_types,
-        in_store: e.in_store,
-    })));
+    res.json((await tecweb_db_get_collection("products")).map(e => {
+        const id = e._id.toString();
+        delete e._id;
+        return { ...e, id: id, }
+    }));
 })
 
 productsRouter.post('/', passport.authenticate('jwt-admin', { session: false }), 
@@ -48,8 +45,11 @@ productsRouter.get('/id/:id', async (req, res) => {
 
         const p = await tecweb_db_read("products", { "_id": id });
 
-        if (p === null) res.sendStatus(200)
-        else res.json(p);
+        if (p === null) res.sendStatus(409)
+        else {
+            delete p._id;
+            res.json([{ ...p, id: id.toString(), }])
+        }
     }
 });
 

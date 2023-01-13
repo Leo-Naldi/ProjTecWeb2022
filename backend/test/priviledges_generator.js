@@ -8,7 +8,7 @@ const existing_admin = require("../data/test_data").existing_admin;
 function generate_none_level_ptests(endpoint_generator, method, body, describe_string_prefix) {
     if (method == 'get') {
 
-        describe(describe_string_prefix + " Privilege Tests", function () {
+        describe("Privilege Tests", function () {
 
             it("Should return status 200 to non-logged users", function (done) {
                 request(app).get(endpoint_generator()).expect(200, done);
@@ -17,7 +17,7 @@ function generate_none_level_ptests(endpoint_generator, method, body, describe_s
         });
 
     } else if (method == 'post') {
-        describe(describe_string_prefix + " Privilege Tests", function () {
+        describe("Privilege Tests", function () {
 
             it("Should return status 200 to non-logged users", function (done) {
                 request(app).post(endpoint_generator())
@@ -32,7 +32,7 @@ function generate_none_level_ptests(endpoint_generator, method, body, describe_s
 function generate_user_level_ptests(endpoint_generator, method, body, describe_string_prefix) {
     if (method == 'get') {
 
-        describe(describe_string_prefix + " Privilege Tests", function () {
+        describe("Privilege Tests", function () {
 
             let user_token = null;
 
@@ -60,7 +60,7 @@ function generate_user_level_ptests(endpoint_generator, method, body, describe_s
         });
 
     } else if (method == 'post') {
-        describe(describe_string_prefix + " Privilege Tests", function () {
+        describe("Privilege Tests", function () {
 
             let user_token = null;
 
@@ -95,7 +95,7 @@ function generate_user_level_ptests(endpoint_generator, method, body, describe_s
 function generate_admin_level_ptests(endpoint_generator, method, body, describe_string_prefix) {
     if (method == 'get') {
 
-        describe(describe_string_prefix + " Privilege Tests", function () {
+        describe("Privilege Tests", function () {
 
             let user_token = null, admin_token = null;
 
@@ -138,7 +138,7 @@ function generate_admin_level_ptests(endpoint_generator, method, body, describe_
         });
 
     } else if (method == 'post') {
-        describe(describe_string_prefix + " Privilege Tests", function () {
+        describe("Privilege Tests", function () {
 
             let user_token = null, admin_token = null;
 
