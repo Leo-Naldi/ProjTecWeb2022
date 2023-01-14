@@ -1,9 +1,9 @@
 require("dotenv").config();
 const request = require("supertest");
 
-const app = require("../config/server");
-const existing_user = require("../data/test_data").existing_user;
-const existing_admin = require("../data/test_data").existing_admin;
+const app = require("../../config/server");
+const existing_user = require("../../data/test_data").existing_user;
+const existing_admin = require("../../data/test_data").existing_admin;
 
 function generate_none_level_ptests(endpoint_generator, method, body) {
     if (method == 'get') {

@@ -12,15 +12,25 @@ const {
     tecweb_db_user_auth,
 } = require("../db/db_operations");
 
+const make_token = require("../auth/make_token");
 
 const make_user = async (req, res, type) => {
 
-    if (!res.body) return res.sendStatus(409);
+    if (!req.body) {
+        return res.sendStatus(409);
+    }
 
     const username = req.body.username;
     const email = req.body.email;
     const password = req.body.password;
     const pets = req.body.pets || [];
+
+    if (!(req.body.username) || !(req.body.email) || !(req.body.password))
+        return res.sendStatus(409)
+
+    //console.log(req.body)
+
+    //console.log("returning1")
 
     const inserted = await tecweb_db_create("users", {
         username: username,
@@ -34,14 +44,18 @@ const make_user = async (req, res, type) => {
             return res.status(500).json({ message: "Sum server problem ocurred :(" });
         }
     );
+    
+    //console.log(inserted)
 
     if (inserted === null) {
+        console.log(req.body.email)
         return res.status(409).json({ message: "User with email already exists!" });
     }
 
+    
     const jwtToken = make_token(inserted, email, type);
 
-    res.json({ message: "Thanks for registering", token: jwtToken });
+    return res.json({ message: "Thanks for registering", token: jwtToken, id: inserted.toString() });
 };
 
 /* 
@@ -69,9 +83,12 @@ usersRouter.post('/admin', passport.authenticate('jwt-admin', { session: false }
 
 usersRouter.get('/id/:id', passport.authenticate('jwt-user', { session: false }), 
     async (req, res) => {
+
         
         if ((req.user.type != 'admin') && (req.user._id.toString() != req.params.id)) 
-            return res.sendStatus(401);
+        {
+            console.log("CRISTIDDIO")
+                return res.sendStatus(401);}
 
         if (!(ObjectId.isValid(req.params.id))) return res.sendStatus(409);
 

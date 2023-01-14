@@ -15,7 +15,12 @@ const {
 
 servicesRouter.get('/', async (req, res) => {
 
-    res.json((await tecweb_db_get_collection("services")).map(s => ({ ...s, id: s._id.toString() })));
+    res.json((await tecweb_db_get_collection("services")).map(s => {
+        const id = s._id.toString();
+        delete s._id;
+
+        return { ...s, id: id }
+    }));
 })
 
 
@@ -32,16 +37,22 @@ servicesRouter.get('/id/:id', passport.authenticate('jwt-admin', { session: fals
     async (req, res) => {
 
         if (!(ObjectId.isValid(req.params.id))) {
-            console.log(req.params.id)
+            //console.log(req.params.id)
             return res.sendStatus(409);
         }
 
         const r = await tecweb_db_read("services", { "_id": new ObjectId(req.params.id) });
 
-        if (r !== null)
-            res.json({ ...r, id: r._id.toString() });
-        else 
-            res.json({});
+        if (r !== null){
+
+            const id = r._id.toString();
+            delete r._id;
+
+            return res.json([{ ...r, id: id }]);
+        } else {
+
+            return res.json([{}]);
+        }
 })
 
 

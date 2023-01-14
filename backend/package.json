@@ -6,10 +6,10 @@
   "scripts": {
     "pretest": "clear && npm run remake-db",
     "test": "mocha",
-    "posttest": "mongosh -f ./test/cleanup/register_cleanup.js -f ./test/cleanup/products_cleanup.js",
     "start": "node run.js",
     "start-dev": "nodemon -e js,json run.js",
-    "remake-db": "mongosh -f ./data/drop_all.js -f ./data/users.js -f ./data/products.js -f ./data/services.js"
+    "make-db": "find ./data/setup_data -name '*.js' -print0 | xargs -0 mongosh -f",
+    "remake-db": "mongosh -f ./data/drop_all.js  && npm run make-db"
   },
   "author": "",
   "license": "ISC",

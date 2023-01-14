@@ -26,17 +26,22 @@ productsRouter.get('/', async (req, res) => {
 productsRouter.post('/', passport.authenticate('jwt-admin', { session: false }), 
     async (req, res) => {
         //console.log(req.body)
+
+        if (Object.keys(req.body).length == 0) return res.sendStatus(409)
+
         const added_id = await tecweb_db_create("products", req.body);
+        
+        if (added_id === null) return res.sendStatus(409);
         //console.log(added_id)
 
-        if (added_id === null) res.sendStatus(409);
-
-        res.json({ id: added_id.toString() });
+        return res.status(200).json({ id: added_id.toString() });
 })
 
 
 productsRouter.get('/id/:id', async (req, res) => {
     
+    //console.log(req.params.id)
+
     if (!(ObjectId.isValid(req.params.id))) {
     
         res.sendStatus(409);

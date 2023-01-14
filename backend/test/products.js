@@ -9,19 +9,25 @@ const new_product1 = require("../data/test_data").new_product1;
 const existing_user = require("../data/test_data").existing_user;
 const existing_admin = require("../data/test_data").existing_admin;
 
+
 const {
     generate_none_level_ptests,
     generate_user_level_ptests,
     generate_admin_level_ptests,
     generate_specific_user_level_ptests
-} = require("./priviledges_generator");
+} = require("./generators/priviledges_generator");
 
-const get_keys_test = require("./keys_generator").get_keys_test;
-const get_val_test = require("./keys_generator").get_val_test;
-const post_keys_test = require("./keys_generator").post_keys_test;
-const post_val_test = require("./keys_generator").post_val_test;
+const get_keys_test = require("./generators/keys_generator").get_keys_test;
+const get_val_test = require("./generators/keys_generator").get_val_test;
+const post_keys_test = require("./generators/keys_generator").post_keys_test;
+const post_val_test = require("./generators/keys_generator").post_val_test;
+
+const semantic_tests = require("./generators/semantics_generator");
 
 const params = require("./hooks");
+const new_product3 = require("../data/test_data").new_product3;
+
+const test_data = require("../data/test_data");
 
 describe("/products/ Test Suite", function(){
     describe("GET /products/", function(){
@@ -51,16 +57,23 @@ describe("/products/ Test Suite", function(){
             'post',
             () => ('Bearer ' + params.user_token),
             () => ('Bearer ' + params.admin_token),
-            new_product1
+            test_data.make_new_product()
         );
 
         post_keys_test(
             () => '/products/',
-            [new_product2],
+            [test_data.make_new_product()],
             () => ['id'],
             () => ('Bearer ' + params.admin_token),
             'POST /products/'
         );
+
+        semantic_tests.post_insert_semantics_test(
+            () => '/products/',
+            (prod) => ('/products/id/' + prod.id),
+            () => ('Bearer ' + params.admin_token),
+            [test_data.make_new_product()]
+        )
 
     });
 
@@ -89,6 +102,12 @@ describe("/products/ Test Suite", function(){
             "GET /products/id/:id"
         )
 
+        semantic_tests.get_semantics_test(
+            () => '/products/',
+            (product) => ('/products/id/' + product.id),
+            () =>('Bearer ' + params.admin_token)
+        );
+
         describe("Misc Tests", function(){
             it("Should return 409 if the product does not exist", function (done) {
                 request(app).get("/products/id/" + "63bc15adc9dc4b773e5126ca")
@@ -100,6 +119,7 @@ describe("/products/ Test Suite", function(){
                 request(app).get("/products/id/" + "notveryvalidid")
                     .expect(409, done)
             });
+
         })
     });
 
@@ -137,11 +157,11 @@ describe("/products/ Test Suite", function(){
             it("Should return an array of products that have the given category in their categories", function (done) {
                 request(app).get("/products/category/giocattoli")
                     .expect(200)
-                    .expect(res => res.body.map(product => {
-                        product.categories.should.be.an('array')
-                            .that.is.not.empty;
-                        product.categories.should.include.members(['giocattoli']);
-                    }))
+                    .expect(res => {
+                        res.body.should.be.an('array').that.is.not.empty;
+                        res.body.map(product => {
+                        product.categories.should.be.an('array').that.includes.members(['giocattoli']);
+                    })})
                     .end(done);
             });
         });

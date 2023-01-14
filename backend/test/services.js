@@ -11,16 +11,20 @@ const existing_admin = require("../data/test_data").existing_admin;
 const new_service1 = require("../data/test_data").new_service1;
 const new_service2 = require("../data/test_data").new_service2;
 
+const test_data = require("../data/test_data");
+
 const sizes = require('../db/db_categories').pet_sizes;
 
 const params = require("./hooks");
+
+const semantic_tests = require("./generators/semantics_generator");
 
 const {
     generate_none_level_ptests,
     generate_user_level_ptests,
     generate_admin_level_ptests,
     generate_specific_user_level_ptests,
-} = require("./priviledges_generator");
+} = require("./generators/priviledges_generator");
 
 
 describe("/services/ Test Suite", function(){
@@ -29,6 +33,7 @@ describe("/services/ Test Suite", function(){
 
         generate_none_level_ptests(() => "/services/", 'get', null);
 
+        // TODO use test_keys
         it("Should return an array of services", function (done) {
             const expected_properties = [
                 "id",
@@ -63,7 +68,7 @@ describe("/services/ Test Suite", function(){
             'post',
             () => ('Bearer ' + params.user_token),
             () => ('Bearer ' + params.admin_token),
-            new_service1
+            test_data.make_new_service()
         );
     });
 
@@ -88,6 +93,12 @@ describe("/services/ Test Suite", function(){
             () => ('Bearer ' + params.user_token),
             () => ('Bearer ' + params.admin_token),
             null
+        );
+
+        semantic_tests.get_semantics_test(
+            () => '/services/',
+            (service) => ('/services/id/' + service.id),
+            () => ('Bearer ' + params.admin_token),
         );
 
     });

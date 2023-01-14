@@ -12,7 +12,7 @@ const {
     generate_user_level_ptests,
     generate_admin_level_ptests,
     generate_specific_user_level_ptests
-} = require("./priviledges_generator");
+} = require("./generators/priviledges_generator");
 
 describe("/login/ Test Suite", function(){
 

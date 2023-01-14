@@ -1,8 +1,10 @@
 const jwt = require("jsonwebtoken");
 
 function make_token(id, email, type) {
+
+    
     return jwt.sign({
-        id: id.toHexString(),
+        id: id.toString(),
         emai: email,
         type: type,
     }, process.env.JWT_SECRET);

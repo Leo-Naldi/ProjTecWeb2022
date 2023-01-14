@@ -7,6 +7,7 @@ describe("Random tries", function(){
             {
                 a: 1,
                 b: 2,
+                c: 3,
             },
             {
                 a: 4,
@@ -18,8 +19,7 @@ describe("Random tries", function(){
             },
         ]
 
-        arr.should.be.an('array').that.is.not.empty;
-        arr.map(v => { v.should.be.an('object').that.has.all.keys('a', 'b') })
+        arr[0].should.include({a: 1, b: 2})
         done();
     })
 })

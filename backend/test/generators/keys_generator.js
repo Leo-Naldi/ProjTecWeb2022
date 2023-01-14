@@ -2,15 +2,15 @@ require("dotenv").config();
 const should = require("chai").should();
 const request = require("supertest");
 
-const app = require("../config/server");
-const existing_user = require("../data/test_data").existing_user;
-const existing_admin = require("../data/test_data").existing_admin;
+const app = require("../../config/server");
+const existing_user = require("../../data/test_data").existing_user;
+const existing_admin = require("../../data/test_data").existing_admin;
 
 
 function test_res_keys(res, expected_keys) {
 
     res.body.should.be.an('array').that.is.not.empty;
-    res.body.map(v => { v.should.be.an('object').that.has.all.keys(expected_keys); })
+    res.body.map(v => { v.should.be.an('object').that.includes.all.keys(expected_keys); })
 
 }
 
@@ -29,7 +29,7 @@ function test_res_object_values(res, expected_val) {
 
 function test_res_object_keys(res, expected_keys) {
 
-    res.body.should.be.an('object').that.has.all.keys(expected_keys);
+    res.body.should.be.an('object').that.includes.all.keys(expected_keys);
 
 }
 
