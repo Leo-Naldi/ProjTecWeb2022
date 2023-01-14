@@ -4,16 +4,8 @@ const request = require("supertest");
 
 const app = require("../config/server");
 
-const {
-    existing_user,
-    existing_admin,
-    new_user,
-    new_admin,
-    new_product1,
-    new_product2,
-    new_service1,
-    new_service2,
-} = require("../data/test_data");
+const test_data = require("../data/test_data");
+const { MongoErrorLabel } = require("mongodb");
 
 
 after(async function(){
@@ -24,17 +16,36 @@ let params = {};
 
     before(function(done){
         request(app).post("/login/admin")
-            .send(existing_admin)
+            .send(test_data.existing_admin)
             .expect(200)
             .end((err, res) => {
+
+                if (err) throw err;
+
                 params.admin_token = res.body.token;
+                params.admin_id = res.body.id;
 
                 request(app).post("/login/user")
-                    .send(existing_user)
+                    .send(test_data.existing_user)
                     .expect(200)
                     .end((err, res) => {
+
+                        if (err) throw err;
+
                         params.user_token = res.body.token;
-                        done()
+                        params.user_id = res.body.id;
+                        
+                        request(app).post("/login/user")
+                            .send(test_data.existing_user2)
+                            .expect(200)
+                            .end((err, res) => {
+
+                                if (err) throw err;
+
+                                params.user2_token = res.body.token;
+                                params.user2_id = res.body.id;
+                                done()
+                            })
                     })
 
             });

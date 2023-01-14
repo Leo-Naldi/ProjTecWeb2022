@@ -1,23 +1,22 @@
 require("dotenv").config();
 const request = require("supertest");
-const path = require("path")
 
 const app = require("../../config/server");
 
 
-function post_insert_semantics_test(post_url, get_url, admin_auth, bodies) {
+function post_semantics_test(post_url, get_url, admin_auth, bodies) {
     describe("Semantics Tests", function(){
         for (let i = 0; i < bodies.length; i++){
+
             it("Calling get on the inserted item should return it", async function(){
-                
+
                 const res = await request(app).post(post_url())
                     .set('Authorization', admin_auth())
                     .send(bodies[i])
 
                 res.status.should.equal(200);
-                res.body.should.be.an('object').that.includes.all.keys(['id']);
+                res.body.should.be.an('object');
 
-                    
                 const res2 = await request(app).get(get_url(res.body))
                             .set('Authorization', admin_auth());
                 
@@ -50,7 +49,7 @@ function get_semantics_test(get_collection_url, get_item_url, admin_auth) {
     });
 }
 
-function delete_semantics_test(get_url, delete_url, admin_auth, item) {
+function delete_semantics_test(get_url, delete_url, admin_auth) {
     describe("Semantics Test", function(){
         it("Should delete the given item, thus GETting it from /id/:id should return 409", async function(){
             const check = await request(app).get(get_url())
@@ -66,7 +65,7 @@ function delete_semantics_test(get_url, delete_url, admin_auth, item) {
             const fail = await request(app).get(get_url())
                 .set("Authorization", admin_auth());
 
-            fail.status.should.be(409);
+            fail.status.should.equal(409);
         });
     });
 }
@@ -76,7 +75,7 @@ function get_query_semantics_test() {
 }
 
 module.exports = {
-    post_insert_semantics_test,
+    post_semantics_test,
     get_semantics_test,
     delete_semantics_test,
     get_query_semantics_test,

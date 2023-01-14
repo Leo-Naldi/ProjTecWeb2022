@@ -84,13 +84,13 @@ usersRouter.post('/admin', passport.authenticate('jwt-admin', { session: false }
 usersRouter.get('/id/:id', passport.authenticate('jwt-user', { session: false }), 
     async (req, res) => {
 
+        if (!(ObjectId.isValid(req.params.id))) return res.sendStatus(409);
         
         if ((req.user.type != 'admin') && (req.user._id.toString() != req.params.id)) 
         {
-            console.log("CRISTIDDIO")
-                return res.sendStatus(401);}
+            return res.sendStatus(401);
+        }
 
-        if (!(ObjectId.isValid(req.params.id))) return res.sendStatus(409);
 
         const r = await tecweb_db_read("users", { _id: new ObjectId(req.params.id) })
 
@@ -107,6 +107,8 @@ usersRouter.get('/id/:id', passport.authenticate('jwt-user', { session: false })
 usersRouter.get('/email/:email', passport.authenticate('jwt-user', { session: false }),
     async (req, res) => {
 
+        if (!(req.params.email)) return res.sendStatus(409)
+
         if ((req.user.type != 'admin') && (req.user.email != req.params.email))
             return res.sendStatus(401);
 
@@ -116,34 +118,42 @@ usersRouter.get('/email/:email', passport.authenticate('jwt-user', { session: fa
             return res.sendStatus(409);
         } else {
 
+            const id = r._id.toString();
             delete r._id;
 
-            return res.json([{ ...r, id: req.params.id }]);
+            return res.json([{ ...r, id: id }]);
         }
 });
 
 usersRouter.post('/id/:id', passport.authenticate('jwt-user', { session: false }),
     async (req, res) => {
 
+        if (!(ObjectId.isValid(req.params.id))) return res.sendStatus(409);
+        
         if ((req.user.type != 'admin') && (req.user._id.toString() != req.params.id))
             return res.sendStatus(401);
-
+        
+        
         const fields = ['email', 'password', 'pets', 'username'];
+
         const update = fields.reduce((q, current) => {
-            if (current in req.body) q[current] = req.body.current;
+            if (current in req.body) q[current] = req.body[current];
+            return q;
         }, {});
 
         if (Object.keys(update).length > 0) {
-            const updated = await tecweb_db_update("users", update,{ _id: req.params.id });
+            const updated = await tecweb_db_update("users", update, { "_id": new ObjectId(req.params.id) });
 
             if ((updated.modifiedCount == 0) && (updated.matchedCount > 0)) 
                 return res.sendStatus(500);
-            else if (((updated.modifiedCount == 0) && (updated.matchedCount == 0)))
+            else if (((updated.modifiedCount == 0) && (updated.matchedCount == 0))){
+                
                 return res.sendStatus(409);
-            else 
-                return res.json(update);
+            } else 
+                return res.json({ ...update, id: req.params.id });
 
         } else {
+
             return res.sendStatus(409);
         }
     });
@@ -156,7 +166,8 @@ usersRouter.post('/email/:email', passport.authenticate('jwt-user', { session: f
 
         const fields = ['email', 'password', 'pets', 'username'];
         const update = fields.reduce((q, current) => {
-            if (current in req.body) q[current] = req.body.current;
+            if (current in req.body) q[current] = req.body[current];
+            return q;
         }, {});
 
         if (Object.keys(update).length > 0) {
@@ -167,7 +178,7 @@ usersRouter.post('/email/:email', passport.authenticate('jwt-user', { session: f
             else if (((updated.modifiedCount == 0) && (updated.matchedCount == 0)))
                 return res.sendStatus(409);
             else
-                return res.json(update);
+                return res.json({ ...update, email: req.params.email });
 
         } else {
             return res.sendStatus(409);
@@ -176,11 +187,12 @@ usersRouter.post('/email/:email', passport.authenticate('jwt-user', { session: f
 
 usersRouter.delete('/id/:id', passport.authenticate('jwt-user', { session: false }),
     async (req, res) => {
+        
+        if (!(ObjectId.isValid(req.params.id))) return res.sendStatus(409);
 
         if ((req.user.type != 'admin') && (req.user._id.toString() != req.params.id))
             return res.sendStatus(401);
 
-        if (!(ObjectId.isValid(req.params.id))) return res.sendStatus(409);
         
         const del_count = await tecweb_db_delete("users", { _id: new ObjectId(req.params.id) });
 
@@ -196,9 +208,7 @@ usersRouter.delete('/email/:email', passport.authenticate('jwt-user', { session:
         if ((req.user.type != 'admin') && (req.user.email != req.params.email))
             return res.sendStatus(401);
 
-        if (!(ObjectId.isValid(req.params.id))) return res.sendStatus(409);
-
-        const del_count = await tecweb_db_delete("users", { _id: new ObjectId(req.params.id) });
+        const del_count = await tecweb_db_delete("users", { email: req.params.email });
 
         if (del_count == 0)
             return res.sendStatus(500); // If you got here the id was valid
@@ -206,5 +216,6 @@ usersRouter.delete('/email/:email', passport.authenticate('jwt-user', { session:
             return res.json({ count: del_count });
     });
 
+// TODO deleting you account invalidates the token
 
 module.exports = usersRouter;

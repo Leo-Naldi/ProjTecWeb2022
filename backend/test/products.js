@@ -1,14 +1,7 @@
 require("dotenv").config();
 const request = require("supertest");
-const exec = require("child_process").exec;
-var expect = require('chai').expect;
 
 const app = require("../config/server");
-const new_product2 = require("../data/test_data").new_product2;
-const new_product1 = require("../data/test_data").new_product1;
-const existing_user = require("../data/test_data").existing_user;
-const existing_admin = require("../data/test_data").existing_admin;
-
 
 const {
     generate_none_level_ptests,
@@ -25,7 +18,6 @@ const post_val_test = require("./generators/keys_generator").post_val_test;
 const semantic_tests = require("./generators/semantics_generator");
 
 const params = require("./hooks");
-const new_product3 = require("../data/test_data").new_product3;
 
 const test_data = require("../data/test_data");
 
@@ -68,7 +60,7 @@ describe("/products/ Test Suite", function(){
             'POST /products/'
         );
 
-        semantic_tests.post_insert_semantics_test(
+        semantic_tests.post_semantics_test(
             () => '/products/',
             (prod) => ('/products/id/' + prod.id),
             () => ('Bearer ' + params.admin_token),

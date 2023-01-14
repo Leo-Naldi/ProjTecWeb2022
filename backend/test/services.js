@@ -7,9 +7,6 @@ const tecweb_db_read = require("../db/db_operations").tecweb_db_read;
 
 // Taken from ../data/users.json, the test assumes it was alreadi put in the db
 const existing_user = require("../data/test_data").existing_user;
-const existing_admin = require("../data/test_data").existing_admin;
-const new_service1 = require("../data/test_data").new_service1;
-const new_service2 = require("../data/test_data").new_service2;
 
 const test_data = require("../data/test_data");
 

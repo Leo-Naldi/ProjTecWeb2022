@@ -3,8 +3,6 @@ const should = require("chai").should();
 const request = require("supertest");
 
 const app = require("../../config/server");
-const existing_user = require("../../data/test_data").existing_user;
-const existing_admin = require("../../data/test_data").existing_admin;
 
 
 function test_res_keys(res, expected_keys) {
