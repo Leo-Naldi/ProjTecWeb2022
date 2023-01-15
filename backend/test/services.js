@@ -101,15 +101,6 @@ describe("/services/ Test Suite", function(){
 
     describe("POST /services/id/:id", function(){
 
-        it("Should work", async function () {
-            //console.log(new_data.services[1].id);
-            const r = await request(app).post('/services/id/' + new_data.services[1].id)
-                .set("Authorization", 'Bearer ' + params.admin_token)
-                .send({ name: 'albano' });
-
-            r.status.should.equal(200)
-        })
-
         generate_admin_level_ptests(
             () => ('/services/id/' + new_data.services[2].id),
             'post',

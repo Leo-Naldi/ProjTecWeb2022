@@ -22,6 +22,26 @@ const params = require("./hooks");
 const test_data = require("../data/test_data");
 
 describe("/products/ Test Suite", function(){
+
+    const new_data = {
+        products: [],
+    };
+
+    // NB if post /products/ tests fail then this fails
+    before(async function () {
+        for (let i = 0; i < 4; i++) {
+            const product = test_data.make_new_product();
+
+            const inserted = await request(app).post('/products/')
+                .set("Authorization", 'Bearer ' + params.admin_token)
+                .send(product);
+
+            inserted.status.should.equal(200);
+            new_data.products.push({ ...product, id: inserted.body.id })
+        }
+    })
+
+
     describe("GET /products/", function(){
         
         generate_none_level_ptests(() => '/products', 'get', null)
@@ -39,6 +59,7 @@ describe("/products/ Test Suite", function(){
             ],
             null,
             "GET /products/")
+
     });
 
     describe("POST /products/", function(){
@@ -157,5 +178,39 @@ describe("/products/ Test Suite", function(){
                     .end(done);
             });
         });
+    });
+
+    describe("POST /products/id/:id", function(){
+
+        generate_admin_level_ptests(
+            () => ('/products/id/' + new_data.products[0].id),
+            'post',
+            () => ('Bearer ' + params.user_token),
+            () => ('Bearer ' + params.admin_token),
+            { in_store: 666 }
+        );
+
+        semantic_tests.post_semantics_test(
+            () => ('/products/id/' + new_data.products[1].id),
+            () => ('/products/id/' + new_data.products[1].id),
+            () => ('Bearer ' + params.admin_token),
+            [{ in_store: 5 }, { in_store: 666 }]
+        )
+    });
+
+    describe("DELETE /products/id/:id", function(){
+        generate_admin_level_ptests(
+            () => ('/products/id/' + new_data.products[2].id),
+            'delete',
+            () => ('Bearer ' + params.user_token),
+            () => ('Bearer ' + params.admin_token),
+            null
+        )
+
+        semantic_tests.delete_semantics_test(
+            () => ('/products/id/' + new_data.products[3].id),
+            () => ('/products/id/' + new_data.products[3].id),
+            () => ('Bearer ' + params.admin_token),
+        );
     });
 });

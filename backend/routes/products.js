@@ -66,4 +66,58 @@ productsRouter.get('/category/:category', async (req, res) => {
     res.json(result);
 })
 
+productsRouter.post('/id/:id', passport.authenticate('jwt-admin', { session: false }), async (req, res) => {
+    
+    if (!(ObjectId.isValid(req.params.id))) return res.sendStatus(409);
+
+
+    /* 
+    "img": "https://source.unsplash.com/random",
+        "name": "Osso giocattolo placcato in oro",
+        "price": 900,
+        "categories": [
+            "giocattoli",
+            "accessori"
+        ],
+        "pet_types": [
+            "cane"
+        ],
+        "in_store": 100,
+     */
+
+    const fields = ['img', 'name', 'price', 'categories', 'pet_types', 'in_store'];
+
+    const update = fields.reduce((q, current) => {
+        if (current in req.body) q[current] = req.body[current];
+        return q;
+    }, {});
+
+    if (Object.keys(update).length > 0) {
+        const updated = await tecweb_db_update("products", update, { "_id": new ObjectId(req.params.id) });
+
+        if ((updated.modifiedCount == 0) && (updated.matchedCount > 0))
+            return res.sendStatus(500);
+        else if (((updated.modifiedCount == 0) && (updated.matchedCount == 0))) {
+
+            return res.sendStatus(409);
+        } else
+            return res.json({ ...update, id: req.params.id });
+
+    } else {
+
+        return res.sendStatus(409);
+    }
+});
+
+productsRouter.delete('/id/:id', passport.authenticate('jwt-admin', { session: false }), async (req, res) => {
+    if (!(ObjectId.isValid(req.params.id))) return res.sendStatus(409);
+
+    const del_count = await tecweb_db_delete("products", { _id: new ObjectId(req.params.id) });
+
+    if (del_count == 0)
+        return res.sendStatus(500); // If you got here the id was valid
+    else
+        return res.json({ count: del_count });
+});
+
 module.exports = productsRouter;
