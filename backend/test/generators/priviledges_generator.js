@@ -124,6 +124,27 @@ function generate_admin_level_ptests(endpoint_generator, method, user_auth, admi
             })
 
         });
+    } else if (method == 'delete') {
+        describe("Privilege Tests", function () {
+
+            it("Should return status 401 to non-logged users", function (done) {
+                request(app).delete(endpoint_generator())
+                    .expect(401, done);
+            });
+
+            it("Should return status 401 to logged users", function (done) {
+                request(app).delete(endpoint_generator())
+                    .set('Authorization', user_auth())
+                    .expect(401, done);
+            })
+
+            it("Should return status 200 to logged admins", function (done) {
+                request(app).delete(endpoint_generator())
+                    .set('Authorization', admin_auth())
+                    .expect(200, done);
+            })
+
+        });
     }
 }
 

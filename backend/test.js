@@ -11,9 +11,13 @@ const existing_admin = {
     "password": "iloveyou7",
 };
 
-axios.post("http://localhost:8001/users/email/" + existing_user.email, { username: 'albano' }).then(res => {
+
+axios.post("http://localhost:8001/services/id/63c3ea3dd61dd413f6e3ad6c", { name: 'albano' }).then(res => {
     console.log(res.json().body);
-});
+});    
+
+
+
 
 //axios.get("http://localhost:8001/products/id/63bc190a9ac1ef849a6b9240 ").then(res => {
 //    console.log(res.data);

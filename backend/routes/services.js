@@ -51,10 +51,54 @@ servicesRouter.get('/id/:id', passport.authenticate('jwt-admin', { session: fals
             return res.json([{ ...r, id: id }]);
         } else {
 
-            return res.json([{}]);
+            return res.sendStatus(409);
         }
 })
 
+
+servicesRouter.post('/id/:id', passport.authenticate('jwt-admin', { session: false }), async (req, res) => {
+    
+    console.log(req.params.id)
+
+    if (!(ObjectId.isValid(req.params.id))) return res.sendStatus(409);
+
+    const fields = ['name', 'type', 'city', 'pet_types', 'sizes_min', 'sizes_max'];
+
+    const update = fields.reduce((q, current) => {
+        if (current in req.body) q[current] = req.body[current];
+        return q;
+    }, {});
+
+    //console.log(req.body)
+
+    if (Object.keys(update).length > 0) {
+        const updated = await tecweb_db_update("services", update, { "_id": new ObjectId(req.params.id) });
+
+        if ((updated.modifiedCount == 0) && (updated.matchedCount > 0))
+            return res.sendStatus(500);
+        else if (((updated.modifiedCount == 0) && (updated.matchedCount == 0))) {
+            console.log("tuamadre")
+            return res.sendStatus(409);
+        } else
+            return res.json({ ...update, id: req.params.id });
+
+    } else {
+
+        return res.sendStatus(409);
+    }
+});
+
+servicesRouter.delete('/id/:id', passport.authenticate('jwt-admin', { session: false }), async (req, res) => {
+    if (!(ObjectId.isValid(req.params.id))) return res.sendStatus(409);
+
+
+    const del_count = await tecweb_db_delete("services", { _id: new ObjectId(req.params.id) });
+
+    if (del_count == 0)
+        return res.sendStatus(409);
+    else
+        return res.json({ count: del_count });
+});
 
 
 servicesRouter.get('/query/', async (req, res) => {

@@ -5,7 +5,6 @@ const request = require("supertest");
 const app = require("../config/server");
 
 const test_data = require("../data/test_data");
-const { MongoErrorLabel } = require("mongodb");
 
 
 after(async function(){
