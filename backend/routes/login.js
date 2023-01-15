@@ -23,17 +23,17 @@ const login = async (req, res, type) => {
     
     if (!userWithEmail)
         return res
-            .status(400)
+            .status(401)
             .json({ message: "Incorrect email or password" });
     
     if ((type == "admin") && (userWithEmail.type != "admin"))
         return res
-            .status(400)
+            .status(401)
             .json({ message: "Incorrect email or password" });
 
     if (userWithEmail.password !== password)
         return res
-            .status(400)
+            .status(401)
             .json({ message: "Incorrect email or password" });
 
     const jwtToken = make_token(

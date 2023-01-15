@@ -28,13 +28,13 @@ describe("/login/ Test Suite", function(){
                 }).end(done);
         })
 
-        it("Should return status 400 when given a user that does not exist", function(done){
+        it("Should return status 401 when given a user that does not exist", function(done){
             request(app).post("/login/user")
                 .send({
                     username: "jbkijbnkj",
                     email: "hjbuivuib",
                     password: "cbifdcbeifbveivn"
-                }).expect(400, done);
+                }).expect(401, done);
         });
 
         it("Should log in an admin account", function (done) {
@@ -57,19 +57,19 @@ describe("/login/ Test Suite", function(){
                 }).end(done);
         });
 
-        it("Should reject an admin that does not exist", function (done) {
+        it("Should return status 401 when given a user that does not exist", function (done) {
             request(app).post("/login/admin")
                 .send({
                     username: "jbkijbnkj",
                     email: "hjbuivuib",
                     password: "cbifdcbeifbveivn",
                     type: "admin",
-                }).expect(400, done);
+                }).expect(401, done);
         });
 
-        it("Should reject a user account", function(done){
+        it("Should return status 401 when given a user account", function(done){
             request(app).post("/login/admin")
-                .send(existing_user).expect(400, done);
+                .send(existing_user).expect(401, done);
         });
     });
 });

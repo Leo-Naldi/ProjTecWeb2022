@@ -216,6 +216,10 @@ usersRouter.delete('/email/:email', passport.authenticate('jwt-user', { session:
             return res.json({ count: del_count });
     });
 
-// TODO deleting you account invalidates the token
+usersRouter.get('/verifytoken/user', passport.authenticate('jwt-user', { session: false }),
+    (req, res) => { res.sendStatus(200) })
+
+usersRouter.get('/verifytoken/admin', passport.authenticate('jwt-admin', { session: false }),
+    (req, res) => { res.sendStatus(200) })
 
 module.exports = usersRouter;
