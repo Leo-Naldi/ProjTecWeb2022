@@ -188,7 +188,7 @@ Esistono 4 collezioni (implementate 3):
 - /users/
 - /products/
 - /services/
-- /posts/
+- /posts/ (TODO)
 
 Per ogni collezione esiste un endpoint /{collezione}/id/:id che permette di accedere alle singole risorse.
 
