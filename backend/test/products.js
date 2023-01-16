@@ -1,160 +1,216 @@
 require("dotenv").config();
 const request = require("supertest");
-const exec = require("child_process").exec;
 
 const app = require("../config/server");
-const new_product = require("../data/test_data").new_product;
-const existing_user = require("../data/test_data").existing_user;
-const existing_admin = require("../data/test_data").existing_admin;
 
+const {
+    generate_none_level_ptests,
+    generate_user_level_ptests,
+    generate_admin_level_ptests,
+    generate_specific_user_level_ptests
+} = require("./generators/priviledges_generator");
+
+const get_keys_test = require("./generators/keys_generator").get_keys_test;
+const get_val_test = require("./generators/keys_generator").get_val_test;
+const post_keys_test = require("./generators/keys_generator").post_keys_test;
+const post_val_test = require("./generators/keys_generator").post_val_test;
+
+const semantic_tests = require("./generators/semantics_generator");
+
+const params = require("./hooks");
+
+const test_data = require("../data/test_data");
 
 describe("/products/ Test Suite", function(){
-    describe("GET /products/", function(){
-        it("Should return status 200 to non-logged users", function(done){
-            request(app).get("/products/")
-                .expect(200, done);
-        });
 
-        it("Should return an array of products", function(done){
-            const expected_properties = [
+    const new_data = {
+        products: [],
+    };
+
+    // NB if post /products/ tests fail then this fails
+    before(async function () {
+        for (let i = 0; i < 4; i++) {
+            const product = test_data.make_new_product();
+
+            const inserted = await request(app).post('/products/')
+                .set("Authorization", 'Bearer ' + params.admin_token)
+                .send(product);
+
+            inserted.status.should.equal(200);
+            new_data.products.push({ ...product, id: inserted.body.id })
+        }
+    })
+
+
+    describe("GET /products/", function(){
+        
+        generate_none_level_ptests(() => '/products', 'get', null)
+
+        get_keys_test(
+            () => '/products', 
+            () => [
                 "id",
                 "img",
                 "price",
+                "name",
                 "categories",
                 "pet_types",
                 "in_store",
-            ];
+            ],
+            null,
+            "GET /products/")
 
-            request(app).get("/products/")
-                .expect(res => {
-                    res.body.map(e => {
-                        for (let i = 0; i < expected_properties.length; i++) {
-                            if (!(expected_properties[i] in e)) {
-                                throw new Error(`GET /products/ Missing property:\n${expected_properties[i]}\n from product:\n ${e}\n`);
-                            }
-                        }
-                    })
-                }).end(done);
-        });
     });
 
     describe("POST /products/", function(){
 
-        let user_token = null, admin_token = null;
-        // ids are remade at every run so
 
-        before(function (done) {
-            request(app).post("/login/admin")
-                .send(existing_admin)
-                .expect(200)
-                .end((err, res) => {
-                    admin_token = res.body.token;
-                    //console.log(token);
-                    
-                });
-            request(app).post("/login/user")
-                .send(existing_user)
-                .expect(200)
-                .end((err, res) => {
-                    user_token = res.body.token;
-                    //console.log(token);
-                    done()
-                })
-        })
+        generate_admin_level_ptests(
+            () => '/products/', 
+            'post',
+            () => ('Bearer ' + params.user_token),
+            () => ('Bearer ' + params.admin_token),
+            test_data.make_new_product()
+        );
 
-        it("Should return status 401 to non-logged users", function(done){
-            request(app).post("/products/")
-                .send(new_product)
-                .expect(401, done)
-        });
+        post_keys_test(
+            () => '/products/',
+            [test_data.make_new_product()],
+            () => ['id'],
+            () => ('Bearer ' + params.admin_token),
+            'POST /products/'
+        );
 
-        it("Should return status 401 to non-admin users", function(done){
-            request(app).post("/products/")
-                .set('Authentication', 'Bearer ' + user_token)
-                .send(new_product)
-                .expect(401, done)
-        });
+        semantic_tests.post_semantics_test(
+            () => '/products/',
+            (prod) => ('/products/id/' + prod.id),
+            () => ('Bearer ' + params.admin_token),
+            [test_data.make_new_product()]
+        )
 
-        it("Should return status 200 and the inserted id to logged admins", function(done){
-            request(app).post("/products/")
-                .set('Authorization', 'Bearer ' + admin_token)
-                .send(new_product)
-                .expect(200)
-                .expect(res => {
-                    if (!('id' in res.body)) 
-                    throw new Error(`POST /products/ id not sent`);
-                })
-                .end(done)
-        });
     });
 
     describe("GET /products/id/:id", function(){
 
-        let existing_id = null;
+        let new_prod_data = { id: null, product: null, };
         
         before(function(done){
             request(app).get("/products/")
                 .expect(200)
                 .end((err, res) => {
-                    existing_id = res.body[0].id;
-                    if(!existing_id) 
+                    new_prod_data.id = res.body[0].id;
+                    new_prod_data.product = res.body[0];
+                    if(!(new_prod_data.id)) 
                         throw new Error("Something went wrong when fetching product id")
                     done();
                 })
         })
 
-        it("Should return status 200 to non-logged users", function (done) {
-            request(app).get("/products/id/" + existing_id)
-                .expect(200, done);
-        });
+        generate_none_level_ptests(() => ("/products/id/" + new_prod_data.id), 'get', null)
 
-        it("Should return null if the product does not exist", function(done){
-            request(app).get("/products/id/" + "63bc15adc9dc4b773e5126ca")
-                .expect(200)
-                .expect(res => {
-                    if (Object.keys(res.body).length != 0) 
-                        throw new Error(`Body not empty on non existant product id: ${JSON.stringify(res.body)}`)
-                })
-                .end(done);
-        });
+        get_val_test(
+            () => ("/products/id/" + new_prod_data.id),
+            () => [new_prod_data.product],
+            null,
+            "GET /products/id/:id"
+        )
 
-        it("Should return 409 if the given id is not in the correct form", function(done){
-            request(app).get("/products/id/" + "notveryvalidid")
-                .expect(409, done)
-        });
+        semantic_tests.get_semantics_test(
+            () => '/products/',
+            (product) => ('/products/id/' + product.id),
+            () =>('Bearer ' + params.admin_token)
+        );
 
-        it("Should return 200 and the correct product if the id matches", function(done){
-            request(app).get("/products/id/" + existing_id)
-                .expect(200)
-                .expect(res => res.body.id == existing_id)
-                .end(done);
-        });
+        describe("Misc Tests", function(){
+            it("Should return 409 if the product does not exist", function (done) {
+                request(app).get("/products/id/" + "63bc15adc9dc4b773e5126ca")
+                    .expect(409)
+                    .end(done);
+            });
+
+            it("Should return 409 if the given id is not in the correct form", function (done) {
+                request(app).get("/products/id/" + "notveryvalidid")
+                    .expect(409, done)
+            });
+
+        })
     });
 
     describe("GET /products/category/:category", function(){
-        it("Should return status 200 to non-logged users", function(done){
-            request(app).get("/products/category/giocattoli")
-                .expect(200, done);
-        });
+        
+        generate_none_level_ptests(() => '/products/category/giocattoli', 'get',
+            null)
 
-        it("Should return [] if there are no products of the given category", function(done){
-            request(app).get("/products/category/inshtallah")
-                .expect(200)
-                .expect(res => {
-                    if (res.body.length != 0)
-                        throw new Error("Body not empty");
-                    
-                }).end(done);
-        });
+        get_keys_test(
+            () => '/products',
+            () => [
+                "id",
+                "img",
+                "price",
+                "name",
+                "categories",
+                "pet_types",
+                "in_store",
+            ],
+            null,
+            "GET /products/"
+        );
 
-        it("Should return an array of products that have the given category in their categories", function(done){
-            request(app).get("/products/category/giocattoli")
-                .expect(200)
-                .expect(res => res.body.map(product => {
-                    if (product.categories.indexOf('giocattoli') == -1)
-                        throw new Error("Category not present")
-                }))
-                .end(done);
+        describe("Misc Tests", function(){
+            it("Should return [] if there are no products of the given category", function (done) {
+                request(app).get("/products/category/inshtallah")
+                    .expect(200)
+                    .expect(res => {
+                        if (res.body.length != 0)
+                            throw new Error("Body not empty");
+
+                    }).end(done);
+            });
+
+            it("Should return an array of products that have the given category in their categories", function (done) {
+                request(app).get("/products/category/giocattoli")
+                    .expect(200)
+                    .expect(res => {
+                        res.body.should.be.an('array').that.is.not.empty;
+                        res.body.map(product => {
+                        product.categories.should.be.an('array').that.includes.members(['giocattoli']);
+                    })})
+                    .end(done);
+            });
         });
+    });
+
+    describe("POST /products/id/:id", function(){
+
+        generate_admin_level_ptests(
+            () => ('/products/id/' + new_data.products[0].id),
+            'post',
+            () => ('Bearer ' + params.user_token),
+            () => ('Bearer ' + params.admin_token),
+            { in_store: 666 }
+        );
+
+        semantic_tests.post_semantics_test(
+            () => ('/products/id/' + new_data.products[1].id),
+            () => ('/products/id/' + new_data.products[1].id),
+            () => ('Bearer ' + params.admin_token),
+            [{ in_store: 5 }, { in_store: 666 }]
+        )
+    });
+
+    describe("DELETE /products/id/:id", function(){
+        generate_admin_level_ptests(
+            () => ('/products/id/' + new_data.products[2].id),
+            'delete',
+            () => ('Bearer ' + params.user_token),
+            () => ('Bearer ' + params.admin_token),
+            null
+        )
+
+        semantic_tests.delete_semantics_test(
+            () => ('/products/id/' + new_data.products[3].id),
+            () => ('/products/id/' + new_data.products[3].id),
+            () => ('Bearer ' + params.admin_token),
+        );
     });
 });

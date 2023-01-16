@@ -23,17 +23,17 @@ const login = async (req, res, type) => {
     
     if (!userWithEmail)
         return res
-            .status(400)
+            .status(401)
             .json({ message: "Incorrect email or password" });
     
     if ((type == "admin") && (userWithEmail.type != "admin"))
         return res
-            .status(400)
+            .status(401)
             .json({ message: "Incorrect email or password" });
 
     if (userWithEmail.password !== password)
         return res
-            .status(400)
+            .status(401)
             .json({ message: "Incorrect email or password" });
 
     const jwtToken = make_token(
@@ -42,7 +42,7 @@ const login = async (req, res, type) => {
         type,
     );
 
-    res.json({ message: "Welcome Back!", token: jwtToken });
+    res.json({ message: "Welcome Back!", token: jwtToken, id: userWithEmail._id.toString() });
 };
 
 router.post("/user", async (req, res) => login(req, res, "user"));
