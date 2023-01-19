@@ -258,3 +258,4 @@ L'API risponde con tre codici:
 - POST deve sempre ritornare la risorsa aggiunta o modificata
 - i GET sulle collezioni devono gestire il campo query
 - Gestire lo scheduling (i.e. creare prenotazoni, trovare i provider disponibili in un dato giorno, cancellare una prenotazione)
+- Aggiungere il cart agli utenti (mehhhhh non e' cosi importante dai)
