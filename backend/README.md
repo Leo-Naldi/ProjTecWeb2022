@@ -161,7 +161,7 @@ URI implementati:
 
 | **URI**   | **Description**  | **Methods** | **Auth** |
 |-----------|------------------|-----|-----|
-| /users/ | User Collection | GET | Admin (GET) |
+| /users/ | User Collection | GET, | Admin (GET) |
 | /users/register/user | Crea un account user | POST | None (POST) |
 | /users/register/admin | crea un account admin | POST | Admin (POST) |
 | /users/id/:id | Singolo utente | GET, POST, DELETE | SpecificUser (GET, POST, DELETE) |
@@ -218,6 +218,7 @@ Se email e password sono validi si ricevera' una risposta con status code 200 e 
 ```json
 {
     "token": "keyboardsmash.exe",
+    "id": "keyboardsmash2.exe"
 }
 ```
 Il token potra essere usato nelle successive richieste con schema bearer, p.e:
@@ -251,6 +252,9 @@ L'API risponde con tre codici:
 - 401, autenticazione fallita (p.e. non si e' inviato il token, il token era sbagliato, etch)
 - 409, i dati inviati non sono corretti o non corrispondono a nessuna risorsa presente nel db (p.e. si e' fatto GET /users/email/:email con una email che non appartiene a nessun utente)
 
-## Project Structure
+## TODOS
 
-TODO
+- /users/register fa schifo come endpoint, sarebbe meglio mettere un post generico da qualche parte
+- POST deve sempre ritornare la risorsa aggiunta o modificata
+- i GET sulle collezioni devono gestire il campo query
+- Gestire lo scheduling (i.e. creare prenotazoni, trovare i provider disponibili in un dato giorno, cancellare una prenotazione)

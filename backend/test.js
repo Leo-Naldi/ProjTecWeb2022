@@ -12,10 +12,13 @@ const existing_admin = {
 };
 
 
-axios.post("http://localhost:8001/services/id/63c3ea3dd61dd413f6e3ad6c", { name: 'albano' }).then(res => {
-    console.log(res.json().body);
-});    
-
+fetch("http://localhost:8001/login/user", {
+    method: "post",
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ email: 'leonardo.naldi@studio.unibo.it', password: 'supersafepassword4' })
+})
 
 
 
