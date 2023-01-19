@@ -120,7 +120,7 @@ function HeaderBar({ shoppingCart, openSignIn, openCart, openLeftDrawer }) {
                                     <ShoppingCartIcon />
                                 </Badge>
                             </IconButton>
-                        { user.username === 'default' ? (<IconButton
+                        { (!user) ? (<IconButton
                                 size="large"
                                 edge="start"
                                 color="inherit"

@@ -11,27 +11,57 @@ import Typography from '@mui/material/Typography';
 
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
-import { useDispatchAccount } from '../context/CurrentAccountContext';
+import { useDispatchAccount, useSetToken, useToken } from '../context/CurrentAccountContext';
 import validateSignIn from '../utils/signInUser';
 
 
 function SignInForm({afterSignInSuccess = null, afterSignInError = null}) {
 
     const accountDispatch = useDispatchAccount();
+    const setToken = useSetToken();
 
     const handleSubmit = (event) => {
         event.preventDefault();
 
         const data = new FormData(event.currentTarget);
+        //console.log(data);
 
         validateSignIn(data)
-            .then((serverdata) => {  // login success
-                console.log(serverdata);
-                console.log(serverdata.token);
+            .then(res => {  // login success
+                console.log("YEY")
+                if (res.ok) return res.json();
+                else if (res.status === 409) throw new Error("Failed");
+            })
+            .then(body => {
+                // console.log(body.token)
+                setToken(body.token);
+
+                fetch('http://localhost:8001/users/id/' + body.id, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + body.token,
+                    },
+                    method: 'get',
+                }).then((res) => {
+                    if (res.ok) return res.json();
+                    else if (res.status === 409) throw new Error("Failed");
+                }).then(body => {
+                    
+                    accountDispatch({ 
+                        type: 'USER_CHANGED', 
+                        username: body[0].username,
+                        email: body[0].email,
+                        pets: body[0].pets || [],
+                    });
+                    if (afterSignInSuccess) afterSignInSuccess();
+                }).catch(e => console.error(e))
+
+                // TODO fetch user info
             })
             .catch((e) => {
-                console.log(e);
-                if (afterSignInError !== null) afterSignInError();
+                console.log("NOOOOOO")
+                console.error(e);
+                // TODO set an error message
             });
             
 
