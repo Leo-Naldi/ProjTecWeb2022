@@ -252,6 +252,8 @@ L'API risponde con tre codici:
 - 401, autenticazione fallita (p.e. non si e' inviato il token, il token era sbagliato, etch)
 - 409, i dati inviati non sono corretti o non corrispondono a nessuna risorsa presente nel db (p.e. si e' fatto GET /users/email/:email con una email che non appartiene a nessun utente)
 
-## Project Structure
+## TODOS
 
-TODO
+- /users/register fa schifo come endpoint, sarebbe meglio mettere un post generico da qualche parte
+- POST deve sempre ritornare la risorsa aggiunta o modificata
+- i GET sulle collezioni devono gestire il campo query
