@@ -161,7 +161,7 @@ URI implementati:
 
 | **URI**   | **Description**  | **Methods** | **Auth** |
 |-----------|------------------|-----|-----|
-| /users/ | User Collection | GET | Admin (GET) |
+| /users/ | User Collection | GET, | Admin (GET) |
 | /users/register/user | Crea un account user | POST | None (POST) |
 | /users/register/admin | crea un account admin | POST | Admin (POST) |
 | /users/id/:id | Singolo utente | GET, POST, DELETE | SpecificUser (GET, POST, DELETE) |
@@ -218,6 +218,7 @@ Se email e password sono validi si ricevera' una risposta con status code 200 e 
 ```json
 {
     "token": "keyboardsmash.exe",
+    "id": "keyboardsmash2.exe"
 }
 ```
 Il token potra essere usato nelle successive richieste con schema bearer, p.e:
