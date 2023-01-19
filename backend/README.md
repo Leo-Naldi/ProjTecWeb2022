@@ -257,3 +257,4 @@ L'API risponde con tre codici:
 - /users/register fa schifo come endpoint, sarebbe meglio mettere un post generico da qualche parte
 - POST deve sempre ritornare la risorsa aggiunta o modificata
 - i GET sulle collezioni devono gestire il campo query
+- Gestire lo scheduling (i.e. creare prenotazoni, trovare i provider disponibili in un dato giorno, cancellare una prenotazione)
