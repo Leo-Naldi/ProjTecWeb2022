@@ -17,26 +17,26 @@ const db_operations = require('../db/db_operations');
  *      bookings: [events]
  * }
  * 
- * Service Events:
+ * Service Bookings:
  * {
+ *      date: 
  *      from:
  *      to:
  *      user_email: 
  * }
  * 
- * User Events:
+ * User bookings:
  * {
  *      from:
  *      to:
- *      service_id:
- *      service_email: 
+ *      service_id: 
  * }
  * 
  */
 
 function check_schedule(from, schedule) {
 
-    if (schedule.workweek.indexOf(from.day()) == -1) return false;
+    if (schedule.workweek.indexOf(from.day()) === -1) return false;
 
     if ((schedule.opening_moring) && (schedule.opening_afternoon)) {
 
@@ -86,6 +86,27 @@ async function add_event(user_id, service_id, event) {
     return true;
 }
 
+// Returns an array of slots ({ from: , to: }) that dont match any booking.
+function get_free_slots_array(service, day) {
+    if (service.schedule.workweek.indexOf(day) === -1) return [];
+
+    let res = [];
+    let starting_time = dayjs(service.schedule.opening_moring);
+    const closing = dayjs(service.schedule.closing_moring);
+
+    starting_time.day(closing.day()).month(closing.month()).year(closing.year());
+
+    while (starting_time.isBefore(closing, 'minutes')) {
+        res.push();
+    }
+}
+
 async function date_available_services(date) {
-    const services = await db_operations.tecweb_db_read("services", null, {});
+    const services = await db_operations.tecweb_db_get_collection("setvices");
+
+    let res = services.filter(s => (s.schedule.workweek.indexof(dayjs(date).day()) === -1));
+
+
+
+    return res;
 }
