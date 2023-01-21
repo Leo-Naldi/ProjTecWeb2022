@@ -5,8 +5,76 @@ const snum = 0; // service number
 const pnum = 0; // product number
 const anum = 0; // appointment number
 
-db.createCollection('users');
+db.createCollection('users', {
+    validator: {
+       '$jsonSchema': {
+            bsonType: 'object',
+            title: "User Object Validator",
+            required: ['username', 'email', 'password', 'pets','type'],
+            properties: {
+                usename: {
+                    bsonType: 'string',
+                },
+                email: {
+                    bsonType: 'string',
+                },
+                password: {
+                    bsonType: 'string',
+                },
+                type: {
+                    enum: ['user', 'admin'],
+                },
+                pets: {
+                    bsonType: 'array',
+                    items: {
+                        bsonType: 'object',
+                        required: ['name', 'size', 'age', 'type'],
+                        properties: {
+                            name: {
+                                bsonType: 'string',
+                            },
+                            size: {
+                                enum: [
+                                    'subatomico',
+                                    'microscopico',
+                                    'minuscolo',
+                                    'piccolo',
+                                    'medio',
+                                    'grande',
+                                    'immenso',
+                                    'colossale',
+                                    'gargantuesco',
+                                    'apocalittico',
+                                ],
+                            },
+                            age: {
+                                bsonType: 'int',
+                            },
+                            type: {
+                                enum: [
+                                    'cane',
+                                    'gatto',
+                                    'rettile',
+                                    'uccello',
+                                    'scoiattolo',
+                                    'pesce',
+                                    'ragno',
+                                    'orrore lovecraftiano',
+                                    'criceto',
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+});
+db.users.createIndex({ "email": 1 }, { unique: true });
+
 db.createCollection('services');
+
+
 db.createCollection('products');
 
 function make_new_user() {
@@ -63,24 +131,24 @@ function make_new_product() {
 
 db.users.insertMany([
     {
-        "username": "Leonaldi",
-        "email": "leonardo.naldi@studio.unibo.it",
-        "password": "suppersafepassword4",
-        "pets": [
+        username: "Leonaldi",
+        email: "leonardo.naldi@studio.unibo.it",
+        password: "suppersafepassword4",
+        pets: [
             {
-                "name": "Alberto",
-                "size": "medio",
-                "age": 3,
-                "type": "cane"
+                name: "Alberto",
+                size: "medio",
+                age: 3,
+                type: "cane"
             },
             {
-                "name": "Pierfrancesco",
-                "size": "medio",
-                "age": 1,
-                "type": "gatto"
+                name: "Pierfrancesco",
+                size: "medio",
+                age: 1,
+                type: "gatto"
             }
         ],
-        "type": "user"
+        type: "user"
     },
     {
         "username": "pieralberto",
