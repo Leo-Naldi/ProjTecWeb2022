@@ -5,6 +5,6 @@
 
 db = connect('mongodb://localhost/TecWebDB');
 
-db.users.deleteMany({});
-db.products.deleteMany({});
-db.services.deleteMany({});
+db.users.drop();
+db.products.drop();
+db.services.drop();
