@@ -43,7 +43,7 @@ function make_new_service() {
         "name": `verygoodserivice${serviceid++}`,
         "type": "dog sitter",
         "city": "Bologna",
-        "pet_types": [
+        "petTypes": [
             "cane",
             "gatto",
             "rettile",
@@ -52,8 +52,8 @@ function make_new_service() {
             "pesce",
             "ragno"
         ],
-        "sizes_min": "subatomico",
-        "sizes_max": null
+        "sizesMin": "subatomico",
+        "sizesMax": null
     };
 }
 
@@ -63,13 +63,13 @@ function make_new_product() {
         "price": productid * 10 + 2,
         "name": `jisusproduct${productid++}`,
         "categories": ['giocattoli'],
-        "pet_types": ['cane',
+        "petTypes": ['cane',
             'gatto',
             'rettile',
             'scoiattolo',
             'pesce',
         ],
-        "in_store": 42.
+        "inStore": 42.
     }
 }
 

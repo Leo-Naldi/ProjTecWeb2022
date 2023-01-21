@@ -1,12 +1,21 @@
 
 db = connect('mongodb://localhost/TecWebDB');
 
+const schedule = {
+        openingMorning: null,
+        closingMorning: null,
+        openingAfternoon: null,
+        closingAfternoon: null,
+        workweek: [],
+        vacations: [],
+}
+
 db.services.insertMany([
     {
             "name": "InaccioPets",
             "type": "veterinario",
             "city": "Bologna",
-            "pet_types": [
+            "petTypes": [
                 "cane", 
                 "gatto", 
                 "rettile", 
@@ -15,52 +24,52 @@ db.services.insertMany([
                 "pesce", 
                 "ragno"
             ],
-            "sizes_min": "subatomico",
-            "sizes_max": null
+            "sizesMin": "subatomico",
+            "sizesMax": null
     },
     {
             "name": "Gianfranchi & Gianfranchi",
             "type": "veterinario",
             "city": "Forli",
-            "pet_types": [],
-            "sizes_min": "piccolo",
-            "sizes_max": "gargantuesco"
+            "petTypes": [],
+            "sizesMin": "piccolo",
+            "sizesMax": "gargantuesco"
     },
     {
             "name": "God Please Kill Me Veterinari",
             "type": "veterinario",
             "city": "Roma",
-            "pet_types": [],
-            "sizes_min": null,
-            "sizes_max": null
+            "petTypes": [],
+            "sizesMin": null,
+            "sizesMax": null
     },
     {
             "name": "Piero Angela PetSitter",
             "type": "pet sitter",
             "city": "Roma",
-            "pet_types": [],
-            "sizes_min": null,
-            "sizes_max": null
+            "petTypes": [],
+            "sizesMin": null,
+            "sizesMax": null
     },
     {
             "name": "Gesu cristo",
             "type": "pet sitter",
             "city": "Roma",
-            "pet_types": [],
-            "sizes_min": null,
-            "sizes_max": null
+            "petTypes": [],
+            "sizesMin": null,
+            "sizesMax": null
     },
     {
         "name": "PetSitterTM",
         "type": "pet sitter",
         "city": "Frosinone",
-        "pet_types": [
+        "petTypes": [
             "scoiattolo",
             "pesce",
             "ragno",
             "serpente"
         ],
-        "sizes_min": null,
-        "sizes_max": null
+        "sizesMin": null,
+        "sizesMax": null
     }
 ]);

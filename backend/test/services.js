@@ -47,7 +47,7 @@ describe("/services/ Test Suite", function(){
 
         get_keys_test(
             () => '/services/',
-            () => ['name', 'type', 'city', 'pet_types', 'sizes_min', 'sizes_max'],
+            () => ['name', 'type', 'city', 'petTypes', 'sizesMin', 'sizesMax'],
             null,
             '',
         )

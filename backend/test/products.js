@@ -54,8 +54,8 @@ describe("/products/ Test Suite", function(){
                 "price",
                 "name",
                 "categories",
-                "pet_types",
-                "in_store",
+                "petTypes",
+                "inStore",
             ],
             null,
             "GET /products/")
@@ -149,8 +149,8 @@ describe("/products/ Test Suite", function(){
                 "price",
                 "name",
                 "categories",
-                "pet_types",
-                "in_store",
+                "petTypes",
+                "inStore",
             ],
             null,
             "GET /products/"
@@ -187,14 +187,14 @@ describe("/products/ Test Suite", function(){
             'post',
             () => ('Bearer ' + params.user_token),
             () => ('Bearer ' + params.admin_token),
-            { in_store: 666 }
+            { inStore: 666 }
         );
 
         semantic_tests.post_semantics_test(
             () => ('/products/id/' + new_data.products[1].id),
             () => ('/products/id/' + new_data.products[1].id),
             () => ('Bearer ' + params.admin_token),
-            [{ in_store: 5 }, { in_store: 666 }]
+            [{ inStore: 5 }, { inStore: 666 }]
         )
     });
 

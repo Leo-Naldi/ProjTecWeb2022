@@ -9,10 +9,10 @@ db.products.insertMany([
             "giocattoli",
             "accessori"
         ],
-        "pet_types": [
+        "petTypes": [
             "cane"
         ],
-        "in_store": 100,
+        "inStore": 100,
     },
     {
         "img": "https://source.unsplash.com/random",
@@ -22,11 +22,11 @@ db.products.insertMany([
             "giocattoli",
             "accessori"
         ],
-        "pet_types": [
+        "petTypes": [
             "cane",
             "gatto"
         ],
-        in_store: 10,
+        "inStore": 10,
     },
     {
         "img": "https://source.unsplash.com/random",
@@ -36,11 +36,11 @@ db.products.insertMany([
             "giocattoli",
             "accessori"
         ],
-        "pet_types": [
+        "petTypes": [
             "cane",
             "gatto"
         ],
-        "in_store": 10,
+        "inStore": 10,
     },
     {
         "img": "https://source.unsplash.com/random",
@@ -50,11 +50,11 @@ db.products.insertMany([
             "giocattoli",
             "accessori"
         ],
-        "pet_types": [
+        "petTypes": [
             "cane",
             "gatto"
         ],
-        "in_store": 10,
+        "inStore": 10,
     },
     {
         "img": "https://source.unsplash.com/random",
@@ -63,11 +63,11 @@ db.products.insertMany([
         "categories": [
             "cibo"
         ],
-        "pet_types": [
+        "petTypes": [
             "cane",
             "orrore lovecraftiano"
         ],
-        "in_store": 10
+        "inStore": 10
     },
     {
         "img": "https://source.unsplash.com/random",
@@ -77,7 +77,7 @@ db.products.insertMany([
             "cibo",
             "armi di distruzione di massa"
         ],
-        "pet_types": [],
-        in_store: 10,
+        "petTypes": [],
+        "inStore": 10,
     }
 ]);

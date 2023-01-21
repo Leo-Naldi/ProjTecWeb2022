@@ -28,10 +28,6 @@ const make_user = async (req, res, type) => {
     if (!(req.body.username) || !(req.body.email) || !(req.body.password))
         return res.sendStatus(409)
 
-    //console.log(req.body)
-
-    //console.log("returning1")
-
     const inserted = await tecweb_db_create("users", {
         username: username,
         email: email,

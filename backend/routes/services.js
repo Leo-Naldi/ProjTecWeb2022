@@ -77,7 +77,6 @@ servicesRouter.post('/id/:id', passport.authenticate('jwt-admin', { session: fal
         if ((updated.modifiedCount == 0) && (updated.matchedCount > 0))
             return res.sendStatus(500);
         else if (((updated.modifiedCount == 0) && (updated.matchedCount == 0))) {
-            console.log("tuamadre")
             return res.sendStatus(409);
         } else
             return res.json({ ...update, id: req.params.id });
@@ -106,31 +105,19 @@ servicesRouter.get('/query/', async (req, res) => {
     let query = new Object();
     let sizes = [];
 
-    console.log(req.query)
-
     if (cities.indexOf(req.query.city) != -1) query.city = req.query.city;
 
-    console.log(1);
-
     if (service_types.indexOf(req.query.type) != -1) query.type = req.query.type;
-
-    console.log(2);
 
     // provider whos min size is equal or lesser than the given one
     if (pet_sizes.indexOf(req.query.min_size) != -1) {
         query.sizes_min = { '$or': pet_sizes.slice(0, pet_sizes.indexOf(req.query.min_size) + 1) + [null] }
     }
 
-
-    console.log(3);
-
     // providers whose max size is equal to or greater than the given one
     if (pet_sizes.indexOf(req.query.max_size) != -1) {
         query.sizes_max = { '$or': pet_sizes.slice(pet_sizes.indexOf(req.query.max_size)) + [null]}
     }
-
-    console.log("YOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
-    console.log(query);
 
     if (Object.keys(query).length > 0) {
         res.json(await tecweb_db_read("services", null, query))

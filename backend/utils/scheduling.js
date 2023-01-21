@@ -34,6 +34,67 @@ const db_operations = require('../db/db_operations');
  * 
  */
 
+async function make_appointment(user_id, service_id, from, to) {
+
+    const aggregate_expression = [
+        {
+            '$match': { // find bookings with same uid, sid
+                uid: new ObjectId(user_id),
+                sid: new ObjectId(service_id),
+                '$or': [  // documents whos either from or to falls between from and to
+                    {
+                        from: {
+                            '$and': [
+                                {
+                                    '$gte': {
+                                        '$dateTrunc': {
+                                            date: from,
+                                            unit: 'minute',
+                                        }
+                                    }
+                                },
+                                {
+                                    '$leq': {
+                                        '$dateTrunc': {
+                                            date: to,
+                                            unit: 'minute',
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        to: {
+                            '$and': [
+                                {
+                                    '$gte': {
+                                        '$dateTrunc': {
+                                            date: from,
+                                            unit: 'minute',
+                                        }
+                                    }
+                                },
+                                {
+                                    '$leq': {
+                                        '$dateTrunc': {
+                                            date: to,
+                                            unit: 'minute',
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }      
+        },
+    ];
+    
+
+    
+}
+
 function check_schedule(from, schedule) {
 
     if (schedule.workweek.indexOf(from.day()) === -1) return false;
